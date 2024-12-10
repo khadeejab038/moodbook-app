@@ -45,7 +45,7 @@ class _SignInScreenState extends State<SignInScreen> {
             center: Alignment(-0.5, -0.5),
             radius: 1.8,
             colors: [
-              Color(0xFFF3EAF8),
+              Color(0xFFA551D3),
               Color(0xFFFF92A9),
               Color(0xFFCCEFFF),
             ],
