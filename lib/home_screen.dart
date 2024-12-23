@@ -373,11 +373,12 @@ class AddMoodModal extends StatelessWidget {
           stops: [0.3, 0.8, 1],
         ),
       ),
-      height: MediaQuery.of(context).size.height * 0.9,
+      height: MediaQuery.of(context).size.height,
       width: double.infinity,
       padding: const EdgeInsets.only(top: 20.0),
       child: Column(
         children: [
+          SizedBox(height: 35),
           Row(
             children: [
               SizedBox(width: 20),

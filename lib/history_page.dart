@@ -9,6 +9,7 @@ class HistoryPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false, // Prevent back button
         backgroundColor: Colors.transparent,
         elevation: 0,
         title: PreferredSize(
