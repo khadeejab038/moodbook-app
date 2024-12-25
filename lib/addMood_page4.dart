@@ -2,14 +2,14 @@ import 'package:firebasebackend/home_screen.dart';
 import 'package:flutter/material.dart';
 
 
-class modal4 extends StatefulWidget {
-  const modal4({super.key});
+class AddNotes extends StatefulWidget {
+  const AddNotes({super.key});
 
   @override
-  State<modal4> createState() => _modal4State();
+  State<AddNotes> createState() => _AddNotesState();
 }
 
-class _modal4State extends State<modal4> {
+class _AddNotesState extends State<AddNotes> {
   TextEditingController notesController = TextEditingController();
 
   void showPopupDialog() {
