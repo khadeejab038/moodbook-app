@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'addMood_page2.dart';
 
-class AddMoodModal extends StatelessWidget {
+class AddMood extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -98,7 +98,7 @@ class AddMoodModal extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => const TwoByFour(),
+                  builder: (context) => const AddEmotions(),
                 ),
               );
             },

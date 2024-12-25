@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 
 import 'addMood_page3.dart';
 
-class TwoByFour extends StatefulWidget {
-  const TwoByFour({super.key});
+class AddEmotions extends StatefulWidget {
+  const AddEmotions({super.key});
 
   @override
-  State<TwoByFour> createState() => _TwoByFourState();
+  State<AddEmotions> createState() => _AddEmotionsState();
 }
 
 class EmojiItem {
@@ -17,7 +17,7 @@ class EmojiItem {
   EmojiItem({required this.imagePath, required this.title});
 }
 
-class _TwoByFourState extends State<TwoByFour> {
+class _AddEmotionsState extends State<AddEmotions> {
   final List<EmojiItem> allEmotions = [
     EmojiItem(imagePath: 'lib/assets/neutral-face.png', title: 'Neutral'),
     EmojiItem(imagePath: 'lib/assets/heart-eyes.png', title: 'Heart Eyes'),
@@ -295,7 +295,7 @@ class _TwoByFourState extends State<TwoByFour> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const ReasonSelection(),
+                          builder: (context) => const AddReasons(),
                         ),
                       );
                     },

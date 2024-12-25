@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 
 import 'addMood_page4.dart';
 
-class ReasonSelection extends StatefulWidget {
-  const ReasonSelection({super.key});
+class AddReasons extends StatefulWidget {
+  const AddReasons({super.key});
 
   @override
-  State<ReasonSelection> createState() => _ReasonSelectionState();
+  State<AddReasons> createState() => _AddReasonsState();
 }
 
-class _ReasonSelectionState extends State<ReasonSelection> {
+class _AddReasonsState extends State<AddReasons> {
   final List<String> allReasons = [
     "Work", "Hobbies", "Family", "Breakup", "Weather", "Wife",
     "Party", "Love", "Self esteem", "Sleep", "Social", "Food",
@@ -224,7 +224,7 @@ class _ReasonSelectionState extends State<ReasonSelection> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const modal4(),
+                        builder: (context) => const AddNotes(),
                       ),
                     );
                   },
