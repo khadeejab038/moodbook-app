@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
-import 'addMood_page2.dart';
+import 'package:provider/provider.dart';
+import 'Providers/moodEntry_provider.dart';
 import 'home_screen.dart';
+import 'addMood_page2.dart';
 
 class AddMood extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final moodEntryProvider = Provider.of<MoodEntryProvider>(context);
+
     return Container(
       decoration: const BoxDecoration(
         gradient: RadialGradient(
@@ -51,6 +55,7 @@ class AddMood extends StatelessWidget {
               Spacer(),
               ElevatedButton(
                 onPressed: () {
+                  moodEntryProvider.clear(); // Clear state if user closes
                   Navigator.pushAndRemoveUntil(
                     context,
                     MaterialPageRoute(builder: (context) => HomeScreen()),
@@ -100,6 +105,8 @@ class AddMood extends StatelessWidget {
               minimumSize: const Size(350, 20),
             ),
             onPressed: () {
+              // Example: Save the selected mood
+              moodEntryProvider.setMood("Happy");
               Navigator.push(
                 context,
                 MaterialPageRoute(
