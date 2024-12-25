@@ -1,6 +1,8 @@
-import 'package:firebasebackend/home_screen.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-
+import 'package:provider/provider.dart';
+import 'Providers/moodEntry_provider.dart';
+import 'home_screen.dart';
 
 class AddNotes extends StatefulWidget {
   const AddNotes({super.key});
@@ -12,6 +14,7 @@ class AddNotes extends StatefulWidget {
 class _AddNotesState extends State<AddNotes> {
   TextEditingController notesController = TextEditingController();
 
+  // Show popup dialog after saving
   void showPopupDialog() {
     showDialog(
       context: context,
@@ -27,12 +30,11 @@ class _AddNotesState extends State<AddNotes> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Padding(
-                  padding: const EdgeInsets.only(left:20.0),
+                  padding: const EdgeInsets.only(left: 20.0),
                   child: Image.asset('lib/assets/goodtogo.png'),
                 ),
-
                 const Text(
-                  "You're on a good way!\nYour day is going \n amazing",
+                  "You're on a good way!\nYour day is going \namazing",
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 20,
@@ -48,15 +50,18 @@ class _AddNotesState extends State<AddNotes> {
                 const SizedBox(height: 20),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFF8B4CFC),
+                    backgroundColor: const Color(0xFF8B4CFC),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(40),
                     ),
                     minimumSize: const Size(200, 50),
                   ),
                   onPressed: () {
-                    //Navigator.pop(context); // Close the popup
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => HomeScreen()));
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(builder: (context) => HomeScreen()),
+                          (route) => false,
+                    );
                   },
                   child: const Text(
                     'Got it',
@@ -69,6 +74,33 @@ class _AddNotesState extends State<AddNotes> {
         );
       },
     );
+  }
+
+  // Function to save the mood entry to Firebase
+  Future<void> saveMoodEntryToFirebase() async {
+    final moodProvider = Provider.of<MoodEntryProvider>(context, listen: false);
+    final moodEntry = moodProvider.moodEntry;
+
+    // Add the notes from the controller to the mood entry
+    moodEntry.setNotes = notesController.text;
+
+    // Add the mood entry to Firestore
+    try {
+      await FirebaseFirestore.instance.collection('mood_entries').add({
+        'timestamp': moodEntry.getTimestamp,
+        'mood': moodEntry.getMood,
+        'emotions': moodEntry.getEmotions,
+        'reasons': moodEntry.getReasons,
+        'notes': moodEntry.getNotes,
+      });
+      // Show the popup dialog after saving
+      showPopupDialog();
+    } catch (e) {
+      print('Error saving mood entry: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Error saving mood entry')),
+      );
+    }
   }
 
   @override
@@ -90,7 +122,6 @@ class _AddNotesState extends State<AddNotes> {
           ),
           child: Column(
             children: [
-
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -138,7 +169,6 @@ class _AddNotesState extends State<AddNotes> {
 
               const SizedBox(height: 20),
 
-
               Padding(
                 padding: const EdgeInsets.all(20.0),
                 child: Container(
@@ -168,36 +198,27 @@ class _AddNotesState extends State<AddNotes> {
                 ),
               ),
 
-
               const Spacer(),
 
               Column(
                 children: [
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFF8B4CFC),
+                      backgroundColor: const Color(0xFF8B4CFC),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(40),
                       ),
                       minimumSize: const Size(350, 50),
                     ),
-                    onPressed: showPopupDialog,
+                    onPressed: saveMoodEntryToFirebase, // Save on pressing the button
                     child: const Text(
                       'Save',
                       style: TextStyle(fontSize: 18, color: Colors.white),
                     ),
                   ),
 
-                  const SizedBox(height: 5),
+                  const SizedBox(height: 35),
 
-                  TextButton(
-                    onPressed: showPopupDialog,
-                    child: const Text(
-                      'Skip and Save',
-                      style: TextStyle(fontSize: 16, color: Color(0xFF8B4CFC)),
-                    ),
-                  ),
-                  const SizedBox(height: 30),
                 ],
               ),
             ],

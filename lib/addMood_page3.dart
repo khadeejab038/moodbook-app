@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-
+import 'package:provider/provider.dart';
 import 'addMood_page4.dart';
 import 'home_screen.dart';
+import 'Providers/moodEntry_provider.dart';
 
 class AddReasons extends StatefulWidget {
   const AddReasons({super.key});
@@ -19,11 +20,12 @@ class _AddReasonsState extends State<AddReasons> {
 
   final List<String> recentlyUsed = ["Family", "Self esteem", "Sleep", "Social"];
 
-  Set<String> selectedReasons = {};
   String searchQuery = '';
 
   @override
   Widget build(BuildContext context) {
+    final moodProvider = Provider.of<MoodEntryProvider>(context); // Access the provider
+
     final filteredReasons = allReasons
         .where((reason) => reason.toLowerCase().contains(searchQuery.toLowerCase()))
         .toList();
@@ -124,24 +126,23 @@ class _AddReasonsState extends State<AddReasons> {
               ),
             ),
 
-
             const SizedBox(height: 20),
 
             // Selected Reasons and Clear All Button
-            if (selectedReasons.isNotEmpty)
+            if (moodProvider.selectedReasons.isNotEmpty)
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      "Selected (${selectedReasons.length})",
+                      "Selected (${moodProvider.selectedReasons.length})",
                       style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                     ),
                     TextButton(
                       onPressed: () {
                         setState(() {
-                          selectedReasons.clear();
+                          moodProvider.clearSelectedReasons(); // Use the provider method
                         });
                       },
                       child: const Text(
@@ -153,17 +154,17 @@ class _AddReasonsState extends State<AddReasons> {
                 ),
               ),
 
-            if (selectedReasons.isNotEmpty)
+            if (moodProvider.selectedReasons.isNotEmpty)
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Wrap(
                   spacing: 10,
-                  children: selectedReasons.map((reason) {
+                  children: moodProvider.selectedReasons.map((reason) {
                     return Chip(
                       label: Text(reason),
                       onDeleted: () {
                         setState(() {
-                          selectedReasons.remove(reason);
+                          moodProvider.toggleReason(reason); // Remove reason using provider method
                         });
                       },
                     );
@@ -184,7 +185,7 @@ class _AddReasonsState extends State<AddReasons> {
               child: Wrap(
                 spacing: 10,
                 children: recentlyUsed.map((reason) {
-                  return _reasonChip(reason);
+                  return _reasonChip(reason, moodProvider);
                 }).toList(),
               ),
             ),
@@ -207,7 +208,7 @@ class _AddReasonsState extends State<AddReasons> {
                     spacing: 10,
                     runSpacing: 10,
                     children: filteredReasons.map((reason) {
-                      return _reasonChip(reason);
+                      return _reasonChip(reason, moodProvider);
                     }).toList(),
                   ),
                 ),
@@ -249,15 +250,15 @@ class _AddReasonsState extends State<AddReasons> {
   }
 
   // Custom Chip Widget
-  Widget _reasonChip(String reason) {
-    final isSelected = selectedReasons.contains(reason);
+  Widget _reasonChip(String reason, MoodEntryProvider moodProvider) {
+    final isSelected = moodProvider.selectedReasons.contains(reason);
     return GestureDetector(
       onTap: () {
         setState(() {
           if (isSelected) {
-            selectedReasons.remove(reason);
+            moodProvider.toggleReason(reason); // Remove reason using provider method
           } else {
-            selectedReasons.add(reason);
+            moodProvider.toggleReason(reason); // Add reason using provider method
           }
         });
       },
@@ -267,7 +268,6 @@ class _AddReasonsState extends State<AddReasons> {
             color:  Colors.grey,
             width: 1.5,
           ),
-
           backgroundColor: Colors.transparent,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(50),
@@ -276,9 +276,9 @@ class _AddReasonsState extends State<AddReasons> {
         onPressed: () {
           setState(() {
             if (isSelected) {
-              selectedReasons.remove(reason);
+              moodProvider.toggleReason(reason); // Remove reason using provider method
             } else {
-              selectedReasons.add(reason);
+              moodProvider.toggleReason(reason); // Add reason using provider method
             }
           });
         },
@@ -293,5 +293,4 @@ class _AddReasonsState extends State<AddReasons> {
       ),
     );
   }
-
 }
