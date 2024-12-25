@@ -3,6 +3,7 @@ import 'package:firebasebackend/signin_screen.dart';
 import 'package:firebasebackend/signin_screen.dart';
 import 'package:firebasebackend/snack_bar_helper.dart';
 import 'package:flutter/material.dart';
+import 'addMood_Page1.dart';
 import 'home_screen.dart';
 import 'stats_page.dart';
 import 'history_page.dart';
