@@ -84,8 +84,11 @@ class _AddEmotionsState extends State<AddEmotions> {
                       const SizedBox(width: 100),
                       ElevatedButton(
                         onPressed: () {
-                          Navigator.push(context,
-                              MaterialPageRoute(builder: (context) => HomeScreen()));
+                          Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(builder: (context) => HomeScreen()),
+                                (route) => false,
+                          );
                         },
                         style: ElevatedButton.styleFrom(
                           shape: const CircleBorder(),

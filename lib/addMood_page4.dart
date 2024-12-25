@@ -55,7 +55,7 @@ class _AddNotesState extends State<AddNotes> {
                     minimumSize: const Size(200, 50),
                   ),
                   onPressed: () {
-                    Navigator.pop(context); // Close the popup
+                    //Navigator.pop(context); // Close the popup
                     Navigator.push(context, MaterialPageRoute(builder: (context) => HomeScreen()));
                   },
                   child: const Text(
@@ -104,7 +104,11 @@ class _AddNotesState extends State<AddNotes> {
                   IconButton(
                     icon: const Icon(Icons.close),
                     onPressed: () {
-                      Navigator.pop(context);
+                      Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(builder: (context) => HomeScreen()),
+                            (route) => false,
+                      );
                     },
                   ),
                 ],

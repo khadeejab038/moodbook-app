@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'addMood_page4.dart';
+import 'home_screen.dart';
 
 class AddReasons extends StatefulWidget {
   const AddReasons({super.key});
@@ -62,7 +63,13 @@ class _AddReasonsState extends State<AddReasons> {
                   ),
                   IconButton(
                     icon: const Icon(Icons.close),
-                    onPressed: () => Navigator.pop(context),
+                    onPressed: () {
+                      Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(builder: (context) => HomeScreen()),
+                            (route) => false,
+                      );
+                    },
                   ),
                 ],
               ),

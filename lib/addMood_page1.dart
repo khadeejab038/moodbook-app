@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'addMood_page2.dart';
+import 'home_screen.dart';
 
 class AddMood extends StatelessWidget {
   @override
@@ -50,7 +51,11 @@ class AddMood extends StatelessWidget {
               Spacer(),
               ElevatedButton(
                 onPressed: () {
-                  Navigator.pop(context); // Close the modal sheet
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (context) => HomeScreen()),
+                        (route) => false,
+                  );
                 },
                 child: const Icon(Icons.close, color: Colors.black),
                 style: ElevatedButton.styleFrom(
