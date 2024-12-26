@@ -14,6 +14,16 @@ class AddNotes extends StatefulWidget {
 class _AddNotesState extends State<AddNotes> {
   TextEditingController notesController = TextEditingController();
 
+  @override
+  void initState() {
+    super.initState();
+
+    final moodProvider = Provider.of<MoodEntryProvider>(context, listen: false);
+
+    // Pre-fill the TextField with the saved note if it exists
+    notesController.text = moodProvider.moodEntry.getNotes ?? '';
+  }
+
   // Show popup dialog after saving
   void showPopupDialog() {
     showDialog(
@@ -106,7 +116,6 @@ class _AddNotesState extends State<AddNotes> {
       );
     }
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -132,13 +141,24 @@ class _AddNotesState extends State<AddNotes> {
                   IconButton(
                     icon: const Icon(Icons.arrow_back),
                     onPressed: () {
+                      final moodProvider = Provider.of<MoodEntryProvider>(context, listen: false);
+
+                      // Save the note in the provider
+                      moodProvider.moodEntry.setNotes = notesController.text;
+
+                      // Navigate back
                       Navigator.pop(context);
                     },
                   ),
-                  const Text("4/4", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  const Text(
+                    "4/4",
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
                   IconButton(
                     icon: const Icon(Icons.close),
                     onPressed: () {
+                      final moodProvider = Provider.of<MoodEntryProvider>(context, listen: false);
+                      moodProvider.clear();
                       Navigator.pushAndRemoveUntil(
                         context,
                         MaterialPageRoute(builder: (context) => HomeScreen()),
@@ -148,9 +168,7 @@ class _AddNotesState extends State<AddNotes> {
                   ),
                 ],
               ),
-
               const SizedBox(height: 20),
-
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 20.0),
                 child: Text(
@@ -159,9 +177,7 @@ class _AddNotesState extends State<AddNotes> {
                   textAlign: TextAlign.center,
                 ),
               ),
-
               const SizedBox(height: 20),
-
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 50.0),
                 child: Text(
@@ -170,9 +186,7 @@ class _AddNotesState extends State<AddNotes> {
                   textAlign: TextAlign.center,
                 ),
               ),
-
               const SizedBox(height: 20),
-
               Padding(
                 padding: const EdgeInsets.all(20.0),
                 child: Container(
@@ -201,9 +215,7 @@ class _AddNotesState extends State<AddNotes> {
                   ),
                 ),
               ),
-
               const Spacer(),
-
               Column(
                 children: [
                   ElevatedButton(
@@ -214,15 +226,13 @@ class _AddNotesState extends State<AddNotes> {
                       ),
                       minimumSize: const Size(350, 50),
                     ),
-                    onPressed: saveMoodEntryToFirebase, // Save on pressing the button
+                    onPressed: saveMoodEntryToFirebase,
                     child: const Text(
                       'Save',
                       style: TextStyle(fontSize: 18, color: Colors.white),
                     ),
                   ),
-
                   const SizedBox(height: 35),
-
                 ],
               ),
             ],
@@ -232,3 +242,4 @@ class _AddNotesState extends State<AddNotes> {
     );
   }
 }
+
