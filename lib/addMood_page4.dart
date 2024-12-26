@@ -93,6 +93,10 @@ class _AddNotesState extends State<AddNotes> {
         'reasons': moodEntry.getReasons,
         'notes': moodEntry.getNotes,
       });
+
+      // Clear the provider's data after successful saving
+      moodProvider.clear();
+
       // Show the popup dialog after saving
       showPopupDialog();
     } catch (e) {
