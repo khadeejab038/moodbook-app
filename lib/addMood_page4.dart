@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'Providers/moodEntry_provider.dart';
@@ -91,23 +92,18 @@ class _AddNotesState extends State<AddNotes> {
     final moodProvider = Provider.of<MoodEntryProvider>(context, listen: false);
     final moodEntry = moodProvider.moodEntry;
 
-    // Add the notes from the controller to the mood entry
-    moodEntry.setNotes = notesController.text;
+    // Add the user ID to the mood entry
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      moodEntry.setUserId = user.uid;
+    } else {
+      print('Error: No user logged in');
+      return;
+    }
 
-    // Add the mood entry to Firestore
     try {
-      await FirebaseFirestore.instance.collection('mood_entries').add({
-        'timestamp': moodEntry.getTimestamp,
-        'mood': moodEntry.getMood,
-        'emotions': moodEntry.getEmotions,
-        'reasons': moodEntry.getReasons,
-        'notes': moodEntry.getNotes,
-      });
-
-      // Clear the provider's data after successful saving
+      await FirebaseFirestore.instance.collection('mood_entries').add(moodEntry.toMap());
       moodProvider.clear();
-
-      // Show the popup dialog after saving
       showPopupDialog();
     } catch (e) {
       print('Error saving mood entry: $e');
@@ -116,6 +112,7 @@ class _AddNotesState extends State<AddNotes> {
       );
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

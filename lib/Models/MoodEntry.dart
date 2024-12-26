@@ -1,9 +1,10 @@
 class MoodEntry {
-  DateTime _timestamp; // Combines date and time into a single field
+  DateTime _timestamp;
   String _mood = '';
   List<String> _emotions = [];
   List<String> _reasons = [];
   String? _notes;
+  String? _userId;
 
   // Constructor
   MoodEntry({
@@ -12,11 +13,13 @@ class MoodEntry {
     List<String>? emotions,
     List<String>? reasons,
     String? notes,
+    String? userId,
   })  : _timestamp = timestamp,
         _mood = mood,
         _emotions = emotions ?? [],
         _reasons = reasons ?? [],
-        _notes = notes;
+        _notes = notes,
+        _userId = userId;
 
   // Getters
   DateTime get getTimestamp => _timestamp;
@@ -24,6 +27,7 @@ class MoodEntry {
   List<String> get getEmotions => _emotions;
   List<String> get getReasons => _reasons;
   String? get getNotes => _notes;
+  String? get getUserId => _userId;
 
   // Setters
   set setTimestamp(DateTime timestamp) => _timestamp = timestamp;
@@ -31,6 +35,7 @@ class MoodEntry {
   set setEmotions(List<String> emotions) => _emotions = emotions;
   set setReasons(List<String> reasons) => _reasons = reasons;
   set setNotes(String? notes) => _notes = notes;
+  set setUserId(String? userId) => _userId = userId;
 
   // Methods for adding/removing emotions
   void addEmotion(String emotion) {
@@ -53,11 +58,12 @@ class MoodEntry {
   // Convert to Firestore-compatible Map
   Map<String, dynamic> toMap() {
     return {
-      'timestamp': _timestamp.toIso8601String(), // Ensure compatibility
+      'timestamp': _timestamp.toIso8601String(),
       'mood': _mood,
       'emotions': _emotions,
       'reasons': _reasons,
       'notes': _notes,
+      'userId': _userId,
     };
   }
 
@@ -69,6 +75,7 @@ class MoodEntry {
       emotions: List<String>.from(map['emotions'] ?? []),
       reasons: List<String>.from(map['reasons'] ?? []),
       notes: map['notes'],
+      userId: map['userId'],
     );
   }
 }
