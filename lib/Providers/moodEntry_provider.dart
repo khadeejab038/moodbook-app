@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:firebase_auth/firebase_auth.dart';  // Import FirebaseAuth
 import '../Models/MoodEntry.dart';
 
 class MoodEntryProvider extends ChangeNotifier {
@@ -89,21 +90,35 @@ class MoodEntryProvider extends ChangeNotifier {
 
   // Firestore: Add a mood entry
   Future<void> addMoodEntry() async {
-    try {
-      await _collection.add(_moodEntry.toMap());
-      print('Mood entry added successfully.');
-    } catch (e) {
-      print('Failed to add mood entry: $e');
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      // Set the user ID in the mood entry
+      _moodEntry.setUserId = user.uid;
+      try {
+        await _collection.add(_moodEntry.toMap());
+        print('Mood entry added successfully.');
+      } catch (e) {
+        print('Failed to add mood entry: $e');
+      }
+    } else {
+      print('No user logged in.');
     }
   }
 
   // Firestore: Update an existing mood entry by ID
   Future<void> updateMoodEntry(String id) async {
-    try {
-      await _collection.doc(id).update(_moodEntry.toMap());
-      print('Mood entry updated successfully.');
-    } catch (e) {
-      print('Failed to update mood entry: $e');
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      // Set the user ID in the mood entry
+      _moodEntry.setUserId = user.uid;
+      try {
+        await _collection.doc(id).update(_moodEntry.toMap());
+        print('Mood entry updated successfully.');
+      } catch (e) {
+        print('Failed to update mood entry: $e');
+      }
+    } else {
+      print('No user logged in.');
     }
   }
 
@@ -117,15 +132,23 @@ class MoodEntryProvider extends ChangeNotifier {
     }
   }
 
-  // Firestore: Fetch all mood entries
+  // Firestore: Fetch all mood entries for the current user
   Future<List<MoodEntry>> fetchMoodEntries() async {
-    try {
-      final QuerySnapshot snapshot = await _collection.get();
-      return snapshot.docs
-          .map((doc) => MoodEntry.fromMap(doc.data() as Map<String, dynamic>))
-          .toList();
-    } catch (e) {
-      print('Failed to fetch mood entries: $e');
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      try {
+        final QuerySnapshot snapshot = await _collection
+            .where('userId', isEqualTo: user.uid) // Filter by user ID
+            .get();
+        return snapshot.docs
+            .map((doc) => MoodEntry.fromMap(doc.data() as Map<String, dynamic>))
+            .toList();
+      } catch (e) {
+        print('Failed to fetch mood entries: $e');
+        return [];
+      }
+    } else {
+      print('No user logged in.');
       return [];
     }
   }
