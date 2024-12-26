@@ -11,6 +11,8 @@ class AddMood extends StatefulWidget {
 
 class _AddMoodState extends State<AddMood> {
   DateTime? selectedDateTime;
+  final List<String> emojis = ['😡', '😞', '😐', '😊', '😍'];
+  int selectedEmojiIndex = 2; // Default to the middle emoji
 
   @override
   void initState() {
@@ -143,14 +145,49 @@ class _AddMoodState extends State<AddMood> {
               textAlign: TextAlign.center,
             ),
           ),
-          const SizedBox(height: 180),
-          SizedBox(
-            width: double.infinity,
-            height: 100,
-            child: Stack(
-              children: [
-                Image.asset('lib/assets/emojibar-def.png'),
-              ],
+          const SizedBox(height: 30),
+          Container(
+            height: 120,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: emojis.length,
+              itemBuilder: (context, index) {
+                final isSelected = selectedEmojiIndex == index;
+
+                return GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      selectedEmojiIndex = index;
+                    });
+                  },
+                  child: AnimatedContainer(
+                    duration: Duration(milliseconds: 300),
+                    margin: EdgeInsets.symmetric(horizontal: 8),
+                    width: isSelected ? 80 : 60,
+                    height: isSelected ? 80 : 60,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                      boxShadow: isSelected
+                          ? [
+                        BoxShadow(
+                          color: Colors.black26,
+                          blurRadius: 10,
+                          offset: Offset(0, 4),
+                        )
+                      ]
+                          : [],
+                    ),
+                    child: Text(
+                      emojis[index],
+                      style: TextStyle(
+                        fontSize: isSelected ? 40 : 30,
+                      ),
+                    ),
+                  ),
+                );
+              },
             ),
           ),
           const SizedBox(height: 200),
@@ -165,7 +202,7 @@ class _AddMoodState extends State<AddMood> {
             ),
             onPressed: () {
               // Example: Save the selected mood and timestamp
-              moodEntryProvider.setMood("Happy");
+              moodEntryProvider.setMood(emojis[selectedEmojiIndex]);
               moodEntryProvider.setTimestamp(selectedDateTime!); // Save timestamp
               Navigator.push(
                 context,
