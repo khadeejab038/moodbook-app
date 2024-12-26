@@ -4,7 +4,64 @@ import 'Providers/moodEntry_provider.dart';
 import 'home_screen.dart';
 import 'addMood_page2.dart';
 
-class AddMood extends StatelessWidget {
+class AddMood extends StatefulWidget {
+  @override
+  _AddMoodState createState() => _AddMoodState();
+}
+
+class _AddMoodState extends State<AddMood> {
+  DateTime? selectedDateTime;
+
+  @override
+  void initState() {
+    super.initState();
+    // Set default date and time to now
+    selectedDateTime = DateTime.now();
+  }
+
+  Future<void> _selectDateAndTime(BuildContext context) async {
+    // Select date
+    final DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: selectedDateTime ?? DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime.now(), // Restrict to current or past dates
+    );
+
+    if (pickedDate != null) {
+      // Select time
+      final TimeOfDay? pickedTime = await showTimePicker(
+        context: context,
+        initialTime: TimeOfDay.fromDateTime(selectedDateTime ?? DateTime.now()),
+      );
+
+      if (pickedTime != null) {
+        // Combine the selected date and time
+        final DateTime combinedDateTime = DateTime(
+          pickedDate.year,
+          pickedDate.month,
+          pickedDate.day,
+          pickedTime.hour,
+          pickedTime.minute,
+        );
+
+        if (combinedDateTime.isAfter(DateTime.now())) {
+          // Show an error if the selected time is in the future
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text("Future dates and times are not allowed."),
+              duration: const Duration(seconds: 2),
+            ),
+          );
+        } else {
+          setState(() {
+            selectedDateTime = combinedDateTime; // Update the selected timestamp
+          });
+        }
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final moodEntryProvider = Provider.of<MoodEntryProvider>(context);
@@ -27,32 +84,34 @@ class AddMood extends StatelessWidget {
       padding: const EdgeInsets.only(top: 20.0),
       child: Column(
         children: [
-          SizedBox(height: 35),
+          const SizedBox(height: 35),
           Row(
             children: [
-              SizedBox(width: 20),
+              const SizedBox(width: 20),
               ElevatedButton(
-                onPressed: () {
-                  // Calendar button action
-                },
+                onPressed: () => _selectDateAndTime(context), // Open date and time picker
                 style: ElevatedButton.styleFrom(
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30.0),
                   ),
-                  padding:
-                  const EdgeInsets.symmetric(horizontal: 20.0, vertical: 15.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 15.0),
                 ),
                 child: Row(
                   children: [
-                    Text('Sun, 4 Jun', style: TextStyle(fontFamily: 'Pangram')),
-                    SizedBox(width: 10),
-                    Icon(Icons.calendar_month_outlined),
+                    Text(
+                      selectedDateTime != null
+                          ? "${selectedDateTime!.day}/${selectedDateTime!.month}/${selectedDateTime!.year}, ${selectedDateTime!.hour}:${selectedDateTime!.minute.toString().padLeft(2, '0')}"
+                          : "Select Date & Time",
+                      style: const TextStyle(fontFamily: 'Pangram'),
+                    ),
+                    const SizedBox(width: 10),
+                    const Icon(Icons.calendar_month_outlined),
                   ],
                 ),
               ),
-              SizedBox(width: 40),
-              Text("1/4", style: TextStyle(fontFamily: 'Pangram')),
-              Spacer(),
+              const SizedBox(width: 40),
+              const Text("1/4", style: TextStyle(fontFamily: 'Pangram')),
+              const Spacer(),
               ElevatedButton(
                 onPressed: () {
                   moodEntryProvider.clear(); // Clear state if user closes
@@ -70,13 +129,13 @@ class AddMood extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: 30),
-          Text(
+          const SizedBox(height: 30),
+          const Text(
             "What's your mood right now?",
             style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, fontFamily: 'Pangram'),
           ),
-          SizedBox(height: 30),
-          SizedBox(
+          const SizedBox(height: 30),
+          const SizedBox(
             width: 280,
             child: Text(
               "Select mood that reflects the most how you are feeling at this moment.",
@@ -84,7 +143,7 @@ class AddMood extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
           ),
-          SizedBox(height: 180),
+          const SizedBox(height: 180),
           SizedBox(
             width: double.infinity,
             height: 100,
@@ -94,10 +153,10 @@ class AddMood extends StatelessWidget {
               ],
             ),
           ),
-          SizedBox(height: 200),
+          const SizedBox(height: 200),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: Color(0xFF8B4CFC),
+              backgroundColor: const Color(0xFF8B4CFC),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(40),
               ),
@@ -105,8 +164,9 @@ class AddMood extends StatelessWidget {
               minimumSize: const Size(350, 20),
             ),
             onPressed: () {
-              // Example: Save the selected mood
+              // Example: Save the selected mood and timestamp
               moodEntryProvider.setMood("Happy");
+              moodEntryProvider.setTimestamp(selectedDateTime!); // Save timestamp
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -114,7 +174,7 @@ class AddMood extends StatelessWidget {
                 ),
               );
             },
-            child: Text("Continue", style: TextStyle(color: Colors.white, fontFamily: 'Pangram')),
+            child: const Text("Continue", style: TextStyle(color: Colors.white, fontFamily: 'Pangram')),
           ),
         ],
       ),
