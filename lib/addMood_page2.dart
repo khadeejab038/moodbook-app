@@ -46,7 +46,8 @@ class _AddEmotionsState extends State<AddEmotions> {
 
   @override
   Widget build(BuildContext context) {
-    final moodProvider = Provider.of<MoodEntryProvider>(context); // Access the provider
+    final moodProvider = Provider.of<MoodEntryProvider>(context);
+    final currentMood = moodProvider.moodEntry.getMood;
 
     // Filtered emotions list based on the search query
     final filteredEmotions = allEmotions
@@ -106,10 +107,10 @@ class _AddEmotionsState extends State<AddEmotions> {
 
                     const SizedBox(height: 30),
 
-                    const Padding(
+                    Padding(
                       padding: EdgeInsets.all(8.0),
                       child: Text(
-                        "Choose the emotions that make you feel neutral",
+                        "Choose the emotions that make you feel $currentMood",
                         style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                         textAlign: TextAlign.center,
                       ),
