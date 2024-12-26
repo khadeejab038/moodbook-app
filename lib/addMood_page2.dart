@@ -148,7 +148,6 @@ class _AddEmotionsState extends State<AddEmotions> {
                 const SizedBox(height: 10),
 
                 if (moodProvider.selectedEmotions.isNotEmpty) ...[
-
                   const Padding(
                     padding: EdgeInsets.only(right: 200),
                     child: Text(
@@ -156,7 +155,7 @@ class _AddEmotionsState extends State<AddEmotions> {
                       style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                   ),
-                  SizedBox(height: 20,),
+                  const SizedBox(height: 20),
 
                   Wrap(
                     spacing: 12.0,
@@ -180,10 +179,15 @@ class _AddEmotionsState extends State<AddEmotions> {
                           ],
                         ),
                         backgroundColor: Colors.purple[200],
+                        deleteIcon: const Icon(Icons.close, size: 16, color: Colors.black),
+                        onDeleted: () {
+                          moodProvider.toggleEmotion(emotionTitle); // Deselect the emotion
+                        },
                       );
                     }).toList(),
                   ),
                 ],
+
 
                 SizedBox(height: 20,),
 
