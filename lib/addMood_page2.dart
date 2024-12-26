@@ -284,12 +284,24 @@ class _AddEmotionsState extends State<AddEmotions> {
                     minimumSize: const Size(350, 10),
                   ),
                   onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const AddReasons(),
-                      ),
-                    );
+                    if (moodProvider.selectedEmotions.isEmpty) {
+                      // Show a SnackBar if no emotion is selected
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Please select at least one emotion before continuing.'),
+                          backgroundColor: Colors.red,
+                          duration: Duration(seconds: 2),
+                        ),
+                      );
+                    } else {
+                      // Proceed to the next screen if validation passes
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const AddReasons(),
+                        ),
+                      );
+                    }
                   },
                   child: const Text(
                     'Continue',

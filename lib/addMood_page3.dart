@@ -229,12 +229,24 @@ class _AddReasonsState extends State<AddReasons> {
                     ),
                   ),
                   onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const AddNotes(),
-                      ),
-                    );
+                    if (moodProvider.selectedReasons.isEmpty) {
+                      // Show a SnackBar if no reason is selected
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Please select at least one reason before continuing.'),
+                          backgroundColor: Colors.red,
+                          duration: Duration(seconds: 2),
+                        ),
+                      );
+                    } else {
+                      // Proceed to the next screen if validation passes
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const AddNotes(),
+                        ),
+                      );
+                    }
                   },
                   child: const Text(
                     "Continue",
