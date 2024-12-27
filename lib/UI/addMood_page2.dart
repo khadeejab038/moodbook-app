@@ -25,6 +25,9 @@ class _AddEmotionsState extends State<AddEmotions> {
         .where((emotion) => emotion.title.toLowerCase().contains(searchQuery.toLowerCase()))
         .toList();
 
+    // Determine whether to show the "Recently Used" section based on search query
+    final showRecentlyUsed = searchQuery.isEmpty;
+
     return Scaffold(
       body: SafeArea(
         child: Stack(
@@ -79,7 +82,7 @@ class _AddEmotionsState extends State<AddEmotions> {
                     const SizedBox(height: 30),
 
                     Padding(
-                      padding: EdgeInsets.all(8.0),
+                      padding: const EdgeInsets.all(8.0),
                       child: Text(
                         "Choose the emotions that make you feel $currentMood",
                         style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
@@ -123,11 +126,12 @@ class _AddEmotionsState extends State<AddEmotions> {
 
                     const SizedBox(height: 10),
 
+                    // Display Selected Emotions Section (above Recently Used)
                     if (moodProvider.selectedEmotions.isNotEmpty) ...[
                       const Padding(
-                        padding: EdgeInsets.only(right: 200),
+                        padding: EdgeInsets.symmetric(horizontal: 20),
                         child: Text(
-                          "Selected Emotions:",
+                          "Selected:",
                           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                         ),
                       ),
@@ -136,7 +140,6 @@ class _AddEmotionsState extends State<AddEmotions> {
                       Wrap(
                         spacing: 12.0,
                         children: moodProvider.selectedEmotions.map((emotionTitle) {
-                          // Find the corresponding emoji item by title
                           final emojiItem = allEmotions.firstWhere((item) => item.title == emotionTitle);
                           return Chip(
                             label: Row(
@@ -164,6 +167,51 @@ class _AddEmotionsState extends State<AddEmotions> {
                       ),
                     ],
 
+                    const SizedBox(height: 20),
+
+                    // Display Recently Used Emotions if no search query
+                    if (showRecentlyUsed && moodProvider.recentlyUsedEmotions.isNotEmpty) ...[
+                      const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 20),
+                        child: Text(
+                          "Recently Used:",
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+
+                      Wrap(
+                        spacing: 12.0,
+                        children: moodProvider.recentlyUsedEmotions.map((emotionTitle) {
+                          final emojiItem = allEmotions.firstWhere((item) => item.title == emotionTitle);
+                          return GestureDetector(
+                            onTap: () {
+                              moodProvider.toggleEmotion(emotionTitle); // Select the emotion
+                            },
+                            child: CircleAvatar(
+                              backgroundColor: Colors.purple[100],
+                              radius: 40,
+                              child: Image.asset(
+                                emojiItem.imagePath,
+                                width: 35,
+                                height: 35,
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ],
+
+                    const SizedBox(height: 20),
+
+                    // Display All Emotions Section
+                    const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 20),
+                      child: Text(
+                        "All Emotions:",
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                    ),
                     const SizedBox(height: 20),
 
                     Wrap(
