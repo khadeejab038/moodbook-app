@@ -2,6 +2,7 @@ import 'package:provider/provider.dart';
 import 'package:firebasebackend/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'Providers/moodEntry_provider.dart';
+import 'Utils/emoji_data.dart';
 import 'addMood_page3.dart';
 
 class AddEmotions extends StatefulWidget {
@@ -11,37 +12,7 @@ class AddEmotions extends StatefulWidget {
   State<AddEmotions> createState() => _AddEmotionsState();
 }
 
-class EmojiItem {
-  final String imagePath;
-  final String title;
-
-  EmojiItem({required this.imagePath, required this.title});
-}
-
 class _AddEmotionsState extends State<AddEmotions> {
-  final List<EmojiItem> allEmotions = [
-    EmojiItem(imagePath: 'lib/assets/neutral-face.png', title: 'Neutral'),
-    EmojiItem(imagePath: 'lib/assets/heart-eyes.png', title: 'Heart Eyes'),
-    EmojiItem(imagePath: 'lib/assets/angry.png', title: 'Angry'),
-    EmojiItem(imagePath: 'lib/assets/confused.png', title: 'Confused'),
-    EmojiItem(imagePath: 'lib/assets/disappointed.png', title: 'Disappointed'),
-    EmojiItem(imagePath: 'lib/assets/fear.png', title: 'Fear'),
-    EmojiItem(imagePath: 'lib/assets/grin.png', title: 'Grin'),
-    EmojiItem(imagePath: 'lib/assets/horns.png', title: 'Horns'),
-    EmojiItem(imagePath: 'lib/assets/lol.png', title: 'LOL'),
-    EmojiItem(imagePath: 'lib/assets/loved.png', title: 'Loved'),
-    EmojiItem(imagePath: 'lib/assets/shock.png', title: 'Shock'),
-    EmojiItem(imagePath: 'lib/assets/smile.png', title: 'Smile'),
-    EmojiItem(imagePath: 'lib/assets/spicy.png', title: 'Spicy'),
-    EmojiItem(imagePath: 'lib/assets/starryeyes.png', title: 'Starry Eyes'),
-    EmojiItem(imagePath: 'lib/assets/steam.png', title: 'Steam'),
-    EmojiItem(imagePath: 'lib/assets/sweat.png', title: 'Sweat'),
-    EmojiItem(imagePath: 'lib/assets/vomit.png', title: 'Vomit'),
-    EmojiItem(imagePath: 'lib/assets/welcoming.png', title: 'Welcoming'),
-    EmojiItem(imagePath: 'lib/assets/wink.png', title: 'Wink'),
-    EmojiItem(imagePath: 'lib/assets/woozy.png', title: 'Woozy'),
-  ];
-
   String searchQuery = ''; // Search query to filter emotions
 
   @override
