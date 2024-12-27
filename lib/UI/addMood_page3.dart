@@ -18,8 +18,6 @@ class _AddReasonsState extends State<AddReasons> {
     "Distant", "Content", "Exams"
   ];
 
-  final List<String> recentlyUsed = ["Family", "Self esteem", "Sleep", "Social"];
-
   String searchQuery = '';
 
   @override
@@ -116,7 +114,7 @@ class _AddReasonsState extends State<AddReasons> {
                           });
                         },
                         decoration: InputDecoration(
-                          hintText: "Search & add reasons",
+                          hintText: "Search reasons",
                           prefixIcon: const Icon(Icons.search),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(25),
@@ -192,7 +190,7 @@ class _AddReasonsState extends State<AddReasons> {
                       padding: const EdgeInsets.symmetric(horizontal: 20),
                       child: Wrap(
                         spacing: 10,
-                        children: recentlyUsed.map((reason) {
+                        children: moodProvider.recentlyUsedReasons.map((reason) {
                           return _reasonChip(reason, moodProvider);
                         }).toList(),
                       ),

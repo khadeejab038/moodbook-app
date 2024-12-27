@@ -11,6 +11,9 @@ class MoodEntryProvider extends ChangeNotifier {
     notes: null,
   );
 
+  List<String> _recentlyUsedEmotions = [];
+  List<String> _recentlyUsedReasons = [];
+
   final CollectionReference _collection =
   FirebaseFirestore.instance.collection('mood_entries');
 
@@ -22,6 +25,12 @@ class MoodEntryProvider extends ChangeNotifier {
 
   // Get the list of selected reasons
   List<String> get selectedReasons => _moodEntry.getReasons;
+
+  // Get the list of recently used reasons
+  List<String> get recentlyUsedReasons => _recentlyUsedReasons;
+
+  // Get the list of recently used emotions
+  List<String> get recentlyUsedEmotions => _recentlyUsedEmotions;
 
   // Setters to update data
   void setTimestamp(DateTime timestamp) {
@@ -55,6 +64,7 @@ class MoodEntryProvider extends ChangeNotifier {
       _moodEntry.removeEmotion(emotion);
     } else {
       _moodEntry.addEmotion(emotion);
+      _updateRecentlyUsedEmotions(emotion); // Update recently used emotions when added
     }
     notifyListeners();
   }
@@ -65,9 +75,40 @@ class MoodEntryProvider extends ChangeNotifier {
       _moodEntry.removeReason(reason);
     } else {
       _moodEntry.addReason(reason);
+      _updateRecentlyUsedReasons(reason);
+
     }
     notifyListeners();
   }
+
+  // Method to update recently used emotions
+  void _updateRecentlyUsedEmotions(String emotion) {
+    // Add the emotion to the beginning of the list
+    if (!_recentlyUsedEmotions.contains(emotion)) {
+      _recentlyUsedEmotions.insert(0, emotion);
+    }
+
+    // Keep only the last 8 emotions
+    if (_recentlyUsedEmotions.length > 8) {
+      _recentlyUsedEmotions.removeLast();
+    }
+  }
+
+  // Add a reason to the recently used list, keeping the list limited to the most recent 8
+  void _updateRecentlyUsedReasons(String reason) {
+    if (_recentlyUsedReasons.contains(reason)) {
+      _recentlyUsedReasons.remove(reason);
+    }
+    _recentlyUsedReasons.insert(0, reason); // Add to the front of the list
+
+    // Ensure the list only contains the last 8 items
+    if (_recentlyUsedReasons.length > 8) {
+      _recentlyUsedReasons.removeLast();
+    }
+    notifyListeners();
+  }
+
+
 
   // Clear all selected reasons
   void clearSelectedReasons() {
@@ -86,5 +127,5 @@ class MoodEntryProvider extends ChangeNotifier {
     );
     notifyListeners();
   }
-
 }
+
