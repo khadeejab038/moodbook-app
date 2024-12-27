@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'addMood_page4.dart';
 import 'home_screen.dart';
-import 'Providers/moodEntry_provider.dart';
+import '../Providers/moodEntry_provider.dart';
 
 class AddReasons extends StatefulWidget {
   const AddReasons({super.key});

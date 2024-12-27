@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'Providers/moodEntry_provider.dart';
+import '../Providers/moodEntry_provider.dart';
 import 'home_screen.dart';
 import 'addMood_page2.dart';
 

@@ -1,7 +1,7 @@
-import '../Services/database_services.dart';
+import '../../Services/database_services.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'Providers/moodEntry_provider.dart';
+import '../Providers/moodEntry_provider.dart';
 import 'addMood_page5_popup.dart';
 import 'home_screen.dart';
 
