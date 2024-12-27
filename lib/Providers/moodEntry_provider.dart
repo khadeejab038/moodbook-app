@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
-import '../Models/MoodEntry.dart';
+import '../Models/mood_entry.dart';
 
 class MoodEntryProvider extends ChangeNotifier {
   MoodEntry _moodEntry = MoodEntry(

@@ -1,6 +1,6 @@
-import 'addMood_Page1.dart';
-import 'Widgets/bottom_nav_bar.dart';
+import '../Widgets/bottom_nav_bar.dart';
 import 'package:flutter/material.dart';
+import 'addMood_page1.dart';
 
 class HomeScreen extends StatelessWidget {
   @override
