@@ -1,5 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import '../Services/database_services.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'Providers/moodEntry_provider.dart';
@@ -26,38 +25,13 @@ class _AddNotesState extends State<AddNotes> {
     notesController.text = moodProvider.moodEntry.getNotes ?? '';
   }
 
-// Show popup dialog
+  // Show popup dialog
   void showPopupDialog() {
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) => const AddMoodPopup(),
     );
-  }
-
-  // Function to save the mood entry to Firebase
-  Future<void> saveMoodEntryToFirebase() async {
-    final moodProvider = Provider.of<MoodEntryProvider>(context, listen: false);
-    final moodEntry = moodProvider.moodEntry;
-    final user = FirebaseAuth.instance.currentUser;
-
-    if (user != null) {
-      moodEntry.setUserId = user.uid;
-    } else {
-      print('Error: No user logged in');
-      return;
-    }
-
-    try {
-      await FirebaseFirestore.instance.collection('mood_entries').add(moodEntry.toMap());
-      moodProvider.clear();
-      showPopupDialog();
-    } catch (e) {
-      print('Error saving mood entry: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Error saving mood entry')),
-      );
-    }
   }
 
   @override
@@ -116,7 +90,7 @@ class _AddNotesState extends State<AddNotes> {
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 20.0),
                 child: Text(
-                  "Any thing you want to add",
+                  "Anything you want to add",
                   style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                   textAlign: TextAlign.center,
                 ),
@@ -141,7 +115,7 @@ class _AddNotesState extends State<AddNotes> {
                       BoxShadow(
                         color: Colors.black12,
                         blurRadius: 40,
-                      )
+                      ),
                     ],
                   ),
                   child: TextField(
@@ -170,7 +144,26 @@ class _AddNotesState extends State<AddNotes> {
                       ),
                       minimumSize: const Size(350, 50),
                     ),
-                    onPressed: saveMoodEntryToFirebase,
+                    onPressed: () async {
+                      final moodProvider = Provider.of<MoodEntryProvider>(context, listen: false);
+                      final moodEntry = moodProvider.moodEntry;
+
+                      // Update notes in the MoodEntry object
+                      moodEntry.setNotes = notesController.text;
+
+                      try {
+                        // Call the static method from DatabaseServices to save the entry
+                        await DatabaseServices.saveMoodEntryToFirebase(moodEntry);
+
+                        moodProvider.clear(); // Clear the provider state
+                        showPopupDialog();    // Show success popup
+                      } catch (e) {
+                        print('Error: $e');
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Error saving mood entry')),
+                        );
+                      }
+                    },
                     child: const Text(
                       'Save',
                       style: TextStyle(fontSize: 18, color: Colors.white),
@@ -186,4 +179,3 @@ class _AddNotesState extends State<AddNotes> {
     );
   }
 }
-
