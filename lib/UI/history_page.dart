@@ -113,7 +113,7 @@ class HistoryPage extends StatelessWidget {
                     height: 32.0,
                     fit: BoxFit.contain,
                   ),
-                  timestamp: DateFormat('hh:mm a').format((entry['timestamp'] as Timestamp).toDate()),
+                  timestamp: DateFormat('dd/MM/yyyy hh:mm a').format((entry['timestamp'] as Timestamp).toDate()),
                   feelings: entry['emotions']?.join(', ') ?? 'No emotions',
                   reason: entry['reasons']?.join(', ') ?? 'No reason',
                   note: entry['notes'] ?? 'No note',
