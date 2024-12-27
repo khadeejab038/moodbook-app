@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'bottom_nav_bar.dart';
+import 'Widgets/bottom_nav_bar.dart';
 
 class StatsPage extends StatelessWidget {
   @override
