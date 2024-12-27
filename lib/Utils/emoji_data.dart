@@ -22,3 +22,11 @@ final List<EmojiItem> allEmotions = [
   EmojiItem(imagePath: 'lib/assets/wink.png', title: 'Wink'),
   EmojiItem(imagePath: 'lib/assets/woozy.png', title: 'Woozy'),
 ];
+
+final List<EmojiItem> moods = [
+  EmojiItem(imagePath: 'lib/assets/angry.png', title: 'Terrible'),
+  EmojiItem(imagePath: 'lib/assets/disappointed.png', title: 'Bad'),
+  EmojiItem(imagePath: 'lib/assets/neutral-face.png', title: 'Neutral'),
+  EmojiItem(imagePath: 'lib/assets/halo.png', title: 'Good'),
+  EmojiItem(imagePath: 'lib/assets/heart-eyes.png', title: 'Excellent'),
+];

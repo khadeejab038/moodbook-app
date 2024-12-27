@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../Providers/moodEntry_provider.dart';
+import '../Utils/emoji_data.dart';
 import 'home_screen.dart';
 import 'addMood_page2.dart';
 
@@ -11,8 +12,7 @@ class AddMood extends StatefulWidget {
 
 class _AddMoodState extends State<AddMood> {
   DateTime? selectedDateTime;
-  final List<String> emojis = ['😡', '😞', '😐', '😊', '😍'];
-  int selectedEmojiIndex = 2; // Default to the middle emoji
+  int selectedEmojiIndex = 2; // Default to the middle emoji (Neutral)
 
   @override
   void initState() {
@@ -150,7 +150,7 @@ class _AddMoodState extends State<AddMood> {
             height: 120,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
-              itemCount: emojis.length,
+              itemCount: moods.length, // Using the 'moods' list from emoji_data.dart
               itemBuilder: (context, index) {
                 final isSelected = selectedEmojiIndex == index;
 
@@ -179,11 +179,10 @@ class _AddMoodState extends State<AddMood> {
                       ]
                           : [],
                     ),
-                    child: Text(
-                      emojis[index],
-                      style: TextStyle(
-                        fontSize: isSelected ? 40 : 30,
-                      ),
+                    child: Image.asset(
+                      moods[index].imagePath,  // Displaying the image based on selected mood
+                      width: isSelected ? 40 : 30, // Adjust image size based on selection
+                      height: isSelected ? 40 : 30,
                     ),
                   ),
                 );
@@ -201,8 +200,8 @@ class _AddMoodState extends State<AddMood> {
               minimumSize: const Size(350, 20),
             ),
             onPressed: () {
-              // Example: Save the selected mood and timestamp
-              moodEntryProvider.setMood(emojis[selectedEmojiIndex]);
+              // Save the selected mood and timestamp
+              moodEntryProvider.setMood(moods[selectedEmojiIndex].title);  // Using title of selected mood
               moodEntryProvider.setTimestamp(selectedDateTime!); // Save timestamp
               Navigator.push(
                 context,
