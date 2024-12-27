@@ -1,73 +1,36 @@
-import 'package:firebasebackend/home_screen.dart';
+import '../Services/database_services.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'Providers/moodEntry_provider.dart';
+import 'addMood_page5_popup.dart';
+import 'home_screen.dart';
 
-
-class modal4 extends StatefulWidget {
-  const modal4({super.key});
+class AddNotes extends StatefulWidget {
+  const AddNotes({super.key});
 
   @override
-  State<modal4> createState() => _modal4State();
+  State<AddNotes> createState() => _AddNotesState();
 }
 
-class _modal4State extends State<modal4> {
+class _AddNotesState extends State<AddNotes> {
   TextEditingController notesController = TextEditingController();
 
+  @override
+  void initState() {
+    super.initState();
+
+    final moodProvider = Provider.of<MoodEntryProvider>(context, listen: false);
+
+    // Pre-fill the TextField with the saved note if it exists
+    notesController.text = moodProvider.moodEntry.getNotes ?? '';
+  }
+
+  // Show popup dialog
   void showPopupDialog() {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) {
-        return Dialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(30.0),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(left:20.0),
-                  child: Image.asset('lib/assets/goodtogo.png'),
-                ),
-
-                const Text(
-                  "You're on a good way!\nYour day is going \n amazing",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 10),
-                const Text(
-                  "Keep tracking your mood to know how to improve your mental health.",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 14, color: Colors.grey),
-                ),
-                const SizedBox(height: 20),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFF8B4CFC),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(40),
-                    ),
-                    minimumSize: const Size(200, 50),
-                  ),
-                  onPressed: () {
-                    Navigator.pop(context); // Close the popup
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => HomeScreen()));
-                  },
-                  child: const Text(
-                    'Got it',
-                    style: TextStyle(fontSize: 18, color: Colors.white),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
+      builder: (context) => const AddMoodPopup(),
     );
   }
 
@@ -90,39 +53,49 @@ class _modal4State extends State<modal4> {
           ),
           child: Column(
             children: [
-
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   IconButton(
                     icon: const Icon(Icons.arrow_back),
                     onPressed: () {
+                      final moodProvider = Provider.of<MoodEntryProvider>(context, listen: false);
+
+                      // Save the note in the provider
+                      moodProvider.moodEntry.setNotes = notesController.text;
+
+                      // Navigate back
                       Navigator.pop(context);
                     },
                   ),
-                  const Text("4/4", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  const Text(
+                    "4/4",
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
                   IconButton(
                     icon: const Icon(Icons.close),
                     onPressed: () {
-                      Navigator.pop(context);
+                      final moodProvider = Provider.of<MoodEntryProvider>(context, listen: false);
+                      moodProvider.clear();
+                      Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(builder: (context) => HomeScreen()),
+                            (route) => false,
+                      );
                     },
                   ),
                 ],
               ),
-
               const SizedBox(height: 20),
-
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 20.0),
                 child: Text(
-                  "Any thing you want to add",
+                  "Anything you want to add",
                   style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                   textAlign: TextAlign.center,
                 ),
               ),
-
               const SizedBox(height: 20),
-
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 50.0),
                 child: Text(
@@ -131,10 +104,7 @@ class _modal4State extends State<modal4> {
                   textAlign: TextAlign.center,
                 ),
               ),
-
               const SizedBox(height: 20),
-
-
               Padding(
                 padding: const EdgeInsets.all(20.0),
                 child: Container(
@@ -145,7 +115,7 @@ class _modal4State extends State<modal4> {
                       BoxShadow(
                         color: Colors.black12,
                         blurRadius: 40,
-                      )
+                      ),
                     ],
                   ),
                   child: TextField(
@@ -163,37 +133,43 @@ class _modal4State extends State<modal4> {
                   ),
                 ),
               ),
-
-
               const Spacer(),
-
               Column(
                 children: [
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFF8B4CFC),
+                      backgroundColor: const Color(0xFF8B4CFC),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(40),
                       ),
                       minimumSize: const Size(350, 50),
                     ),
-                    onPressed: showPopupDialog,
+                    onPressed: () async {
+                      final moodProvider = Provider.of<MoodEntryProvider>(context, listen: false);
+                      final moodEntry = moodProvider.moodEntry;
+
+                      // Update notes in the MoodEntry object
+                      moodEntry.setNotes = notesController.text;
+
+                      try {
+                        // Call the static method from DatabaseServices to save the entry
+                        await DatabaseServices.saveMoodEntryToFirebase(moodEntry);
+
+                        moodProvider.clear(); // Clear the provider state
+                        showPopupDialog();    // Show success popup
+                      } catch (e) {
+                        print('Error: $e');
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Error saving mood entry')),
+                        );
+                      }
+                    },
                     child: const Text(
                       'Save',
                       style: TextStyle(fontSize: 18, color: Colors.white),
                     ),
                   ),
-
-                  const SizedBox(height: 5),
-
-                  TextButton(
-                    onPressed: showPopupDialog,
-                    child: const Text(
-                      'Skip and Save',
-                      style: TextStyle(fontSize: 16, color: Color(0xFF8B4CFC)),
-                    ),
-                  ),
-                  const SizedBox(height: 30),
+                  const SizedBox(height: 35),
                 ],
               ),
             ],
