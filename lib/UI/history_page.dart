@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../Widgets/bottom_nav_bar.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-
-import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import '../Models/emoji_item.dart';
+import '../Utils/emoji_data.dart';
 import '../Widgets/bottom_nav_bar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -102,10 +98,21 @@ class HistoryPage extends StatelessWidget {
               itemCount: moodEntries.length,
               itemBuilder: (context, index) {
                 final entry = moodEntries[index];
+
+                // Find the matching mood or default to Neutral
+                final emojiItem = moods.firstWhere(
+                      (moodItem) => moodItem.title.toLowerCase() == (entry['mood']?.toLowerCase() ?? 'neutral'),
+                  orElse: () => EmojiItem(imagePath: 'lib/assets/neutral-face.png', title: 'Neutral'),
+                );
+
                 return HistoryTile(
                   mood: entry['mood'] ?? 'No mood',
-                  emoji: '😊', // Default neutral emoji as placeholder
-                  // Check if the timestamp is a Firestore Timestamp and convert it
+                  emoji: Image.asset(
+                    emojiItem.imagePath, // Use the image path for the Image.asset widget
+                    width: 32.0, // Set the desired emoji size
+                    height: 32.0,
+                    fit: BoxFit.contain,
+                  ),
                   timestamp: DateFormat('hh:mm a').format((entry['timestamp'] as Timestamp).toDate()),
                   feelings: entry['emotions']?.join(', ') ?? 'No emotions',
                   reason: entry['reasons']?.join(', ') ?? 'No reason',
@@ -114,6 +121,7 @@ class HistoryPage extends StatelessWidget {
                 );
               },
             );
+
           },
         ),
       ),
@@ -124,16 +132,16 @@ class HistoryPage extends StatelessWidget {
 
 class HistoryTile extends StatefulWidget {
   final String mood;
-  final String emoji;
   final String timestamp;
   final String feelings;
   final String reason;
   final String note;
   final String entryId;
+  final Widget emoji; // Accept emoji as a Widget instead of String
 
   HistoryTile({
     required this.mood,
-    required this.emoji,
+    required this.emoji, // Updated type
     required this.timestamp,
     required this.feelings,
     required this.reason,
@@ -152,7 +160,6 @@ class _HistoryTileState extends State<HistoryTile> {
   void _deleteEntry() async {
     try {
       await FirebaseFirestore.instance.collection('mood_entries').doc(widget.entryId).delete();
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Entry deleted')));
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error deleting entry: $e')));
     }
@@ -160,15 +167,18 @@ class _HistoryTileState extends State<HistoryTile> {
 
   // Method to edit the entry (placeholder, implement functionality later)
   void _editEntry() {
-    // Implement your edit functionality here
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Edit feature is under development')));
   }
 
   @override
   Widget build(BuildContext context) {
-    String displayedNote =
-    widget.note.split('\n')[0]; // Show only the first line initially
-    if (_isNoteExpanded && widget.note.split('\n').length > 1) {
+    String displayedNote = widget.note.length > 20
+        ? widget.note.substring(0, 20) // Display first 20 characters
+        : widget.note; // If note is less than or equal to 20 characters, display full note
+
+    bool showReadMore = widget.note.length > 20; // Only show Read more if note > 20 characters
+
+    if (_isNoteExpanded && widget.note.length > 20) {
       displayedNote = widget.note; // Show the full note if expanded
     }
 
@@ -185,10 +195,7 @@ class _HistoryTileState extends State<HistoryTile> {
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Text(
-                widget.emoji,
-                style: TextStyle(fontSize: 32, fontFamily: 'Pangram'),
-              ),
+              widget.emoji, // Display the emoji image
               SizedBox(width: 8),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -249,17 +256,19 @@ class _HistoryTileState extends State<HistoryTile> {
             style: TextStyle(
                 fontSize: 14, color: Colors.grey, fontFamily: 'Pangram'),
           ),
-          TextButton(
-            onPressed: () {
-              setState(() {
-                _isNoteExpanded = !_isNoteExpanded;
-              });
-            },
-            child: Text(_isNoteExpanded ? '- Read less' : '+ Read more',
-                style: TextStyle(fontFamily: 'Pangram')),
-          ),
+          if (showReadMore) // Only show Read more if note length > 20
+            TextButton(
+              onPressed: () {
+                setState(() {
+                  _isNoteExpanded = !_isNoteExpanded;
+                });
+              },
+              child: Text(_isNoteExpanded ? '- Read less' : '+ Read more',
+                  style: TextStyle(fontFamily: 'Pangram')),
+            ),
         ],
       ),
     );
   }
 }
+

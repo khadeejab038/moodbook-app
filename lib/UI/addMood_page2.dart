@@ -18,7 +18,7 @@ class _AddEmotionsState extends State<AddEmotions> {
   @override
   Widget build(BuildContext context) {
     final moodProvider = Provider.of<MoodEntryProvider>(context);
-    final currentMood = moodProvider.moodEntry.getMood;
+    final currentMood = moodProvider.moodEntry.getMood.toLowerCase();
 
     // Filtered emotions list based on the search query
     final filteredEmotions = allEmotions
