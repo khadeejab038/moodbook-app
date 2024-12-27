@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebasebackend/signup_screen.dart';
+import 'package:firebasebackend/UI/signup_screen.dart';
 import 'package:flutter/material.dart';
-import 'Utils/snack_bar_helper.dart';
+import '../Utils/snack_bar_helper.dart';
 import 'forgot_password_screen.dart';
 import 'home_screen.dart';
 
