@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class MoodEntry {
   DateTime _timestamp;
   String _mood = '';
@@ -14,7 +16,8 @@ class MoodEntry {
     List<String>? reasons,
     String? notes,
     String? userId,
-  })  : _timestamp = timestamp,
+  })
+      : _timestamp = timestamp,
         _mood = mood,
         _emotions = emotions ?? [],
         _reasons = reasons ?? [],
@@ -23,18 +26,28 @@ class MoodEntry {
 
   // Getters
   DateTime get getTimestamp => _timestamp;
+
   String get getMood => _mood;
+
   List<String> get getEmotions => _emotions;
+
   List<String> get getReasons => _reasons;
+
   String? get getNotes => _notes;
+
   String? get getUserId => _userId;
 
   // Setters
   set setTimestamp(DateTime timestamp) => _timestamp = timestamp;
+
   set setMood(String mood) => _mood = mood;
+
   set setEmotions(List<String> emotions) => _emotions = emotions;
+
   set setReasons(List<String> reasons) => _reasons = reasons;
+
   set setNotes(String? notes) => _notes = notes;
+
   set setUserId(String? userId) => _userId = userId;
 
   // Methods for adding/removing emotions
@@ -58,7 +71,8 @@ class MoodEntry {
   // Convert to Firestore-compatible Map
   Map<String, dynamic> toMap() {
     return {
-      'timestamp': _timestamp.toIso8601String(),
+      'timestamp': Timestamp.fromDate(_timestamp),
+      // Convert DateTime to Firestore Timestamp
       'mood': _mood,
       'emotions': _emotions,
       'reasons': _reasons,
@@ -70,7 +84,7 @@ class MoodEntry {
   // Create from Firestore Map
   factory MoodEntry.fromMap(Map<String, dynamic> map) {
     return MoodEntry(
-      timestamp: DateTime.parse(map['timestamp']),
+      timestamp: (map['timestamp'] as Timestamp).toDate(),
       mood: map['mood'] ?? '',
       emotions: List<String>.from(map['emotions'] ?? []),
       reasons: List<String>.from(map['reasons'] ?? []),
