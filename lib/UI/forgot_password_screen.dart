@@ -146,7 +146,7 @@
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'Utils/snack_bar_helper.dart';
+import '../Utils/snack_bar_helper.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   @override
