@@ -25,12 +25,12 @@ class _AddNotesState extends State<AddNotes> {
     notesController.text = moodProvider.moodEntry.getNotes ?? '';
   }
 
-  // Show popup dialog
-  void showPopupDialog() {
+  // Show popup dialog with mood-specific message
+  void showPopupDialog(String mood) {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => const AddMoodPopup(),
+      builder: (context) => AddMoodPopup(mood: mood),
     );
   }
 
@@ -156,7 +156,7 @@ class _AddNotesState extends State<AddNotes> {
                         await DatabaseServices.saveMoodEntryToFirebase(moodEntry);
 
                         moodProvider.clear(); // Clear the provider state
-                        showPopupDialog();    // Show success popup
+                        showPopupDialog(moodEntry.getMood);    // Show success popup with mood-specific message
                       } catch (e) {
                         print('Error: $e');
                         ScaffoldMessenger.of(context).showSnackBar(
