@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'bottom_nav_bar.dart';
+import 'Widgets/bottom_nav_bar.dart';
 
 class HistoryPage extends StatelessWidget {
   @override

@@ -1,8 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebasebackend/signin_screen.dart';
-import 'package:firebasebackend/snack_bar_helper.dart';
 import 'package:flutter/material.dart';
-import 'bottom_nav_bar.dart';
+import 'Utils/snack_bar_helper.dart';
+import 'Widgets/bottom_nav_bar.dart';
 
 class SettingsPage extends StatelessWidget {
   @override

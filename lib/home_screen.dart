@@ -1,5 +1,5 @@
 import 'addMood_Page1.dart';
-import 'bottom_nav_bar.dart';
+import 'Widgets/bottom_nav_bar.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatelessWidget {
