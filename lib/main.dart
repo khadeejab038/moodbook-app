@@ -16,8 +16,6 @@ class MyApp extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (context) => MoodEntryProvider(),
       child: MaterialApp(
-        title: 'Flutter Firebase Auth',
-        theme: ThemeData(primarySwatch: Colors.blue),
         home: SignInScreen(),
       ),
     );

@@ -1,4 +1,4 @@
-import '../Models/EmojiItem.dart';
+import '../Models/emoji_item.dart';
 
 final List<EmojiItem> allEmotions = [
   EmojiItem(imagePath: 'lib/assets/neutral-face.png', title: 'Neutral'),
