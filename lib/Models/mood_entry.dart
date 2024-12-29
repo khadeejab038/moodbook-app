@@ -76,7 +76,7 @@ class MoodEntry {
       'mood': _mood,
       'emotions': _emotions,
       'reasons': _reasons,
-      'notes': _notes,
+      'notes': _notes ?? '',
       'userId': _userId,
     };
   }
@@ -88,7 +88,7 @@ class MoodEntry {
       mood: map['mood'] ?? '',
       emotions: List<String>.from(map['emotions'] ?? []),
       reasons: List<String>.from(map['reasons'] ?? []),
-      notes: map['notes'],
+      notes: map['notes'] ?? '',
       userId: map['userId'],
     );
   }

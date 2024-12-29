@@ -6,6 +6,8 @@ import '../Widgets/bottom_nav_bar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import 'editMood_popup.dart';
+
 class HistoryPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -166,9 +168,32 @@ class _HistoryTileState extends State<HistoryTile> {
   }
 
   // Method to edit the entry (placeholder, implement functionality later)
-  void _editEntry() {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Edit feature is under development')));
+  void _editEntry() async {
+    try {
+
+      // Fetch the mood entry from Firestore
+      DocumentSnapshot document = await FirebaseFirestore.instance
+          .collection('mood_entries')
+          .doc(widget.entryId)
+          .get();
+
+      // Check if the document exists
+      if (document.exists) {
+
+        // Show the edit popup
+        showEditMoodPopup(context, document);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Mood entry not found')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error fetching entry: $e')),
+      );
+    }
   }
+
 
   @override
   Widget build(BuildContext context) {
