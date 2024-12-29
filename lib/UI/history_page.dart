@@ -197,13 +197,13 @@ class _HistoryTileState extends State<HistoryTile> {
 
   @override
   Widget build(BuildContext context) {
-    String displayedNote = widget.note.length > 20
-        ? widget.note.substring(0, 20) // Display first 20 characters
+    String displayedNote = widget.note.length > 40
+        ? widget.note.substring(0, 40) // Display first 20 characters
         : widget.note; // If note is less than or equal to 20 characters, display full note
 
-    bool showReadMore = widget.note.length > 20; // Only show Read more if note > 20 characters
+    bool showReadMore = widget.note.length > 40; // Only show Read more if note > 20 characters
 
-    if (_isNoteExpanded && widget.note.length > 20) {
+    if (_isNoteExpanded && widget.note.length > 40) {
       displayedNote = widget.note; // Show the full note if expanded
     }
 
