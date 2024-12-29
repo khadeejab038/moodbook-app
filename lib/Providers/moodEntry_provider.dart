@@ -8,7 +8,7 @@ class MoodEntryProvider extends ChangeNotifier {
     mood: '',
     emotions: [],
     reasons: [],
-    notes: null,
+    notes: '',
   );
 
   List<String> _recentlyUsedEmotions = [];
@@ -54,7 +54,7 @@ class MoodEntryProvider extends ChangeNotifier {
   }
 
   void setNotes(String? notes) {
-    _moodEntry.setNotes = notes;
+    _moodEntry.setNotes = notes ?? '';
     notifyListeners();
   }
 

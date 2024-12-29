@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../Providers/moodEntry_provider.dart';
 import '../Utils/emoji_data.dart';
+import '../Widgets/date_time_picker.dart';
 import 'home_screen.dart';
 import 'addMood_page2.dart';
 
@@ -19,49 +20,6 @@ class _AddMoodState extends State<AddMood> {
     super.initState();
     // Set default date and time to now
     selectedDateTime = DateTime.now();
-  }
-
-  Future<void> _selectDateAndTime(BuildContext context) async {
-    // Select date
-    final DateTime? pickedDate = await showDatePicker(
-      context: context,
-      initialDate: selectedDateTime ?? DateTime.now(),
-      firstDate: DateTime(2000),
-      lastDate: DateTime.now(), // Restrict to current or past dates
-    );
-
-    if (pickedDate != null) {
-      // Select time
-      final TimeOfDay? pickedTime = await showTimePicker(
-        context: context,
-        initialTime: TimeOfDay.fromDateTime(selectedDateTime ?? DateTime.now()),
-      );
-
-      if (pickedTime != null) {
-        // Combine the selected date and time
-        final DateTime combinedDateTime = DateTime(
-          pickedDate.year,
-          pickedDate.month,
-          pickedDate.day,
-          pickedTime.hour,
-          pickedTime.minute,
-        );
-
-        if (combinedDateTime.isAfter(DateTime.now())) {
-          // Show an error if the selected time is in the future
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: const Text("Future dates and times are not allowed."),
-              duration: const Duration(seconds: 2),
-            ),
-          );
-        } else {
-          setState(() {
-            selectedDateTime = combinedDateTime; // Update the selected timestamp
-          });
-        }
-      }
-    }
   }
 
   @override
@@ -91,7 +49,15 @@ class _AddMoodState extends State<AddMood> {
             children: [
               const SizedBox(width: 20),
               ElevatedButton(
-                onPressed: () => _selectDateAndTime(context), // Open date and time picker
+                onPressed: () => selectDateAndTime(
+                    context,
+                    selectedDateTime ?? DateTime.now(), // Pass current selectedDateTime or default now
+                        (DateTime newDateTime) { // Callback to update the selected date and time
+                      setState(() {
+                        selectedDateTime = newDateTime;
+                      });
+                    }
+                ),
                 style: ElevatedButton.styleFrom(
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30.0),
