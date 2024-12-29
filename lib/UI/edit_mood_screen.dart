@@ -172,8 +172,10 @@ class _EditMoodScreenState extends State<EditMoodScreen> {
                       onTap: () {
                         setState(() {
                           if (isSelected) {
+                            // Remove the emotion and fix commas
                             selectedEmotions.remove(emotion.title);
                           } else {
+                            // Add the emotion and fix commas
                             selectedEmotions.add(emotion.title);
                           }
                         });
@@ -220,10 +222,12 @@ class _EditMoodScreenState extends State<EditMoodScreen> {
                       onTap: () {
                         setState(() {
                           if (isSelected) {
+                            // Remove the reason and fix commas
                             reasonsController.text = reasonsController.text
-                                .replaceAll(reason, '')
-                                .trim();
+                                .replaceAll(RegExp(',?\\b$reason\\b,?'), '')
+                                .trim(); // Remove leading/trailing spaces and commas
                           } else {
+                            // Add the reason and fix commas
                             reasonsController.text += (reasonsController.text.isEmpty
                                 ? ''
                                 : ', ') + reason;
@@ -235,13 +239,12 @@ class _EditMoodScreenState extends State<EditMoodScreen> {
                         backgroundColor: isSelected
                             ? Colors.purpleAccent[700] // Darker background when selected
                             : Colors.grey[200], // Lighter background when not selected
-
                         deleteIcon: isSelected ? Icon(Icons.close) : null,
                         onDeleted: isSelected
                             ? () {
                           setState(() {
                             reasonsController.text = reasonsController.text
-                                .replaceAll(reason, '')
+                                .replaceAll(RegExp(',?\\b$reason\\b,?'), '')
                                 .trim();
                           });
                         }
