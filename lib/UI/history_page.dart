@@ -6,7 +6,7 @@ import '../Widgets/bottom_nav_bar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-import 'editMood_popup.dart';
+import 'edit_mood_screen.dart';
 
 class HistoryPage extends StatelessWidget {
   @override
@@ -179,14 +179,13 @@ class _HistoryTileState extends State<HistoryTile> {
 
       // Check if the document exists
       if (document.exists) {
-
-        // Show the edit popup
-        showModalBottomSheet(
-          context: context,
-          isScrollControlled: true,
-          builder: (context) => EditMoodPopup(moodEntryDoc: document),
+        // Navigate to the EditMoodScreen
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => EditMoodScreen(moodEntryDoc: document),
+          ),
         );
-
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Mood entry not found')),
