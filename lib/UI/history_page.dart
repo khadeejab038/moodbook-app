@@ -181,7 +181,12 @@ class _HistoryTileState extends State<HistoryTile> {
       if (document.exists) {
 
         // Show the edit popup
-        showEditMoodPopup(context, document);
+        showModalBottomSheet(
+          context: context,
+          isScrollControlled: true,
+          builder: (context) => EditMoodPopup(moodEntryDoc: document),
+        );
+
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Mood entry not found')),
