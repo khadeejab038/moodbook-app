@@ -35,15 +35,15 @@ class MoodChart extends StatelessWidget {
   double _getBarHeight(String mood) {
     switch (mood) {
       case 'Terrible':
-        return 20.0;
-      case 'Bad':
         return 40.0;
-      case 'Neutral':
-        return 60.0;
-      case 'Good':
+      case 'Bad':
         return 80.0;
+      case 'Neutral':
+        return 120.0;
+      case 'Good':
+        return 160.0;
       case 'Excellent':
-        return 100.0;
+        return 190.0;
       default:
         return 0.0;
     }
@@ -111,7 +111,7 @@ class MoodChart extends StatelessWidget {
                               children: [
                                 // The background bar
                                 Container(
-                                  height: 100,
+                                  height: 200,
                                   width: 20,
                                   decoration: BoxDecoration(
                                     color: Colors.grey[200],
