@@ -57,12 +57,6 @@ class HomeScreen extends StatelessWidget {
                         ),
                         Row(
                           children: [
-                            Text(
-                              "Sun, 4 Jun",
-                              style: TextStyle(color: Colors.grey, fontFamily: 'Pangram'),
-                            ),
-                            SizedBox(width: 8),
-                            Icon(Icons.calendar_today, size: 20),
                             SizedBox(width: 16),
                             Icon(Icons.local_fire_department, size: 24, color: Colors.orange),
                             Text(
