@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../Models/emoji_item.dart';
-import '../Utils/emoji_data.dart';
-import '../Widgets/bottom_nav_bar.dart';
+import '../../Models/emoji_item.dart';
+import '../../Utils/emoji_data.dart';
+import '../../Widgets/bottom_nav_bar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 

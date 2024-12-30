@@ -1,8 +1,8 @@
 import 'package:provider/provider.dart';
-import 'package:firebasebackend/UI/home_screen.dart';
+import 'package:firebasebackend/UI/home/home_screen.dart';
 import 'package:flutter/material.dart';
-import '../Providers/moodEntry_provider.dart';
-import '../Utils/emoji_data.dart';
+import '../../Providers/moodEntry_provider.dart';
+import '../../Utils/emoji_data.dart';
 import 'addMood_page3.dart';
 
 class AddEmotions extends StatefulWidget {

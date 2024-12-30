@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../Providers/moodEntry_provider.dart';
-import '../Utils/emoji_data.dart';
-import '../Widgets/date_time_picker.dart';
-import 'home_screen.dart';
+import '../../Providers/moodEntry_provider.dart';
+import '../../Utils/emoji_data.dart';
+import '../../Widgets/date_time_picker.dart';
+import '../home/home_screen.dart';
 import 'addMood_page2.dart';
 
 class AddMood extends StatefulWidget {
