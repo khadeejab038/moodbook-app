@@ -2,59 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../Widgets/bottom_nav_bar.dart';
 import '../addMood/addMood_page1.dart';
+import 'mood_chart.dart';
 
 class HomeScreen extends StatelessWidget {
-  Color _getMoodColor(String mood) {
-    switch (mood) {
-      case 'Terrible':
-        return Colors.red;
-      case 'Bad':
-        return Colors.orange;
-      case 'Neutral':
-        return Colors.yellow;
-      case 'Good':
-        return Colors.lightBlue;
-      case 'Excellent':
-        return Colors.green;
-      default:
-        return Colors.grey;
-    }
-  }
-
-  double _getBarHeight(String mood) {
-    switch (mood) {
-      case 'Terrible':
-        return 20.0;
-      case 'Bad':
-        return 40.0;
-      case 'Neutral':
-        return 60.0;
-      case 'Good':
-        return 80.0;
-      case 'Excellent':
-        return 100.0;
-      default:
-        return 0.0;
-    }
-  }
-
-  String _getMoodEmoji(String mood) {
-    switch (mood) {
-      case 'Terrible':
-        return 'lib/assets/angry.png';
-      case 'Bad':
-        return 'lib/assets/disappointed.png';
-      case 'Neutral':
-        return 'lib/assets/neutral-face.png';
-      case 'Good':
-        return 'lib/assets/halo.png';
-      case 'Excellent':
-        return 'lib/assets/heart-eyes.png';
-      default:
-        return 'lib/assets/neutral-face.png';
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -265,99 +215,7 @@ class HomeScreen extends StatelessWidget {
               ),
               SizedBox(height: 24),
 
-              Expanded(
-                child: StreamBuilder<QuerySnapshot>(
-                  stream: FirebaseFirestore.instance.collection('mood_entries').snapshots(),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Center(child: CircularProgressIndicator());
-                    }
-                    if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                      return Center(child: Text('No mood entries available.'));
-                    }
-
-                    final moodEntries = snapshot.data!.docs;
-
-                    return Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.9),
-                          borderRadius: BorderRadius.circular(12.0),
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              "Mood chart",
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18,
-                                fontFamily: 'Pangram',
-                              ),
-                            ),
-                            SizedBox(height: 16),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: List.generate(
-                                moodEntries.length.clamp(0, 5),
-                                    (index) {
-                                  final mood = moodEntries[index]['mood'];
-                                  final timestamp = moodEntries[index]['timestamp'];
-                                  final time = TimeOfDay.fromDateTime(
-                                    (timestamp as Timestamp).toDate(),
-                                  ).format(context);
-
-                                  return Column(
-                                    children: [
-                                      Image.asset(
-                                        _getMoodEmoji(mood),
-                                        height: 24,
-                                        width: 24,
-                                      ),
-                                      SizedBox(height: 8),
-                                      Stack(
-                                        alignment: Alignment.bottomCenter,
-                                        children: [
-                                          Container(
-                                            height: 100,
-                                            width: 12,
-                                            decoration: BoxDecoration(
-                                              color: Colors.grey[300],
-                                              borderRadius: BorderRadius.circular(6),
-                                            ),
-                                          ),
-                                          Container(
-                                            height: _getBarHeight(mood),
-                                            width: 12,
-                                            decoration: BoxDecoration(
-                                              color: _getMoodColor(mood),
-                                              borderRadius: BorderRadius.circular(6),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      SizedBox(height: 8),
-                                      Text(
-                                        time,
-                                        style: TextStyle(
-                                          color: Colors.grey,
-                                          fontSize: 12,
-                                          fontFamily: 'Pangram',
-                                        ),
-                                      ),
-                                    ],
-                                  );
-                                },
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
+              MoodChart(),
             ],
           ),
         ),
