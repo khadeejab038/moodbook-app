@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../Models/mood_entry.dart';
 import '../Services/database_services.dart';
 import '../Utils/emoji_data.dart';
+import '../Utils/reasons_data.dart';
 import '../Widgets/date_time_picker.dart'; // Import emoji data
 
 class EditMoodScreen extends StatefulWidget {
@@ -21,12 +22,6 @@ class _EditMoodScreenState extends State<EditMoodScreen> {
   late TextEditingController notesController;
   late List<String> selectedEmotions;
   late TextEditingController reasonsController;
-
-  final List<String> allReasons = [
-    "Work", "Hobbies", "Family", "Breakup", "Weather", "Wife",
-    "Party", "Love", "Self esteem", "Sleep", "Social", "Food",
-    "Distant", "Content", "Exams"
-  ];
 
   @override
   void initState() {

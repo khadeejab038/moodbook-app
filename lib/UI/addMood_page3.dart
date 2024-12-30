@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../Utils/reasons_data.dart';
 import 'addMood_page4.dart';
 import 'home_screen.dart';
 import '../Providers/moodEntry_provider.dart';
@@ -12,12 +13,6 @@ class AddReasons extends StatefulWidget {
 }
 
 class _AddReasonsState extends State<AddReasons> {
-  final List<String> allReasons = [
-    "Work", "Hobbies", "Family", "Breakup", "Weather", "Wife",
-    "Party", "Love", "Self esteem", "Sleep", "Social", "Food",
-    "Distant", "Content", "Exams"
-  ];
-
   String searchQuery = '';
 
   @override
