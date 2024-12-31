@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../Services/database_services_mood_entries.dart';
+
 class DataManagement {
   // Static method to handle data export functionality
   static void exportData(BuildContext context) {
@@ -18,10 +20,11 @@ class DataManagement {
           TextButton(
             onPressed: () {
               // Handle export logic here
-              Navigator.of(context).pop();
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(content: Text('Data export started!')),
+
               );
+              Navigator.of(context).pop();
             },
             child: Text('Export'),
           ),
@@ -32,8 +35,7 @@ class DataManagement {
 
   // Static method to clear mood logs
   static void clearMoodLogs(BuildContext context) {
-    // Implement clearing mood logs
-    // Example: Show a confirmation dialog
+    // Show confirmation dialog
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -41,16 +43,21 @@ class DataManagement {
         content: Text('Are you sure you want to clear all mood logs? This action cannot be undone.'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: () => Navigator.of(context).pop(), // Cancel button
             child: Text('Cancel'),
           ),
           TextButton(
-            onPressed: () {
-              // Handle clear mood logs logic here
-              Navigator.of(context).pop();
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Mood logs cleared!')),
-              );
+            onPressed: () async {
+              // Call the method to delete all mood entries for the user
+              try {
+                await DatabaseServices.clearAllMoodEntries();
+                //ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Mood logs cleared!')),);
+                Navigator.of(context).pop(); // Close the dialog
+              } catch (e) {
+                // Handle any errors that occur while deleting mood logs
+                //ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to clear mood logs: $e')),);
+                Navigator.of(context).pop(); // Close the dialog
+              }
             },
             child: Text('Clear'),
           ),
@@ -58,4 +65,5 @@ class DataManagement {
       ),
     );
   }
+
 }
