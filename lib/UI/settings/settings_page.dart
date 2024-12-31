@@ -1,8 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebasebackend/UI/signin_screen.dart';
+import 'package:firebasebackend/UI/editprof.dart';
 import 'package:flutter/material.dart';
-import '../Utils/snack_bar_helper.dart';
-import '../Widgets/bottom_nav_bar.dart';
+
+import '../../Utils/snack_bar_helper.dart';
+import '../../Widgets/bottom_nav_bar.dart';
+import '../userAuthentication/signin_screen.dart';
 
 class SettingsPage extends StatelessWidget {
   @override
@@ -48,7 +50,10 @@ class SettingsPage extends StatelessWidget {
             _buildSettingsTile(
               title: 'Profile Management',
               subtitle: 'Edit name, email, and profile picture',
-              onTap: () => _navigateTo(context, '/profileManagement'),
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => EditProf()),
+              ),
             ),
             _buildSettingsTile(
               title: 'Change Password',

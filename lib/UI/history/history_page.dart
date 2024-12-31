@@ -1,14 +1,38 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../Models/emoji_item.dart';
-import '../Utils/emoji_data.dart';
-import '../Widgets/bottom_nav_bar.dart';
+import '../../Models/emoji_item.dart';
+import '../../Utils/emoji_data.dart';
+import '../../Widgets/bottom_nav_bar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import 'edit_mood_screen.dart';
 
-class HistoryPage extends StatelessWidget {
+class HistoryPage extends StatefulWidget {
+  @override
+  _HistoryPageState createState() => _HistoryPageState();
+}
+
+class _HistoryPageState extends State<HistoryPage> {
+  String _sortingOption = 'newest'; // Default sorting option
+
+  int moodToValue(String mood) {
+    switch (mood.toLowerCase()) {
+      case 'terrible':
+        return 1;
+      case 'bad':
+        return 2;
+      case 'neutral':
+        return 3;
+      case 'good':
+        return 4;
+      case 'excellent':
+        return 5;
+      default:
+        return 3; // Default to neutral if mood is unrecognized
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     // Get the current user's ID
@@ -47,6 +71,34 @@ class HistoryPage extends StatelessWidget {
           ),
         ),
         iconTheme: IconThemeData(color: Color(0xFF100F11)),
+        actions: [
+          PopupMenuButton<String>(
+            icon: Icon(Icons.sort, color: Color(0xFF100F11)),
+            onSelected: (value) {
+              setState(() {
+                _sortingOption = value;
+              });
+            },
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                value: 'newest',
+                child: Text('Newest First', style: TextStyle(fontFamily: 'Pangram')),
+              ),
+              PopupMenuItem(
+                value: 'oldest',
+                child: Text('Oldest First', style: TextStyle(fontFamily: 'Pangram')),
+              ),
+              PopupMenuItem(
+                value: 'best',
+                child: Text('Best First', style: TextStyle(fontFamily: 'Pangram')),
+              ),
+              PopupMenuItem(
+                value: 'worst',
+                child: Text('Worst First', style: TextStyle(fontFamily: 'Pangram')),
+              ),
+            ],
+          ),
+        ],
       ),
       body: Container(
         decoration: BoxDecoration(
@@ -93,7 +145,20 @@ class HistoryPage extends StatelessWidget {
               );
             }
 
-            final moodEntries = snapshot.data!.docs;
+            var moodEntries = snapshot.data!.docs;
+
+            // Sort the entries based on the selected sorting option
+            if (_sortingOption == 'newest') {
+              moodEntries.sort((a, b) => (b['timestamp'] as Timestamp)
+                  .compareTo(a['timestamp'] as Timestamp));
+            } else if (_sortingOption == 'oldest') {
+              moodEntries.sort((a, b) => (a['timestamp'] as Timestamp)
+                  .compareTo(b['timestamp'] as Timestamp));
+            } else if (_sortingOption == 'best') {
+              moodEntries.sort((a, b) => moodToValue(b['mood']).compareTo(moodToValue(a['mood'])));
+            } else if (_sortingOption == 'worst') {
+              moodEntries.sort((a, b) => moodToValue(a['mood']).compareTo(moodToValue(b['mood'])));
+            }
 
             return ListView.builder(
               padding: EdgeInsets.all(16.0),
@@ -123,7 +188,6 @@ class HistoryPage extends StatelessWidget {
                 );
               },
             );
-
           },
         ),
       ),
@@ -170,7 +234,6 @@ class _HistoryTileState extends State<HistoryTile> {
   // Method to edit the entry (placeholder, implement functionality later)
   void _editEntry() async {
     try {
-
       // Fetch the mood entry from Firestore
       DocumentSnapshot document = await FirebaseFirestore.instance
           .collection('mood_entries')
@@ -198,14 +261,13 @@ class _HistoryTileState extends State<HistoryTile> {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     String displayedNote = widget.note.length > 40
-        ? widget.note.substring(0, 40) // Display first 20 characters
-        : widget.note; // If note is less than or equal to 20 characters, display full note
+        ? widget.note.substring(0, 40) // Display first 40 characters
+        : widget.note; // If note is less than or equal to 40 characters, display full note
 
-    bool showReadMore = widget.note.length > 40; // Only show Read more if note > 20 characters
+    bool showReadMore = widget.note.length > 40; // Only show Read more if note > 40 characters
 
     if (_isNoteExpanded && widget.note.length > 40) {
       displayedNote = widget.note; // Show the full note if expanded
@@ -285,7 +347,7 @@ class _HistoryTileState extends State<HistoryTile> {
             style: TextStyle(
                 fontSize: 14, color: Colors.grey, fontFamily: 'Pangram'),
           ),
-          if (showReadMore) // Only show Read more if note length > 20
+          if (showReadMore) // Only show Read more if note length > 40
             TextButton(
               onPressed: () {
                 setState(() {
@@ -300,4 +362,3 @@ class _HistoryTileState extends State<HistoryTile> {
     );
   }
 }
-
