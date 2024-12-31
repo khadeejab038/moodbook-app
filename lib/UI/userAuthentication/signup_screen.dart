@@ -31,6 +31,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           // Create or update the user document in Firestore
           await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
             'name': _nameController.text.trim(),
+            'userId' : user.uid,
             'email': _emailController.text.trim(),
             'createdAt': FieldValue.serverTimestamp(),
           });

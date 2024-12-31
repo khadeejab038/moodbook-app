@@ -1,9 +1,29 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebasebackend/UI/home/mood_chart.dart';
 import '../../Widgets/bottom_nav_bar.dart';
 import 'package:flutter/material.dart';
 import '../addMood/addMood_page1.dart';
 
 class HomeScreen extends StatelessWidget {
+
+  Future<String?> _getUserName() async {
+    User? user = FirebaseAuth.instance.currentUser;
+
+    if (user != null) {
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid) // Using current user's UID
+          .get();
+
+      if (userDoc.exists) {
+        // Return the 'name' field of the document
+        return userDoc['name'];
+      }
+    }
+    return null; // Return null if user is not found or there's an issue
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -25,7 +45,7 @@ class HomeScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Top Section (Greeting and Calendar)
+              // Top Section (Greeting)
               Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
@@ -35,26 +55,34 @@ class HomeScreen extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        RichText(
-                          text: TextSpan(
-                            text: "Hey, ",
-                            style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
-                              fontFamily: 'Pangram', // Apply Pangram font
-                            ),
-                            children: [
-                              TextSpan(
-                                text: "Alexa! 👋",
-                                style: TextStyle(
-                                  color: Color(0xFF8B4CFC),
-                                  fontWeight: FontWeight.bold,
-                                  fontFamily: 'Pangram', // Apply Pangram font
+                        FutureBuilder<String?>(
+                            future: _getUserName(), // Fetch the user name
+                            builder: (context, snapshot) {
+                              String greetingText = "Hey! 👋"; // Default greeting with emoji
+
+                              if (snapshot.connectionState == ConnectionState.done) {
+                                if (snapshot.hasData && snapshot.data != null) {
+                                  // Capitalize the first letter of the first name
+                                  String fullName = snapshot.data!;
+                                  String firstName = fullName.split(' ')[0]; // Get the first name
+                                  firstName = firstName[0].toUpperCase() + firstName.substring(1); // Capitalize the first letter
+
+                                  greetingText = "Hey, $firstName! 👋"; // Display first name if found
+                                }
+                              }
+
+                              return RichText(
+                                text: TextSpan(
+                                  text: greetingText, // Display the correct greeting
+                                  style: TextStyle(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                    fontFamily: 'Pangram',
+                                  ),
                                 ),
-                              ),
-                            ],
-                          ),
+                              );
+                            }
                         ),
                         Row(
                           children: [
