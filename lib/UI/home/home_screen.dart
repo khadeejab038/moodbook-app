@@ -1,6 +1,7 @@
-import '../Widgets/bottom_nav_bar.dart';
+import 'package:firebasebackend/UI/home/mood_chart.dart';
+import '../../Widgets/bottom_nav_bar.dart';
 import 'package:flutter/material.dart';
-import 'addMood_page1.dart';
+import '../addMood/addMood_page1.dart';
 
 class HomeScreen extends StatelessWidget {
   @override
@@ -14,8 +15,8 @@ class HomeScreen extends StatelessWidget {
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                Color(0xFFFFCEB7).withOpacity(0.7),
-                Color(0xBACFFF).withOpacity(0.7),
+                Color(0xFFF8E3D9).withOpacity(0.7),
+                Colors.white,
               ],
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
@@ -30,7 +31,7 @@ class HomeScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    SizedBox(height: 20),
+                    SizedBox(height: 40),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -47,7 +48,7 @@ class HomeScreen extends StatelessWidget {
                               TextSpan(
                                 text: "Alexa! 👋",
                                 style: TextStyle(
-                                  color: Colors.purpleAccent,
+                                  color: Color(0xFF8B4CFC),
                                   fontWeight: FontWeight.bold,
                                   fontFamily: 'Pangram', // Apply Pangram font
                                 ),
@@ -57,15 +58,12 @@ class HomeScreen extends StatelessWidget {
                         ),
                         Row(
                           children: [
-                            Text(
-                              "Sun, 4 Jun",
-                              style: TextStyle(color: Colors.grey, fontFamily: 'Pangram'),
-                            ),
-                            SizedBox(width: 8),
-                            Icon(Icons.calendar_today, size: 20),
                             SizedBox(width: 16),
-                            Icon(Icons.local_fire_department,
-                                size: 24, color: Colors.orange),
+                            Icon(
+                              Icons.local_fire_department,
+                              size: 24,
+                              color: Colors.orange,
+                            ),
                             Text(
                               "5",
                               style: TextStyle(
@@ -78,7 +76,7 @@ class HomeScreen extends StatelessWidget {
                         ),
                       ],
                     ),
-                    SizedBox(height: 24),
+                    SizedBox(height: 30),
                     // Calendar Row
                     SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
@@ -100,9 +98,9 @@ class HomeScreen extends StatelessWidget {
                                 padding: EdgeInsets.all(12.0),
                                 decoration: BoxDecoration(
                                   color: index == 3
-                                      ? Colors.purple[100]
-                                      : Colors.grey[200],
-                                  borderRadius: BorderRadius.circular(12.0),
+                                      ? Color(0xFF8B4CFC)
+                                      : Colors.white70,
+                                  borderRadius: BorderRadius.circular(25.0),
                                 ),
                                 width: 60,
                                 child: Column(
@@ -111,9 +109,10 @@ class HomeScreen extends StatelessWidget {
                                       days[index],
                                       style: TextStyle(
                                         color: index == 3
-                                            ? Colors.purple
+                                            ? Colors.white
                                             : Colors.black,
-                                        fontFamily: 'Pangram', // Apply Pangram font
+                                        fontWeight: FontWeight.w600,
+                                        fontFamily: 'Pangram',
                                       ),
                                     ),
                                     SizedBox(height: 4),
@@ -122,9 +121,9 @@ class HomeScreen extends StatelessWidget {
                                       style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         color: index == 3
-                                            ? Colors.purple
+                                            ? Colors.white
                                             : Colors.black,
-                                        fontFamily: 'Pangram', // Apply Pangram font
+                                        fontFamily: 'Pangram',
                                       ),
                                     ),
                                   ],
@@ -165,123 +164,104 @@ class HomeScreen extends StatelessWidget {
                   ],
                 ),
               ),
-              SizedBox(height: 5),
-              Divider(color: Colors.grey[300]),
-
+              Divider(color: Colors.transparent),
               // Today's Check-in Section
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                padding: const EdgeInsets.symmetric(horizontal: 20.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       "Today's check-in",
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, fontFamily: 'Pangram'),
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Pangram',
+                      ),
                     ),
-                    SizedBox(height: 15),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: [
-                            CircleAvatar(
-                              radius: 24,
-                              backgroundColor: Colors.pink[100],
-                              child: Icon(Icons.check_circle, color: Colors.pink),
-                            ),
-                            SizedBox(width: 8),
-                            Text(
-                              "Check-in",
-                              style: TextStyle(fontWeight: FontWeight.w600, fontFamily: 'Pangram'),
-                            ),
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            Text(
-                              "3/3",
-                              style: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Pangram'),
-                            ),
-                            SizedBox(width: 8),
-                            Icon(Icons.local_fire_department,
-                                color: Colors.orange, size: 24),
-                          ],
-                        ),
-                      ],
+                    SizedBox(height: 20),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20.0,
+                        vertical: 12.0,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.pink[50],
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              CircleAvatar(
+                                radius: 24,
+                                backgroundColor: Colors.pink[100],
+                                child: Icon(
+                                  Icons.check_circle,
+                                  color: Colors.pink,
+                                ),
+                              ),
+                              SizedBox(width: 8),
+                              Text(
+                                "Check-in",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  fontFamily: 'Pangram',
+                                ),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              Text(
+                                "3/3",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                  fontFamily: 'Pangram',
+                                ),
+                              ),
+                              SizedBox(width: 8),
+                              Container(
+                                width: 40,
+                                height: 40,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      Color(0xFFFF8E8E),
+                                      Color(0xFFFF3CBE),
+                                    ],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                  ),
+                                ),
+                                child: Center(
+                                  child: CircleAvatar(
+                                    radius: 16,
+                                    backgroundColor: Colors.pink[50],
+                                    child: Icon(
+                                      Icons.local_fire_department,
+                                      color: Colors.orange,
+                                      size: 20,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
               ),
-              SizedBox(height: 24),
-
+              SizedBox(height: 20),
               // Mood Chart Section
               Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.9),
-                      borderRadius: BorderRadius.circular(12.0),
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          "Mood chart",
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 18, fontFamily: 'Pangram'),
-                        ),
-                        SizedBox(height: 16),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: List.generate(5, (index) {
-                            final emojiImages = [
-                              'lib/assets/smile.png',
-                              'lib/assets/angry.png',
-                              'lib/assets/neutral-face.png',
-                              'lib/assets/disappointed.png',
-                              'lib/assets/angry.png',
-                            ];
-                            final times = [
-                              '10:06',
-                              '12:10',
-                              '14:40',
-                              '18:30',
-                              '20:10',
-                            ];
-
-                            return Column(
-                              children: [
-                                // Replace emojis with image assets
-                                Image.asset(
-                                  emojiImages[index],
-                                  height: 24,
-                                  width: 24,
-                                ),
-                                SizedBox(height: 8),
-                                Container(
-                                  height: 100,
-                                  width: 10,
-                                  color: Colors.purpleAccent,
-                                ),
-                                SizedBox(height: 8),
-                                // Display the corresponding time
-                                Text(
-                                  times[index],
-                                  style: TextStyle(
-                                    color: Colors.grey,
-                                    fontSize: 12,
-                                    fontFamily: 'Pangram', // Apply Pangram font
-                                  ),
-                                ),
-                              ],
-                            );
-                          }),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+                child: MoodChart(),
               ),
             ],
           ),

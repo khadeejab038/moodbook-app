@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import '../Utils/snack_bar_helper.dart';
-import 'home_screen.dart';
+import '../../Utils/snack_bar_helper.dart';
+import '../home/home_screen.dart';
 
 class SignUpScreen extends StatefulWidget {
   @override

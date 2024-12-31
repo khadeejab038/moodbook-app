@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../Providers/moodEntry_provider.dart';
-import '../Utils/emoji_data.dart';
-import '../Widgets/date_time_picker.dart';
-import 'home_screen.dart';
+import '../../Providers/moodEntry_provider.dart';
+import '../../Utils/emoji_data.dart';
+import '../../Widgets/date_time_picker.dart';
+import '../home/home_screen.dart';
 import 'addMood_page2.dart';
 
 class AddMood extends StatefulWidget {
@@ -111,7 +111,7 @@ class _AddMoodState extends State<AddMood> {
               textAlign: TextAlign.center,
             ),
           ),
-          const SizedBox(height: 30),
+          const SizedBox(height: 180),
           Container(
             height: 120,
             child: ListView.builder(
@@ -155,7 +155,7 @@ class _AddMoodState extends State<AddMood> {
               },
             ),
           ),
-          const SizedBox(height: 200),
+          const SizedBox(height: 230),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF8B4CFC),

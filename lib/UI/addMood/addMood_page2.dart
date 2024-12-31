@@ -1,8 +1,8 @@
 import 'package:provider/provider.dart';
-import 'package:firebasebackend/UI/home_screen.dart';
+import 'package:firebasebackend/UI/home/home_screen.dart';
 import 'package:flutter/material.dart';
-import '../Providers/moodEntry_provider.dart';
-import '../Utils/emoji_data.dart';
+import '../../Providers/moodEntry_provider.dart';
+import '../../Utils/emoji_data.dart';
 import 'addMood_page3.dart';
 
 class AddEmotions extends StatefulWidget {
@@ -157,7 +157,14 @@ class _AddEmotionsState extends State<AddEmotions> {
                                 ),
                               ],
                             ),
-                            backgroundColor: Colors.purple[200],
+                            backgroundColor: Colors.purple[100], // Background color of the chip
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8), // Softer rounded corners
+                              side: BorderSide(
+                                color: Colors.purple[300]!, // Light purple border
+                                width: 0.8, // Thin border for a softer look
+                              ),
+                            ),
                             deleteIcon: const Icon(Icons.close, size: 16, color: Colors.black),
                             onDeleted: () {
                               moodProvider.toggleEmotion(emotionTitle); // Deselect the emotion
@@ -165,6 +172,7 @@ class _AddEmotionsState extends State<AddEmotions> {
                           );
                         }).toList(),
                       ),
+
                     ],
 
                     const SizedBox(height: 20),
@@ -189,7 +197,7 @@ class _AddEmotionsState extends State<AddEmotions> {
                               moodProvider.toggleEmotion(emotionTitle); // Select the emotion
                             },
                             child: CircleAvatar(
-                              backgroundColor: Colors.purple[100],
+                              backgroundColor: Colors.grey[300],
                               radius: 40,
                               child: Image.asset(
                                 emojiItem.imagePath,
@@ -287,7 +295,7 @@ class _AddEmotionsState extends State<AddEmotions> {
                   },
                   child: const Text(
                     'Continue',
-                    style: TextStyle(fontSize: 18, color: Colors.white),
+                    style: TextStyle(fontSize: 15, color: Colors.white, fontFamily: 'Pangram'),
                   ),
                 ),
               ),
