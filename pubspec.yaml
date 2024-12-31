@@ -92,6 +92,10 @@ flutter:
     - lib/assets/woozy.png
     - lib/assets/goodtogo.png
     - lib/assets/google.png
+    - lib/assets/home.png
+    - lib/assets/stats.png
+    - lib/assets/settings.png
+    - lib/assets/cal.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
