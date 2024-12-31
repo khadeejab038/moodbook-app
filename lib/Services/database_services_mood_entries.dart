@@ -65,6 +65,33 @@ class DatabaseServices {
     }
   }
 
+  // Clear all mood entries for the current user
+  static Future<void> clearAllMoodEntries() async {
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user != null) {
+      try {
+        // Fetch all mood entries for the current user
+        final snapshot = await _db
+            .collection('mood_entries')
+            .where('userId', isEqualTo: user.uid) // Filter by user ID
+            .get();
+
+        // Delete each mood entry
+        for (var doc in snapshot.docs) {
+          await doc.reference.delete();
+        }
+
+        print('All mood entries deleted successfully.');
+      } catch (e) {
+        throw Exception('Failed to delete all mood entries: $e');
+      }
+    } else {
+      throw Exception('No user logged in');
+    }
+  }
+
+
   // Fetch all mood entries for the current user
   static Future<List<MoodEntry>> fetchMoodEntries() async {
     final user = FirebaseAuth.instance.currentUser;
