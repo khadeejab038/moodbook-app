@@ -64,9 +64,8 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              Color(0xFFF3EAF8),
-              Color(0xFFFF92A9),
-              Color(0xFFCCEFFF),
+              Color(0xAAC7DFFF), // #BACFFF with 67% opacity
+              Color(0xFFFFCEB7), // #FFCEB7 with 100% opacity
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -120,7 +119,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
               icon: Icon(Icons.add),
               label: Text('Add Reminder'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Color(0xFFCCEFFF),
+                backgroundColor: Color(0xFF8B4CFC),
                 foregroundColor: Colors.black,
               ),
               onPressed: _addCheckInReminder,
