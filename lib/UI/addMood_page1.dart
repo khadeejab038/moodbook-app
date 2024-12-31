@@ -111,7 +111,7 @@ class _AddMoodState extends State<AddMood> {
               textAlign: TextAlign.center,
             ),
           ),
-          const SizedBox(height: 30),
+          const SizedBox(height: 180),
           Container(
             height: 120,
             child: ListView.builder(
@@ -155,7 +155,7 @@ class _AddMoodState extends State<AddMood> {
               },
             ),
           ),
-          const SizedBox(height: 200),
+          const SizedBox(height: 230),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF8B4CFC),
