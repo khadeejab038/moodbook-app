@@ -5,7 +5,6 @@ import '../../Models/emoji_item.dart';
 import '../../Utils/emoji_data.dart';
 
 class MoodChart extends StatelessWidget {
-  // Method to get the corresponding emoji for a mood
   String _getMoodEmoji(String mood) {
     final moodItem = moods.firstWhere(
           (emoji) => emoji.title == mood,
@@ -100,7 +99,7 @@ class MoodChart extends StatelessWidget {
                       ),
                     ),
                   ),
-                  SizedBox(height: 60),
+                  SizedBox(height: 80),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: List.generate(
@@ -137,7 +136,7 @@ class MoodChart extends StatelessWidget {
                                     borderRadius: BorderRadius.circular(15),
                                   ),
                                 ),
-                                // The image positioned just above the bar
+                                // The image positioned just above the colored fill bar
                                 Positioned(
                                   bottom: _getBarHeight(mood) - 30,
                                   child: Image.asset(
@@ -172,6 +171,7 @@ class MoodChart extends StatelessWidget {
                       },
                     ),
                   ),
+                  SizedBox(height: 20),
                 ],
               ),
             ),
