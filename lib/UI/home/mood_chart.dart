@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart'; // Import the intl package
@@ -52,11 +53,15 @@ class MoodChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final currentUser = FirebaseAuth.instance.currentUser;
+    final userId = currentUser?.uid;
+
     return Expanded(
       child: StreamBuilder<QuerySnapshot>(
         // Query the mood entries, ordered by timestamp in descending order (latest first)
         stream: FirebaseFirestore.instance
             .collection('mood_entries')
+            .where('userId', isEqualTo: userId)
             .orderBy('timestamp', descending: true) // Fetch latest entries first
             .limit(5) // Limit to the 5 most recent entries
             .snapshots(),
