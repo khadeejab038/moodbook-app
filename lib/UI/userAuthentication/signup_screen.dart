@@ -110,7 +110,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         TextFormField(
                           controller: _nameController,
                           decoration: const InputDecoration(
-                            hintText: 'Enter your Full Name',
+                            hintText: 'Enter your name',
                             hintStyle: TextStyle(
                               fontFamily: 'Pangram',
                               fontWeight: FontWeight.w500,
@@ -119,7 +119,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return 'Please enter your full name';
+                              return 'Please enter your name';
                             }
                             return null;
                           },
@@ -129,7 +129,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         TextFormField(
                           controller: _emailController,
                           decoration: const InputDecoration(
-                            hintText: 'Enter your Email',
+                            hintText: 'Enter your email',
                             hintStyle: TextStyle(
                               fontFamily: 'Pangram',
                               fontWeight: FontWeight.w500,
@@ -148,7 +148,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         TextFormField(
                           controller: _passwordController,
                           decoration: const InputDecoration(
-                            hintText: 'Enter your Password',
+                            hintText: 'Enter your password',
                             hintStyle: TextStyle(
                               fontFamily: 'Pangram',
                               fontWeight: FontWeight.w500,
