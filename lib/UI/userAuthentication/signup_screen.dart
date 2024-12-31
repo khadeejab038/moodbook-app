@@ -1,7 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import '../../Services/database_services_users.dart';
 import '../../Utils/snack_bar_helper.dart';
 import '../home/home_screen.dart';
+
+// Import your custom User model with an alias
+import '../../Models/user.dart' as AppUser;
 
 class SignUpScreen extends StatefulWidget {
   @override
@@ -11,21 +15,44 @@ class SignUpScreen extends StatefulWidget {
 class _SignUpScreenState extends State<SignUpScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _nameController = TextEditingController(); // Added name controller
   final _formKey = GlobalKey<FormState>();
 
+  // Register user and save data to Firestore
   Future<void> _signUp() async {
     if (_formKey.currentState!.validate()) {
       try {
-        await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        // Create user with email and password
+        UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: _emailController.text.trim(),
           password: _passwordController.text.trim(),
         );
-        showSnackBar(context, 'Sign-up successful!', Colors.green);
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => HomeScreen()),
-        );
+
+        // After registration, save the user's name, email, and creation time to Firestore
+        User? user = userCredential.user;
+        if (user != null) {
+          // Create or update the user document in Firestore
+          AppUser.User newUser = AppUser.User( // Use AppUser.User here
+            userID: user.uid,
+            name: _nameController.text.trim(),
+            email: _emailController.text.trim(),
+            createdAt: DateTime.now(), // Use DateTime.now() for createdAt
+          );
+
+          // Use DatabaseServicesUsers to save the user to Firestore
+          await DatabaseServicesUsers.saveUserToFirestore(newUser);
+
+          // Show success message
+          showSnackBar(context, 'Sign-up successful!', Colors.green);
+
+          // Navigate to home screen
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => HomeScreen()),
+          );
+        }
       } on FirebaseAuthException catch (e) {
+        // Handle errors during registration
         showSnackBar(context, e.message ?? 'Sign-up failed', Colors.red);
       }
     }
@@ -54,9 +81,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 backgroundColor: Colors.transparent,
                 elevation: 0,
                 leading: IconButton(
-                  icon: Icon(Icons.arrow_back, color: Colors.white), // White back button
+                  icon: Icon(Icons.arrow_back, color: Colors.white),
                   onPressed: () {
-                    Navigator.pop(context); // Go back to previous screen
+                    Navigator.pop(context);
                   },
                 ),
                 title: Padding(
@@ -86,10 +113,30 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
+                        // Name input field
+                        TextFormField(
+                          controller: _nameController,
+                          decoration: const InputDecoration(
+                            hintText: 'Enter your name',
+                            hintStyle: TextStyle(
+                              fontFamily: 'Pangram',
+                              fontWeight: FontWeight.w500,
+                            ),
+                            prefixIcon: Icon(Icons.person_outline, size: 20),
+                          ),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter your name';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 40),
+                        // Email input field
                         TextFormField(
                           controller: _emailController,
                           decoration: const InputDecoration(
-                            hintText: 'Enter your Email',
+                            hintText: 'Enter your email',
                             hintStyle: TextStyle(
                               fontFamily: 'Pangram',
                               fontWeight: FontWeight.w500,
@@ -104,10 +151,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           },
                         ),
                         const SizedBox(height: 40),
+                        // Password input field
                         TextFormField(
                           controller: _passwordController,
                           decoration: const InputDecoration(
-                            hintText: 'Enter your Password',
+                            hintText: 'Enter your password',
                             hintStyle: TextStyle(
                               fontFamily: 'Pangram',
                               fontWeight: FontWeight.w500,
@@ -123,6 +171,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           },
                         ),
                         const SizedBox(height: 40),
+                        // Sign-up button
                         ElevatedButton(
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Color(0xB2C9FAFB),
@@ -144,6 +193,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           ),
                         ),
                         const SizedBox(height: 20),
+                        // Google sign-in button (placeholder)
                         ElevatedButton(
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Color(0xB2C9FAFB),

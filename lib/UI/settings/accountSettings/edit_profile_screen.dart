@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
-class EditProf extends StatefulWidget {
-  const EditProf({super.key});
+class EditProfile extends StatefulWidget {
+  const EditProfile({super.key});
 
   @override
-  State<EditProf> createState() => _EditProfState();
+  State<EditProfile> createState() => _EditProfileState();
 }
 
-class _EditProfState extends State<EditProf> {
+class _EditProfileState extends State<EditProfile> {
   String name = "";
   String email = "";
 
