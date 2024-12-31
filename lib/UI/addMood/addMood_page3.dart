@@ -129,7 +129,6 @@ class _AddReasonsState extends State<AddReasons> {
 
                     const SizedBox(height: 20),
 
-                    // Selected Reasons and Clear All Button
                     if (moodProvider.selectedReasons.isNotEmpty)
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -146,9 +145,15 @@ class _AddReasonsState extends State<AddReasons> {
                                   moodProvider.clearSelectedReasons(); // Use the provider method
                                 });
                               },
+                              style: TextButton.styleFrom(
+                                // backgroundColor: Colors.[300], // Add background color
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20), // Make the button rounded
+                                ),
+                              ),
                               child: const Text(
                                 "Clear all",
-                                style: TextStyle(color: Colors.blue, fontSize: 14),
+                                style: TextStyle(color: Colors.black, fontSize: 14),
                               ),
                             ),
                           ],
@@ -163,15 +168,21 @@ class _AddReasonsState extends State<AddReasons> {
                           children: moodProvider.selectedReasons.map((reason) {
                             return Chip(
                               label: Text(reason),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20), // Rounded chip edges
+                              ),
                               onDeleted: () {
                                 setState(() {
                                   moodProvider.toggleReason(reason); // Remove reason using provider method
                                 });
                               },
+                              backgroundColor: Colors.grey[200], // Optional: Set background color
+                              labelStyle: const TextStyle(color: Colors.black), // Text color for better contrast
                             );
                           }).toList(),
                         ),
                       ),
+
 
                     // Recently Used Section
                     const Padding(
@@ -278,8 +289,13 @@ class _AddReasonsState extends State<AddReasons> {
             fontWeight: FontWeight.w500,
           ),
         ),
-        backgroundColor: isSelected ? Colors.purple : Colors.grey[300],
+        backgroundColor: isSelected ? Colors.purple[200] : Colors.grey[300],
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20), // Softens the edges
+          side: BorderSide.none, // Removes any outline
+        ),
       ),
     );
   }
+
 }
