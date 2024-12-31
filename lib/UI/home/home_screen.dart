@@ -4,6 +4,7 @@ import 'package:firebasebackend/UI/home/mood_chart.dart';
 import '../../Widgets/bottom_nav_bar.dart';
 import 'package:flutter/material.dart';
 import '../addMood/addMood_page1.dart';
+import 'daily_average_mood.dart';
 
 class HomeScreen extends StatelessWidget {
 
@@ -106,89 +107,7 @@ class HomeScreen extends StatelessWidget {
                     ),
                     SizedBox(height: 30),
                     // Calendar Row
-                    SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Column(
-                        children: [
-                          Row(
-                            children: List.generate(7, (index) {
-                              final days = [
-                                'Thu',
-                                'Fri',
-                                'Sat',
-                                'Sun',
-                                'Mon',
-                                'Tue',
-                                'Wed'
-                              ];
-                              return Container(
-                                margin: EdgeInsets.symmetric(horizontal: 8.0),
-                                padding: EdgeInsets.all(12.0),
-                                decoration: BoxDecoration(
-                                  color: index == 3
-                                      ? Color(0xFF8B4CFC)
-                                      : Colors.white70,
-                                  borderRadius: BorderRadius.circular(25.0),
-                                ),
-                                width: 60,
-                                child: Column(
-                                  children: [
-                                    Text(
-                                      days[index],
-                                      style: TextStyle(
-                                        color: index == 3
-                                            ? Colors.white
-                                            : Colors.black,
-                                        fontWeight: FontWeight.w600,
-                                        fontFamily: 'Pangram',
-                                      ),
-                                    ),
-                                    SizedBox(height: 4),
-                                    Text(
-                                      '${index + 1}',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: index == 3
-                                            ? Colors.white
-                                            : Colors.black,
-                                        fontFamily: 'Pangram',
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            }),
-                          ),
-                          SizedBox(height: 10),
-                          Row(
-                            children: List.generate(7, (index) {
-                              final emojis = [
-                                'lib/assets/smile.png',
-                                'lib/assets/disappointed.png',
-                                'lib/assets/neutral-face.png',
-                                'lib/assets/smile.png',
-                                '', // No image for this slot
-                                '', // No image for this slot
-                                ''
-                              ];
-                              return Container(
-                                margin: EdgeInsets.symmetric(horizontal: 8.0),
-                                width: 60,
-                                child: Center(
-                                  child: emojis[index].isNotEmpty
-                                      ? Image.asset(
-                                    emojis[index],
-                                    height: 24,
-                                    width: 24,
-                                  )
-                                      : SizedBox.shrink(),
-                                ),
-                              );
-                            }),
-                          ),
-                        ],
-                      ),
-                    ),
+                    DailyAverageMood(),
                   ],
                 ),
               ),
