@@ -1,8 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../Services/database_services_users.dart';
 import '../../Utils/snack_bar_helper.dart';
 import '../home/home_screen.dart';
+
+// Import your custom User model with an alias
+import '../../Models/user.dart' as AppUser;
 
 class SignUpScreen extends StatefulWidget {
   @override
@@ -29,12 +32,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
         User? user = userCredential.user;
         if (user != null) {
           // Create or update the user document in Firestore
-          await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
-            'name': _nameController.text.trim(),
-            'userId' : user.uid,
-            'email': _emailController.text.trim(),
-            'createdAt': FieldValue.serverTimestamp(),
-          });
+          AppUser.User newUser = AppUser.User( // Use AppUser.User here
+            userID: user.uid,
+            name: _nameController.text.trim(),
+            email: _emailController.text.trim(),
+            createdAt: DateTime.now(), // Use DateTime.now() for createdAt
+          );
+
+          // Use DatabaseServicesUsers to save the user to Firestore
+          await DatabaseServicesUsers.saveUserToFirestore(newUser);
 
           // Show success message
           showSnackBar(context, 'Sign-up successful!', Colors.green);
