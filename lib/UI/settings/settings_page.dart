@@ -1,10 +1,14 @@
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebasebackend/UI/editprof.dart';
+import 'package:firebasebackend/UI/settings/accountSettings/edit_profile_screen.dart';
+import 'package:firebasebackend/UI/settings/accountSettings/account_settings.dart';
+import 'package:firebasebackend/UI/settings/appPreferences/notification_settings_page.dart';
+import 'package:firebasebackend/UI/settings/appPreferences/theme_settings.dart';
+import 'package:firebasebackend/UI/settings/supportAndFeedback/contact_support_page.dart';
+import 'package:firebasebackend/UI/settings/supportAndFeedback/feedback_page.dart';
 import 'package:flutter/material.dart';
-
-import '../../Utils/snack_bar_helper.dart';
 import '../../Widgets/bottom_nav_bar.dart';
-import '../userAuthentication/signin_screen.dart';
+import 'about/about.dart';
+import 'accountSettings/change_password_screen.dart';
+import 'dataManagement/data_management.dart';
 
 class SettingsPage extends StatelessWidget {
   @override
@@ -49,10 +53,10 @@ class SettingsPage extends StatelessWidget {
             _buildSectionTitle('Account Settings'),
             _buildSettingsTile(
               title: 'Profile Management',
-              subtitle: 'Edit name, email, and profile picture',
+              subtitle: 'Edit name, email, and avatar',
               onTap: () => Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => EditProf()),
+                MaterialPageRoute(builder: (context) => EditProfile()),
               ),
             ),
             _buildSettingsTile(
@@ -65,21 +69,30 @@ class SettingsPage extends StatelessWidget {
 
             _buildSettingsTile(
               title: 'Logout',
-              onTap: () => _handleLogout(context),
+              onTap: () => AccountSettings.handleLogout(context),
             ),
+
+            _buildSettingsTile(
+              title: 'Delete Account',
+              onTap: () => AccountSettings.confirmDeleteAccount(context),
+            ),
+
             SizedBox(height: 16),
 
             // App Preferences
             _buildSectionTitle('App Preferences'),
             _buildSwitchTile(
               title: 'Dark Mode',
-              value: false, // Replace with a variable to track state
-              onChanged: (value) => _toggleTheme(context, value),
+              value: false,
+              onChanged: (value) => ThemeSettings.toggleTheme(context, value),
             ),
             _buildSettingsTile(
               title: 'Notification Settings',
               subtitle: 'Set reminder preferences',
-              onTap: () => _navigateTo(context, '/notificationSettings'),
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => NotificationSettingsPage()),
+              ),
             ),
             SizedBox(height: 16),
 
@@ -87,15 +100,11 @@ class SettingsPage extends StatelessWidget {
             _buildSectionTitle('Data Management'),
             _buildSettingsTile(
               title: 'Export Data',
-              onTap: () => _exportData(context),
-            ),
-            _buildSettingsTile(
-              title: 'Delete Account',
-              onTap: () => _confirmDeleteAccount(context),
+              onTap: () => DataManagement.exportData(context),
             ),
             _buildSettingsTile(
               title: 'Clear Mood Logs',
-              onTap: () => _clearMoodLogs(context),
+              onTap: () => DataManagement.clearMoodLogs(context),
             ),
             SizedBox(height: 16),
 
@@ -103,15 +112,21 @@ class SettingsPage extends StatelessWidget {
             _buildSectionTitle('Support and Feedback'),
             _buildSettingsTile(
               title: 'Help Center',
-              onTap: () => _navigateTo(context, '/helpCenter'),
+              onTap: () => _openWebPage('https://moodbook.com/helpCenter'),
             ),
             _buildSettingsTile(
               title: 'Contact Support',
-              onTap: () => _navigateTo(context, '/contactSupport'),
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ContactSupportPage()),
+              ),
             ),
             _buildSettingsTile(
               title: 'Feedback',
-              onTap: () => _navigateTo(context, '/feedback'),
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => FeedbackPage()),
+              ),
             ),
             SizedBox(height: 16),
 
@@ -120,7 +135,7 @@ class SettingsPage extends StatelessWidget {
             _buildSettingsTile(
               title: 'About MoodBook',
               subtitle: 'Version 1.0.0',
-              onTap: () => _showAboutDialog(context),
+              onTap: () => About.showCustomAboutDialog(context),
             ),
             SizedBox(height: 16),
 
@@ -206,220 +221,7 @@ class SettingsPage extends StatelessWidget {
     Navigator.pushNamed(context, route);
   }
 
-  void _toggleTheme(BuildContext context, bool value) {
-    // Implement theme toggle logic
-  }
-
-  void _handleLogout(BuildContext context) async {
-    try {
-      await FirebaseAuth.instance.signOut();
-      showSnackBar(context, 'Logged out successfully!', Color(0xFF8B4CFC));
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => SignInScreen()),
-      );
-    } catch (e) {
-      showSnackBar(context, 'Logout failed', Colors.red);
-    }
-  }
-
-
-  void _exportData(BuildContext context) {
-    // Implement data export functionality
-  }
-
-  void _confirmDeleteAccount(BuildContext context) {
-    // Implement account deletion confirmation
-  }
-
-  void _clearMoodLogs(BuildContext context) {
-    // Implement clearing mood logs
-  }
-
-  void _showAboutDialog(BuildContext context) {
-    showAboutDialog(
-      context: context,
-      applicationName: 'MoodBook',
-      applicationVersion: '1.0.0',
-      applicationLegalese: '© 2024 MoodBook Inc. All rights reserved.',
-    );
-  }
-
   void _openWebPage(String url) {
     // Open a web page using a package like url_launcher
-  }
-}
-
-
-
-
-class ChangePasswordScreen extends StatefulWidget {
-  @override
-  _ChangePasswordScreenState createState() => _ChangePasswordScreenState();
-}
-
-class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
-  final _currentPasswordController = TextEditingController();
-  final _newPasswordController = TextEditingController();
-  final _confirmPasswordController = TextEditingController();
-  final _formKey = GlobalKey<FormState>();
-
-  Future<void> _changePassword() async {
-    if (_formKey.currentState!.validate()) {
-      try {
-        User? user = FirebaseAuth.instance.currentUser;
-
-        // Re-authenticate the user
-        AuthCredential credential = EmailAuthProvider.credential(
-          email: user!.email!,
-          password: _currentPasswordController.text.trim(),
-        );
-
-        await user.reauthenticateWithCredential(credential);
-
-        // Update the password
-        await user.updatePassword(_newPasswordController.text.trim());
-
-        showSnackBar(context, 'Password changed successfully!', Colors.green);
-
-        // Navigate back after successful password change
-        Navigator.pop(context);
-      } on FirebaseAuthException catch (e) {
-        showSnackBar(context, e.message ?? 'Password change failed', Colors.red);
-      }
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: RadialGradient(
-            center: Alignment(-0.5, -0.5),
-            radius: 1.8,
-            colors: [
-              Color(0xFFF3EAF8),
-              Color(0xFFFF92A9),
-              Color(0xFFCCEFFF),
-            ],
-            stops: [0, 0.4, 0.9],
-          ),
-        ),
-        child: SafeArea(
-          child: Column(
-            children: [
-              AppBar(
-                backgroundColor: Colors.transparent,
-                elevation: 0,
-                leading: IconButton(
-                  icon: Icon(Icons.arrow_back, color: Colors.white), // White back button
-                  onPressed: () {
-                    Navigator.pop(context); // Go back to the previous screen
-                  },
-                ),
-                title: Padding(
-                  padding: const EdgeInsets.only(top: 25.0, left: 40),
-                  child: const Text(
-                    'Change Password',
-                    style: TextStyle(
-                      fontFamily: 'Pangram',
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 150),
-              Container(
-                height: 350,
-                width: 350,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20.0),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(25.0),
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        // Current Password Input
-                        TextFormField(
-                          controller: _currentPasswordController,
-                          obscureText: true,
-                          decoration: InputDecoration(
-                            hintText: 'Current Password',
-                            prefixIcon: Icon(Icons.lock, size: 20),
-                          ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter your current password';
-                            }
-                            return null;
-                          },
-                        ),
-                        const SizedBox(height: 20),
-
-                        // New Password Input
-                        TextFormField(
-                          controller: _newPasswordController,
-                          obscureText: true,
-                          decoration: InputDecoration(
-                            hintText: 'New Password',
-                            prefixIcon: Icon(Icons.lock, size: 20),
-                          ),
-                          validator: (value) {
-                            if (value == null || value.length < 6) {
-                              return 'Password must be at least 6 characters';
-                            }
-                            return null;
-                          },
-                        ),
-                        const SizedBox(height: 20),
-
-                        // Confirm New Password Input
-                        TextFormField(
-                          controller: _confirmPasswordController,
-                          obscureText: true,
-                          decoration: InputDecoration(
-                            hintText: 'Confirm New Password',
-                            prefixIcon: Icon(Icons.lock, size: 20),
-                          ),
-                          validator: (value) {
-                            if (value != _newPasswordController.text) {
-                              return 'Passwords do not match';
-                            }
-                            return null;
-                          },
-                        ),
-                        const SizedBox(height: 30),
-
-                        // Change Password Button
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Color(0xB2C9FAFB),
-                            foregroundColor: Colors.black,
-                            minimumSize: const Size(double.infinity, 50),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15.0),
-                            ),
-                            elevation: 5,
-                            shadowColor: Color(0xFFCCEFFF),
-                          ),
-                          onPressed: _changePassword,
-                          child: const Text('Change Password'),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
   }
 }
