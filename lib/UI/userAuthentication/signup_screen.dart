@@ -213,7 +213,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             children: [
                               Padding(
                                 padding: const EdgeInsets.all(8.0),
-                                child: Image.asset('lib/assets/google.png', height: 20),
+                                child: Image.asset('assets/google.png', height: 20),
                               ),
                               const Text(
                                 'Sign In with Google',
