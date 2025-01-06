@@ -16,27 +16,27 @@ class AddMoodPopup extends StatelessWidget {
       'Terrible': {
         'boldText': "Not every day is easy, and that’s okay",
         'regularText': "Small steps like tracking your mood can pave the way to brighter days over time. Keep going—you’ve got this!",
-        'imagePath': 'lib/assets/smile.png', // Path for Terrible mood image
+        'imagePath': 'assets/smile.png', // Path for Terrible mood image
       },
       'Bad': {
         'boldText': "It’s okay to have tough days",
         'regularText': "By taking the time to reflect on your feelings, you’re already doing something positive for yourself. Stay strong—you’re making progress!",
-        'imagePath': 'lib/assets/smile.png', // Path for Bad mood image
+        'imagePath': 'assets/smile.png', // Path for Bad mood image
       },
       'Neutral': {
         'boldText': "Neutral days are an important part of the journey",
         'regularText': "Staying consistent with tracking your mood will help you uncover patterns and discover what truly supports your well-being.",
-        'imagePath': 'lib/assets/smile.png', // Path for Neutral mood image
+        'imagePath': 'assets/smile.png', // Path for Neutral mood image
       },
       'Good': {
         'boldText': "It’s wonderful to see you feeling good!",
         'regularText': "Consistency is key—keep reflecting on what works for you and growing from each day. You’re doing great!",
-        'imagePath': 'lib/assets/halo.png', // Path for Good mood image
+        'imagePath': 'assets/halo.png', // Path for Good mood image
       },
       'Excellent': {
         'boldText': "You’re in a great place today!",
         'regularText': "Take a moment to celebrate your wins and reflect on what brings you joy. Keep tracking to stay connected with these positive feelings.",
-        'imagePath': 'lib/assets/goodtogo.png', // Path for Excellent mood image
+        'imagePath': 'assets/goodtogo.png', // Path for Excellent mood image
       },
     };
 
@@ -44,7 +44,7 @@ class AddMoodPopup extends StatelessWidget {
     final selectedMood = moodData[mood] ?? {
       'boldText': "Neutral days are an important part of the journey.",
       'regularText': "Staying consistent with tracking your mood will help you uncover patterns and discover what truly supports your well-being.",
-      'imagePath': 'lib/assets/goodtogo.png', // Default image path
+      'imagePath': 'assets/goodtogo.png', // Default image path
     };
 
     return Dialog(
@@ -58,7 +58,7 @@ class AddMoodPopup extends StatelessWidget {
           children: [
             Padding(
               padding: const EdgeInsets.only(left: 20.0),
-              child: Image.asset(selectedMood['imagePath'] ?? 'lib/assets/goodtogo.png'),
+              child: Image.asset(selectedMood['imagePath'] ?? 'assets/goodtogo.png'),
             ),
             Text(
               selectedMood['boldText'] ?? "Neutral days are an important part of the journey.",
@@ -76,7 +76,7 @@ class AddMoodPopup extends StatelessWidget {
               style: const TextStyle(
                 fontFamily: 'Pangram',
                 fontSize: 14,
-                color: Colors.grey,
+                color: Colors.black38,
               ),
             ),
             const SizedBox(height: 20),

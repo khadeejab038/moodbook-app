@@ -66,36 +66,37 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-    - lib/assets/emojibar-def.png
-    - lib/assets/emptystate.png
-    - lib/assets/halo.png
-    - lib/assets/state1.png
-    - lib/assets/neutral-face.png
-    - lib/assets/heart-eyes.png
-    - lib/assets/angry.png
-    - lib/assets/confused.png
-    - lib/assets/disappointed.png
-    - lib/assets/fear.png
-    - lib/assets/grin.png
-    - lib/assets/horns.png
-    - lib/assets/lol.png
-    - lib/assets/loved.png
-    - lib/assets/shock.png
-    - lib/assets/smile.png
-    - lib/assets/spicy.png
-    - lib/assets/starryeyes.png
-    - lib/assets/steam.png
-    - lib/assets/sweat.png
-    - lib/assets/vomit.png
-    - lib/assets/welcoming.png
-    - lib/assets/wink.png
-    - lib/assets/woozy.png
-    - lib/assets/goodtogo.png
-    - lib/assets/google.png
-    - lib/assets/home.png
-    - lib/assets/stats.png
-    - lib/assets/settings.png
-    - lib/assets/cal.png
+    - assets/emojibar-def.png
+    - assets/emptystate.png
+    - assets/halo.png
+    - assets/state1.png
+    - assets/neutral-face.png
+    - assets/heart-eyes.png
+    - assets/angry.png
+    - assets/confused.png
+    - assets/disappointed.png
+    - assets/fear.png
+    - assets/grin.png
+    - assets/horns.png
+    - assets/lol.png
+    - assets/loved.png
+    - assets/shock.png
+    - assets/smile.png
+    - assets/spicy.png
+    - assets/starryeyes.png
+    - assets/steam.png
+    - assets/sweat.png
+    - assets/vomit.png
+    - assets/welcoming.png
+    - assets/wink.png
+    - assets/woozy.png
+    - assets/goodtogo.png
+    - assets/google.png
+    - assets/home.png
+    - assets/stats.png
+    - assets/settings.png
+    - assets/cal.png
+    - assets/avatar.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
