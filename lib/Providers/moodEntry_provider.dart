@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import '../Models/mood_entry.dart';
 
 class MoodEntryProvider extends ChangeNotifier {
+  final String userID;
   MoodEntry _moodEntry = MoodEntry(
     timestamp: DateTime.now(),
     mood: '',
@@ -16,6 +17,8 @@ class MoodEntryProvider extends ChangeNotifier {
 
   final CollectionReference _collection =
   FirebaseFirestore.instance.collection('mood_entries');
+
+  MoodEntryProvider({required this.userID}); // Constructor to accept userID
 
   // Getter for mood entry
   MoodEntry get moodEntry => _moodEntry;
