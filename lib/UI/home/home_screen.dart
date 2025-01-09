@@ -86,24 +86,7 @@ class HomeScreen extends StatelessWidget {
                               );
                             }
                         ),
-                        Row(
-                          children: [
-                            SizedBox(width: 16),
-                            Icon(
-                              Icons.local_fire_department,
-                              size: 24,
-                              color: Colors.orange,
-                            ),
-                            Text(
-                              "5",
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.orange,
-                                fontFamily: 'Pangram',
-                              ),
-                            ),
-                          ],
-                        ),
+
                       ],
                     ),
                     SizedBox(height: 30),

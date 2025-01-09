@@ -31,14 +31,13 @@ class CheckInWidget extends StatelessWidget {
                 MaterialPageRoute(
                   builder: (context) {
                     if (totalReminders == 0) {
-                      return NotificationsSettingsPage();
+                      return NotificationsSettingsPage(); // Redirect to Notifications settings
                     } else {
-                      return AddMood();
+                      return AddMood(); // Proceed to AddMood if check-in reminders are set
                     }
                   },
                 ),
               );
-
             },
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20.0),
@@ -98,7 +97,7 @@ class CheckInWidget extends StatelessWidget {
                             Text(
                               totalReminders == 0
                                   ? ""
-                                  : completedCheckIns > totalReminders
+                                  : completedCheckIns >= totalReminders
                                   ? "$totalReminders/$totalReminders"
                                   : "$completedCheckIns/$totalReminders",
                               style: TextStyle(
@@ -118,15 +117,9 @@ class CheckInWidget extends StatelessWidget {
                                     : Colors.pink[50],
                               ),
                               child: Center(
-                                child: Icon(
-                                  totalReminders == 0
-                                      ? Icons.arrow_forward
-                                      : Icons.local_fire_department,
-                                  color: totalReminders == 0
-                                      ? Colors.blue
-                                      : Colors.orange,
-                                  size: 20,
-                                ),
+                                child: totalReminders == 0
+                                    ? Icon(Icons.arrow_forward, color: Colors.blue, size: 20)
+                                    : Container(),
                               ),
                             ),
                           ],
