@@ -14,6 +14,8 @@ class CheckInProvider extends ChangeNotifier {
   Future<void> loadCheckInReminders() async {
     try {
       _checkInReminders = await DatabaseServicesUsers.fetchCheckInReminders(userID);
+      // Sort the reminders in ascending order by timestamp
+      _checkInReminders.sort((a, b) => a.timestamp.compareTo(b.timestamp));
       notifyListeners();
     } catch (e) {
       print('Failed to load check-in reminders: $e');
@@ -24,6 +26,8 @@ class CheckInProvider extends ChangeNotifier {
   Future<void> addCheckInReminder(CheckInReminder reminder) async {
     try {
       _checkInReminders.add(reminder);
+      // Re-sort reminders after updating the time
+      _checkInReminders.sort((a, b) => a.timestamp.compareTo(b.timestamp));
       notifyListeners(); // Update UI immediately
       await DatabaseServicesUsers.addCheckInReminder(userID, reminder);
     } catch (e) {
@@ -63,6 +67,8 @@ class CheckInProvider extends ChangeNotifier {
     );
 
     _checkInReminders[index] = updatedReminder;
+    // Re-sort reminders after updating the time
+    _checkInReminders.sort((a, b) => a.timestamp.compareTo(b.timestamp));
     notifyListeners(); // Update UI immediately
 
     try {
@@ -78,5 +84,15 @@ class CheckInProvider extends ChangeNotifier {
       _checkInReminders[index] = originalReminder;
       notifyListeners();
     }
+  }
+
+  /// Get the total number of check-in reminders
+  int getTotalCheckInReminders() {
+    return _checkInReminders.length;
+  }
+
+  /// Get the number of enabled check-in reminders
+  int getEnabledCheckInRemindersCount() {
+    return _checkInReminders.where((reminder) => reminder.isEnabled).length;
   }
 }

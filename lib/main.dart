@@ -4,7 +4,8 @@ import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart'; // Import FirebaseAuth
 import 'Providers/moodEntry_provider.dart';
 import 'Providers/checkin_provider.dart';
-import 'UI/userAuthentication/signin_screen.dart';
+import 'UI/home/home_screen.dart';
+import 'UI/userAuthentication/signin_screen.dart'; // Import your SignInScreen
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,7 +27,7 @@ class MyApp extends StatelessWidget {
 
         if (snapshot.hasError || !snapshot.hasData) {
           return MaterialApp(
-            home: SignInScreen(),
+            home: SignInScreen(), // Show sign-in screen if no user is authenticated
           );
         }
 
@@ -35,15 +36,11 @@ class MyApp extends StatelessWidget {
 
         return MultiProvider(
           providers: [
-            ChangeNotifierProvider(
-              create: (context) => MoodEntryProvider(userID: userID),
-            ),
-            ChangeNotifierProvider(
-              create: (context) => CheckInProvider(userID: userID),
-            ),
+            ChangeNotifierProvider(create: (context) => MoodEntryProvider(userID: userID)),
+            ChangeNotifierProvider(create: (context) => CheckInProvider(userID: userID)),
           ],
           child: MaterialApp(
-            home: SignInScreen(), // or other home screen
+            home: HomeScreen(), // Your home screen after sign-in (replace with actual home screen)
           ),
         );
       },
