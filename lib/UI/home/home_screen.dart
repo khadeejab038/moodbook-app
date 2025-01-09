@@ -6,8 +6,25 @@ import 'package:flutter/material.dart';
 import '../addMood/addMood_page1.dart';
 import 'check_in.dart';
 import 'daily_average_mood.dart';
+import 'package:provider/provider.dart';
+import '../../Providers/checkin_provider.dart'; // Import CheckInProvider
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
+  @override
+  _HomeScreenState createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Ensure CheckIn reminders are loaded when HomeScreen is initialized
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+    if (userId != null) {
+      // Initialize and load reminders
+      Provider.of<CheckInProvider>(context, listen: false).loadCheckInReminders();
+    }
+  }
 
   Future<String?> _getUserName() async {
     User? user = FirebaseAuth.instance.currentUser;
@@ -86,7 +103,6 @@ class HomeScreen extends StatelessWidget {
                               );
                             }
                         ),
-
                       ],
                     ),
                     SizedBox(height: 30),
@@ -97,9 +113,12 @@ class HomeScreen extends StatelessWidget {
               ),
               Divider(color: Colors.transparent),
               // Today's Check-in Section
-              CheckInWidget(),
+              Consumer<CheckInProvider>(
+                builder: (context, checkInProvider, child) {
+                  return CheckInWidget(); // The CheckInWidget now listens to changes from the provider
+                },
+              ),
 
-              //SizedBox(height: 20),
               // Mood Chart Section
               Expanded(
                 child: MoodChart(),
