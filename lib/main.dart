@@ -16,40 +16,46 @@ void main() async {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<User?>(
-      future: _getCurrentUser(), // Fetch current user UID
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return MaterialApp(
-            home: Center(child: CircularProgressIndicator()),
-          );
-        }
-
-        if (snapshot.hasError || !snapshot.hasData) {
-          return MaterialApp(
-            home: SignInScreen(), // Show sign-in screen if no user is authenticated
-          );
-        }
-
-        final user = snapshot.data;
-        final userID = user?.uid ?? '';
-
-        return MultiProvider(
-          providers: [
-            ChangeNotifierProvider(create: (context) => MoodEntryProvider(userID: userID)),
-            ChangeNotifierProvider(create: (context) => CheckInProvider(userID: userID)),
-          ],
-          child: MaterialApp(
-            home: HomeScreen(), // Your home screen after sign-in (replace with actual home screen)
-          ),
-        );
-      },
+    return MultiProvider(
+      providers: [
+        // Provide default empty providers here
+        ChangeNotifierProvider(create: (context) => MoodEntryProvider(userID: '')),
+        ChangeNotifierProvider(create: (context) => CheckInProvider(userID: '')),
+      ],
+      child: MaterialApp(
+        home: AuthWrapper(), // Wrapper to handle auth state
+      ),
     );
   }
+}
 
-  // Fetch current user
-  Future<User?> _getCurrentUser() async {
-    final currentUser = FirebaseAuth.instance.currentUser;
-    return currentUser;
+class AuthWrapper extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<User?>(
+      stream: FirebaseAuth.instance.authStateChanges(), // Listen to auth state changes
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator()); // Show a loading spinner while checking authentication state
+        }
+
+        if (snapshot.hasData) {
+          // User is signed in
+          final userID = snapshot.data!.uid;
+
+          // Now that we have the userID, update the providers with the actual user ID
+          return MultiProvider(
+            providers: [
+              ChangeNotifierProvider(create: (context) => MoodEntryProvider(userID: userID)),
+              ChangeNotifierProvider(create: (context) => CheckInProvider(userID: userID)),
+            ],
+            child: HomeScreen(), // Navigate to the Home Screen
+          );
+        }
+
+        // User is not signed in
+        return SignInScreen(); // Show the Sign-In Screen
+      },
+    );
   }
 }
