@@ -339,7 +339,7 @@ class _EditProfileState extends State<EditProfile> {
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to fetch user data: $e')),
+        SnackBar(content: Text('Failed to fetch user data: $e'), backgroundColor: Color(0xFF8B4CFC),),
       );
       setState(() {
         isLoading = false;
@@ -417,7 +417,7 @@ class _EditProfileState extends State<EditProfile> {
               currentUser.userID, currentUser);
 
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Profile updated successfully!')),
+            const SnackBar(content: Text('Profile updated successfully!'), backgroundColor: Color(0xFF8B4CFC),),
           );
           Navigator.pop(context);
         }
@@ -425,17 +425,17 @@ class _EditProfileState extends State<EditProfile> {
         if (e.code == 'requires-recent-login') {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-                content: Text('Please log in again to update your email.')),
+                content: Text('Please log in again to update your email.'), backgroundColor: Color(0xFF8B4CFC),),
           );
           // Optionally, you can redirect the user to the login screen.
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Failed to update email: ${e.message}')),
+            SnackBar(content: Text('Failed to update email: ${e.message}'), backgroundColor: Color(0xFF8B4CFC),),
           );
         }
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to update profile: $e')),
+          SnackBar(content: Text('Failed to update profile: $e'), backgroundColor: Color(0xFF8B4CFC),),
         );
       }
     }
@@ -501,7 +501,7 @@ class _EditProfileState extends State<EditProfile> {
                           onTap: () {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(content: Text(
-                                  "profile picture clicked!")),
+                                  "profile picture clicked!"), backgroundColor: Color(0xFF8B4CFC),),
                             );
                           },
                           child: CircleAvatar(

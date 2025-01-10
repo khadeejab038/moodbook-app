@@ -427,7 +427,7 @@ class _HistoryTileState extends State<HistoryTile> {
     try {
       await FirebaseFirestore.instance.collection('mood_entries').doc(widget.entryId).delete();
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error deleting entry: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error deleting entry: $e'), backgroundColor: Color(0xFF8B4CFC),));
     }
   }
 
@@ -451,12 +451,12 @@ class _HistoryTileState extends State<HistoryTile> {
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Mood entry not found')),
+          SnackBar(content: Text('Mood entry not found'), backgroundColor: Color(0xFF8B4CFC),),
         );
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error fetching entry: $e')),
+        SnackBar(content: Text('Error fetching entry: $e'), backgroundColor: Color(0xFF8B4CFC),),
       );
     }
   }

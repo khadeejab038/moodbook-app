@@ -585,14 +585,14 @@ void _confirmDeleteAccount(BuildContext context) {
                   } catch (e) {
                     // Handle any errors during the process
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Error deleting account: $e')),
+                      SnackBar(content: Text('Error deleting account: $e'), backgroundColor: Color(0xFF8B4CFC),),
                     );
                   }
                 }
               } else {
                 // Show an error if the password field is empty
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Please enter your password to proceed.')),
+                  SnackBar(content: Text('Please enter your password to proceed.'), backgroundColor: Color(0xFF8B4CFC),),
                 );
               }
             },

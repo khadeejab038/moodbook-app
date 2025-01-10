@@ -21,7 +21,7 @@ class DataManagement {
             onPressed: () {
               // Handle export logic here
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Data export started!')),
+                SnackBar(content: Text('Data export started!'), backgroundColor: Color(0xFF8B4CFC),),
 
               );
               Navigator.of(context).pop();

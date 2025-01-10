@@ -24,13 +24,13 @@ class _SignInScreenState extends State<SignInScreen> {
           password: _passwordController.text.trim(),
         );
 
-        showSnackBar(context, 'Sign-in successful!', Colors.green);
+        showSnackBar(context, 'Sign-in successful!', Color(0xFF8B4CFC));
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => HomeScreen()),
         );
       } on FirebaseAuthException catch (e) {
-        showSnackBar(context, e.message ?? 'Sign-in failed', Colors.red);
+        showSnackBar(context, e.message ?? 'Sign-in failed', Color(0xFF8B4CFC));
       }
     }
   }
