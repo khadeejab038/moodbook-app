@@ -7,7 +7,7 @@ import '../addMood/addMood_page1.dart';
 import 'check_in.dart';
 import 'daily_average_mood.dart';
 import 'package:provider/provider.dart';
-import '../../Providers/checkin_provider.dart'; // Import CheckInProvider
+import '../../Providers/checkin_provider.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
