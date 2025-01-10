@@ -17,7 +17,7 @@ class _AddReasonsState extends State<AddReasons> {
 
   @override
   Widget build(BuildContext context) {
-    final moodProvider = Provider.of<MoodEntryProvider>(context); // Access the provider
+    final moodProvider = Provider.of<MoodEntryProvider>(context);
 
     final filteredReasons = allReasons
         .where((reason) => reason.toLowerCase().contains(searchQuery.toLowerCase()))
@@ -60,7 +60,7 @@ class _AddReasonsState extends State<AddReasons> {
                           ),
                           const Text(
                             "3/4",
-                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, fontFamily: 'Pangram'),
                           ),
                           IconButton(
                             icon: const Icon(Icons.close),
@@ -82,8 +82,8 @@ class _AddReasonsState extends State<AddReasons> {
                     // Main Title
                     const Center(
                       child: Text(
-                        "What's reason making you feel\nthis way?",
-                        style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                        "What's the reason making you feel\nthis way?",
+                        style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, fontFamily: 'Pangram'),
                         textAlign: TextAlign.center,
                       ),
                     ),
@@ -93,7 +93,7 @@ class _AddReasonsState extends State<AddReasons> {
                     const Center(
                       child: Text(
                         "Select reasons that reflected your emotions",
-                        style: TextStyle(fontSize: 14, color: Colors.black),
+                        style: TextStyle(fontSize: 14, fontFamily: 'Pangram', color: Colors.black),
                       ),
                     ),
 
@@ -110,6 +110,7 @@ class _AddReasonsState extends State<AddReasons> {
                         },
                         decoration: InputDecoration(
                           hintText: "Search reasons",
+                          hintStyle: const TextStyle(fontFamily: 'Pangram'),
                           prefixIcon: const Icon(Icons.search),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(25),
@@ -137,23 +138,22 @@ class _AddReasonsState extends State<AddReasons> {
                           children: [
                             Text(
                               "Selected (${moodProvider.selectedReasons.length})",
-                              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, fontFamily: 'Pangram'),
                             ),
                             TextButton(
                               onPressed: () {
                                 setState(() {
-                                  moodProvider.clearSelectedReasons(); // Use the provider method
+                                  moodProvider.clearSelectedReasons();
                                 });
                               },
                               style: TextButton.styleFrom(
-                                // backgroundColor: Colors.[300], // Add background color
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20), // Make the button rounded
+                                  borderRadius: BorderRadius.circular(20),
                                 ),
                               ),
                               child: const Text(
                                 "Clear all",
-                                style: TextStyle(color: Colors.black, fontSize: 14),
+                                style: TextStyle(color: Colors.black, fontSize: 14, fontFamily: 'Pangram'),
                               ),
                             ),
                           ],
@@ -167,31 +167,33 @@ class _AddReasonsState extends State<AddReasons> {
                           spacing: 10,
                           children: moodProvider.selectedReasons.map((reason) {
                             return Chip(
-                              label: Text(reason),
+                              label: Text(
+                                reason,
+                                style: const TextStyle(fontFamily: 'Pangram'),
+                              ),
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20), // Rounded chip edges
+                                borderRadius: BorderRadius.circular(20),
                               ),
                               onDeleted: () {
                                 setState(() {
-                                  moodProvider.toggleReason(reason); // Remove reason using provider method
+                                  moodProvider.toggleReason(reason);
                                 });
                               },
-                              backgroundColor: Colors.grey[200], // Optional: Set background color
-                              labelStyle: const TextStyle(color: Colors.black), // Text color for better contrast
+                              backgroundColor: Colors.grey[200],
+                              labelStyle: const TextStyle(color: Colors.black),
                             );
                           }).toList(),
                         ),
                       ),
 
-
-                    // Recently Used Section
                     const Padding(
                       padding: EdgeInsets.symmetric(horizontal: 20),
                       child: Text(
                         "Recently used",
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, fontFamily: 'Pangram'),
                       ),
                     ),
+
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20),
                       child: Wrap(
@@ -204,14 +206,14 @@ class _AddReasonsState extends State<AddReasons> {
 
                     const SizedBox(height: 10),
 
-                    // All Reasons Section
                     const Padding(
                       padding: EdgeInsets.symmetric(horizontal: 20),
                       child: Text(
                         "All reasons",
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, fontFamily: 'Pangram'),
                       ),
                     ),
+
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20),
                       child: Wrap(
@@ -227,7 +229,6 @@ class _AddReasonsState extends State<AddReasons> {
               ),
             ),
 
-            // Floating "Continue" Button
             Align(
               alignment: Alignment.bottomCenter,
               child: Padding(
@@ -245,7 +246,10 @@ class _AddReasonsState extends State<AddReasons> {
                     if (moodProvider.selectedReasons.isEmpty) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                          content: Text('Please select at least one reason before continuing.'),
+                          content: Text(
+                            'Please select at least one reason before continuing.',
+                            style: TextStyle(fontFamily: 'Pangram'),
+                          ),
                           backgroundColor: Colors.red,
                           duration: Duration(seconds: 2),
                         ),
@@ -261,7 +265,7 @@ class _AddReasonsState extends State<AddReasons> {
                   },
                   child: const Text(
                     "Continue",
-                    style: TextStyle(fontSize: 16, color: Colors.white),
+                    style: TextStyle(fontSize: 16, color: Colors.white, fontFamily: 'Pangram'),
                   ),
                 ),
               ),
@@ -272,7 +276,6 @@ class _AddReasonsState extends State<AddReasons> {
     );
   }
 
-  // Custom Chip Widget
   Widget _reasonChip(String reason, MoodEntryProvider moodProvider) {
     final isSelected = moodProvider.selectedReasons.contains(reason);
     return GestureDetector(
@@ -287,15 +290,15 @@ class _AddReasonsState extends State<AddReasons> {
           style: TextStyle(
             color: isSelected ? Colors.white : Colors.black,
             fontWeight: FontWeight.w500,
+            fontFamily: 'Pangram',
           ),
         ),
         backgroundColor: isSelected ? Colors.purple[200] : Colors.grey[300],
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20), // Softens the edges
-          side: BorderSide.none, // Removes any outline
+          borderRadius: BorderRadius.circular(20),
+          side: BorderSide.none,
         ),
       ),
     );
   }
-
 }

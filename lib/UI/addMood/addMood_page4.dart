@@ -70,7 +70,11 @@ class _AddNotesState extends State<AddNotes> {
                   ),
                   const Text(
                     "4/4",
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontFamily: 'Pangram',
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   IconButton(
                     icon: const Icon(Icons.close),
@@ -91,7 +95,11 @@ class _AddNotesState extends State<AddNotes> {
                 padding: EdgeInsets.symmetric(horizontal: 20.0),
                 child: Text(
                   "Anything you want to add",
-                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    fontFamily: 'Pangram',
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                  ),
                   textAlign: TextAlign.center,
                 ),
               ),
@@ -100,7 +108,11 @@ class _AddNotesState extends State<AddNotes> {
                 padding: EdgeInsets.symmetric(horizontal: 50.0),
                 child: Text(
                   "Add your notes on any thought that relates to your mood",
-                  style: TextStyle(fontSize: 14, color: Colors.black),
+                  style: TextStyle(
+                    fontFamily: 'Pangram',
+                    fontSize: 14,
+                    color: Colors.black,
+                  ),
                   textAlign: TextAlign.center,
                 ),
               ),
@@ -123,6 +135,7 @@ class _AddNotesState extends State<AddNotes> {
                     maxLines: 15,
                     decoration: InputDecoration(
                       hintText: "Write your notes here",
+                      hintStyle: const TextStyle(fontFamily: 'Pangram'),
                       filled: true,
                       fillColor: Colors.white,
                       border: OutlineInputBorder(
@@ -166,7 +179,11 @@ class _AddNotesState extends State<AddNotes> {
                     },
                     child: const Text(
                       'Save',
-                      style: TextStyle(fontSize: 18, color: Colors.white),
+                      style: TextStyle(
+                        fontFamily: 'Pangram',
+                        fontSize: 18,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 35),
