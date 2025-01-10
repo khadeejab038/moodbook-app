@@ -509,7 +509,7 @@ class _EditProfileState extends State<EditProfile> {
                             backgroundColor: Colors.grey[300],
                             child: ClipOval(
                               child: Image.asset(
-                                'assets/avatar.jpeg',
+                                'assets/avatars/avatar.jpeg',
                                 fit: BoxFit.cover,
                                 width: 200,
                                 height: 200,
