@@ -13,7 +13,7 @@ class AccountSettings {
         MaterialPageRoute(builder: (context) => SignInScreen()),
       );
     } catch (e) {
-      showSnackBar(context, 'Logout failed', Colors.red);
+      showSnackBar(context, 'Logout failed', Color(0xFF8B4CFC));
     }
   }
 
@@ -34,7 +34,7 @@ class AccountSettings {
             onPressed: () {
               // Implement account deletion logic here
               Navigator.of(context).pop();
-              showSnackBar(context, 'Account deleted successfully!', Colors.green);
+              showSnackBar(context, 'Account deleted successfully!', Color(0xFF8B4CFC));
             },
             child: Text('Delete'),
           ),

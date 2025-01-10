@@ -160,7 +160,7 @@ class _AddNotesState extends State<AddNotes> {
                       } catch (e) {
                         print('Error: $e');
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Error saving mood entry')),
+                          const SnackBar(content: Text('Error saving mood entry'), backgroundColor: Color(0xFF8B4CFC),),
                         );
                       }
                     },
