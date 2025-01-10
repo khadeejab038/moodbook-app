@@ -112,6 +112,7 @@ class _MoodHeatmapState extends State<MoodHeatmap> {
                 child: Text(
                   "${currentDate.day}",
                   style: TextStyle(
+                    fontFamily: 'Pangram',
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
                     color: isFutureDate
@@ -140,6 +141,7 @@ class _MoodHeatmapState extends State<MoodHeatmap> {
                 Text(
                   "${DateFormat('MMMM yyyy').format(_currentMonth)}",
                   style: TextStyle(
+                    fontFamily: 'Pangram',
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
