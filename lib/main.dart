@@ -6,6 +6,8 @@ import 'UI/splashscreen.dart';
 import 'UI/userAuthentication/signin_screen.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
@@ -18,6 +20,7 @@ class MyApp extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (context) => MoodEntryProvider(),
       child: MaterialApp(
+        navigatorKey: navigatorKey,
         home: SignInScreen(),
       ),
     );
