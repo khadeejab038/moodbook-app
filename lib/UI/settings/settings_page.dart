@@ -226,6 +226,9 @@
 //   }
 // }
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebasebackend/Services/database_services_users.dart';
 import 'package:firebasebackend/UI/settings/accountSettings/edit_profile_screen.dart';
 import 'package:firebasebackend/UI/settings/accountSettings/account_settings.dart';
 import 'package:firebasebackend/UI/settings/appPreferences/notification_settings_page.dart';
@@ -233,7 +236,9 @@ import 'package:firebasebackend/UI/settings/appPreferences/theme_settings.dart';
 import 'package:firebasebackend/UI/settings/supportAndFeedback/contact_support_page.dart';
 import 'package:firebasebackend/UI/settings/supportAndFeedback/feedback_page.dart';
 import 'package:flutter/material.dart';
+import '../../Services/database_services_users.dart';
 import '../../Widgets/bottom_nav_bar.dart';
+import '../userAuthentication/signin_screen.dart';
 import 'about/about.dart';
 import 'accountSettings/change_password_screen.dart';
 import 'dataManagement/data_management.dart';
@@ -299,7 +304,7 @@ class SettingsPage extends StatelessWidget {
 
                   _buildSettingsTile(
                     title: 'Delete Account',
-                    onTap: () => AccountSettings.confirmDeleteAccount(context),
+                    onTap: () => _confirmDeleteAccount(context),
                   ),
 
                   SizedBox(height: 16),
@@ -452,4 +457,141 @@ class SettingsPage extends StatelessWidget {
   void _openWebPage(String url) {
     // Open a web page using a package like url_launcher
   }
+}
+
+Future<void> deleteUserAccount() async {
+  try {
+    // Get the current user
+    User? user = FirebaseAuth.instance.currentUser;
+
+    if (user == null) {
+      print('No user is signed in.');
+      return;
+    }
+
+    String userId = user.uid;
+
+    // Step 1: Delete Firestore documents associated with the user
+    // Delete the user document from the "users" collection
+    await FirebaseFirestore.instance.collection('users').doc(userId).delete();
+
+    // Delete all mood entries for the user
+    QuerySnapshot moodEntries = await FirebaseFirestore.instance
+        .collection('mood_entries')
+        .where('userId', isEqualTo: userId)
+        .get();
+
+    for (var doc in moodEntries.docs) {
+      await FirebaseFirestore.instance.collection('mood_entries').doc(doc.id).delete();
+    }
+
+    // Step 2: Delete the user account from Firebase Authentication
+    await user.delete();
+
+    print('User account and associated data successfully deleted.');
+  } catch (e) {
+    print('Error while deleting user account: $e');
+  }
+}
+
+
+// Confirm Delete Account Dialog
+void _confirmDeleteAccount(BuildContext context) {
+  final TextEditingController passwordController = TextEditingController();
+
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text('Delete Account'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text('Are you sure you want to delete your account? This action cannot be undone.'),
+            TextField(
+              controller: passwordController,
+              decoration: InputDecoration(
+                labelText: 'Enter your password',
+                hintText: 'Password',
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            child: Text('Cancel'),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+          TextButton(
+            child: Text('Delete'),
+            onPressed: () async {
+
+              Navigator.of(context).pop(); // Close the dialog
+
+              final String password = passwordController.text.trim();
+
+              if (password.isNotEmpty) {
+                final currentUser = FirebaseAuth.instance.currentUser;
+
+                if (currentUser != null) {
+                  try {
+                    // Reauthenticate the user with the password
+                    UserCredential userCredential = await currentUser.reauthenticateWithCredential(
+                      EmailAuthProvider.credential(
+                        email: currentUser.email!,
+                        password: password,
+                      ),
+                    );
+                     await deleteUserAccount();
+
+                    // DataManagement.clearMoodLogs(context);
+                    // print("cleared logs");
+
+                    // First, delete the user data from Firestore
+                   /// Pass uid here
+
+                    print("deleted user");
+                    // After deleting from Firestore, delete the Firebase Authentication account
+
+
+                    // Sign out the user from Firebase
+                    // await FirebaseAuth.instance.signOut();
+                    // AccountSettings.handleLogout(context);
+                    // print("logged out");
+
+                    // Navigate to the SignInScreen
+                    // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => SignInScreen()),);
+
+                    // Navigator.push(context, MaterialPageRoute(builder: (context) => SignInScreen(),),);
+                    // ScaffoldMessenger.of(context).showSnackBar(
+                    //   SnackBar(content: Text('Account deleted successfully.')),
+                    // );
+                    // Navigator.pushAndRemoveUntil(
+                    //   context,
+                    //   MaterialPageRoute(builder: (context) => SignInScreen()),
+                    //       (Route<dynamic> route) => false,
+                    // );
+
+
+                    // Show success message
+
+                  } catch (e) {
+                    // Handle any errors during the process
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Error deleting account: $e')),
+                    );
+                  }
+                }
+              } else {
+                // Show an error if the password field is empty
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Please enter your password to proceed.')),
+                );
+              }
+            },
+          ),
+        ],
+      );
+    },
+  );
 }

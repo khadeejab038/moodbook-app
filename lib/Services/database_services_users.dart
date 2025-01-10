@@ -50,14 +50,35 @@ class DatabaseServicesUsers {
   }
 
   // Delete a user by ID from Firestore
-  static Future<void> deleteUserFromFirestore(String userID) async {
+  // static Future<void> deleteUserFromFirestore(String userID) async {
+  //   try {
+  //     await _db.collection('users').doc(userID).delete();
+  //     print('User deleted successfully.');
+  //   } catch (e) {
+  //     throw Exception('Failed to delete user: $e');
+  //   }
+  // }
+
+
+  static Future delete(String userID) async {
+    final userCollection = FirebaseFirestore.instance.collection("users");
+
     try {
-      await _db.collection('users').doc(userID).delete();
-      print('User deleted successfully.');
+      // Check if the document exists first
+      var docSnapshot = await userCollection.doc(userID).get();
+
+      if (docSnapshot.exists) {
+        // If the document exists, proceed to delete
+        await userCollection.doc(userID).delete();
+        print("User data deleted successfully.");
+      } else {
+        throw Exception("User document not found.");
+      }
     } catch (e) {
-      throw Exception('Failed to delete user: $e');
+      throw Exception('Failed to delete user data from Firestore: $e');
     }
   }
+
 
   // Fetch the current user from Firestore based on the FirebaseAuth current user
   static Future<User?> fetchCurrentUser() async {
