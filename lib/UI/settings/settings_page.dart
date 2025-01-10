@@ -238,6 +238,7 @@ import 'package:firebasebackend/UI/settings/supportAndFeedback/feedback_page.dar
 import 'package:flutter/material.dart';
 import '../../Services/database_services_users.dart';
 import '../../Widgets/bottom_nav_bar.dart';
+import '../../main.dart';
 import '../userAuthentication/signin_screen.dart';
 import 'about/about.dart';
 import 'accountSettings/change_password_screen.dart';
@@ -487,8 +488,14 @@ Future<void> deleteUserAccount() async {
 
     // Step 2: Delete the user account from Firebase Authentication
     await user.delete();
-
     print('User account and associated data successfully deleted.');
+
+    await FirebaseAuth.instance.signOut();
+
+      navigatorKey.currentState?.pushReplacement(
+        MaterialPageRoute(builder: (context) => SignInScreen()),
+      );
+
   } catch (e) {
     print('Error while deleting user account: $e');
   }
