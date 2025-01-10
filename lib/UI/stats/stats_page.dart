@@ -1,115 +1,22 @@
-// import 'package:flutter/material.dart';
-// import '../Widgets/bottom_nav_bar.dart';
-//
-// class StatsPage extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         automaticallyImplyLeading: false, // Prevent back button
-//         backgroundColor: Colors.transparent,
-//         elevation: 0,
-//         title: PreferredSize(
-//           preferredSize: Size.fromHeight(kToolbarHeight),
-//           child: Align(
-//             alignment: Alignment.centerLeft,
-//             child: Text(
-//               'Stats',
-//               style: TextStyle(
-//                 fontFamily: 'Pangram',
-//                 fontWeight: FontWeight.bold,
-//                 color: Color(0xFF100F11),
-//                 fontSize: 20.0,
-//               ),
-//             ),
-//           ),
-//         ),
-//         iconTheme: IconThemeData(color: Color(0xFF100F11)),
-//       ),
-//       body: SingleChildScrollView(
-//         child: Container(
-//           decoration: BoxDecoration(
-//             gradient: LinearGradient(
-//               colors: [
-//                 Color(0xAAC7DFFF),
-//                 Color(0xFFFFCEB7),
-//               ],
-//               begin: Alignment.topLeft,
-//               end: Alignment.bottomRight,
-//             ),
-//           ),
-//           child: Padding(
-//             padding: const EdgeInsets.all(16.0),
-//             child: Column(
-//               children: [
-//                 SizedBox(height: 20),
-//                 Container(
-//                   height: 200,
-//                   color: Colors.white,
-//                   child: Center(
-//                     child: Text(
-//                       'Data Visualization Here',
-//                       style: TextStyle(fontFamily: 'Pangram'),
-//                     ),
-//                   ),
-//                 ),
-//                 SizedBox(height: 20),
-//                 Container(
-//                   height: 200,
-//                   color: Colors.white,
-//                   child: Center(
-//                     child: Text(
-//                       'Data Visualization Here',
-//                       style: TextStyle(fontFamily: 'Pangram'),
-//                     ),
-//                   ),
-//                 ),
-//                 SizedBox(height: 20),
-//                 Container(
-//                   height: 200,
-//                   color: Colors.white,
-//                   child: Center(
-//                     child: Text(
-//                       'Data Visualization Here',
-//                       style: TextStyle(fontFamily: 'Pangram'),
-//                     ),
-//                   ),
-//                 ),
-//                 // SizedBox(height: 16),
-//               ],
-//             ),
-//           ),
-//         ),
-//       ),
-//       bottomNavigationBar: BottomNavBar(currentIndex: 1),
-//     );
-//   }
-// }
-
 import 'package:flutter/material.dart';
 import '../../Widgets/bottom_nav_bar.dart';
+import 'mood_heatmap.dart'; // Import heatmap
 
 class StatsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        automaticallyImplyLeading: false, // Prevent back button
+        automaticallyImplyLeading: false,
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: PreferredSize(
-          preferredSize: Size.fromHeight(kToolbarHeight),
-          child: Align(
-            alignment: Alignment.centerLeft,
-            child: Text(
-              'Stats',
-              style: TextStyle(
-                fontFamily: 'Pangram',
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF100F11),
-                fontSize: 20.0,
-              ),
-            ),
+        title: Text(
+          'Stats',
+          style: TextStyle(
+            fontFamily: 'Pangram',
+            fontWeight: FontWeight.bold,
+            color: Color(0xFF100F11),
+            fontSize: 20.0,
           ),
         ),
         iconTheme: IconThemeData(color: Color(0xFF100F11)),
@@ -135,39 +42,26 @@ class StatsPage extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SizedBox(height: 20),
-                  Container(
-                    height: 200,
-                    color: Colors.white,
-                    child: Center(
-                      child: Text(
-                        'Data Visualization Here',
-                        style: TextStyle(fontFamily: 'Pangram'),
-                      ),
+                  Text(
+                    'Mood Calendar',
+                    style: TextStyle(
+                      fontFamily: 'Pangram',
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                      color: Color(0xFF100F11),
                     ),
                   ),
-                  SizedBox(height: 20),
+                  SizedBox(height: 16),
                   Container(
-                    height: 200,
-                    color: Colors.white,
-                    child: Center(
-                      child: Text(
-                        'Data Visualization Here',
-                        style: TextStyle(fontFamily: 'Pangram'),
-                      ),
+                    decoration: BoxDecoration(
+                      color: Color(0xFFDED7FA).withOpacity(0.8),
+                      borderRadius: BorderRadius.circular(12.0),
                     ),
-                  ),
-                  SizedBox(height: 20),
-                  Container(
-                    height: 200,
-                    color: Colors.white,
-                    child: Center(
-                      child: Text(
-                        'Data Visualization Here',
-                        style: TextStyle(fontFamily: 'Pangram'),
-                      ),
-                    ),
+                    padding: EdgeInsets.all(16.0), // Optional padding inside the box
+                    child: MoodHeatmap(), // Heatmap widget
                   ),
                   SizedBox(height: 20),
                 ],
@@ -180,4 +74,3 @@ class StatsPage extends StatelessWidget {
     );
   }
 }
-
