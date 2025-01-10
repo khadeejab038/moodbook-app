@@ -110,7 +110,11 @@ flutter:
     - assets/stats.png
     - assets/settings.png
     - assets/cal.png
-    - assets/avatar.jpeg
+    - assets/avatars/avatar.jpeg
+    - assets/avatars/blue-avatar.jpg
+    - assets/avatars/cool-guy.jpg
+    - assets/avatars/ducky.jpg
+    - assets/avatars/pink-bow.jpg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
