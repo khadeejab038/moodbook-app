@@ -5,7 +5,7 @@ class User {
   String email;
   String name;
   DateTime createdAt;
-  String? avatar; // Optional
+  String avatar;
   List<CheckInReminder>? checkInReminders; // Optional list of check-in reminders
 
   // Default unnamed constructor
@@ -14,7 +14,7 @@ class User {
     required this.email,
     required this.name,
     required this.createdAt,
-    this.avatar,
+    this.avatar = "grey",
     this.checkInReminders,
   });
 
