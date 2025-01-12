@@ -43,7 +43,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           await DatabaseServicesUsers.saveUserToFirestore(newUser);
 
           // Show success message
-          showSnackBar(context, 'Sign-up successful!', Colors.green);
+          showSnackBar(context, 'Sign-up successful!', Color(0xFF8B4CFC));
 
           // Navigate to home screen
           Navigator.pushReplacement(
@@ -53,7 +53,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         }
       } on FirebaseAuthException catch (e) {
         // Handle errors during registration
-        showSnackBar(context, e.message ?? 'Sign-up failed', Colors.red);
+        showSnackBar(context, e.message ?? 'Sign-up failed', Color(0xFF8B4CFC));
       }
     }
   }
@@ -213,7 +213,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             children: [
                               Padding(
                                 padding: const EdgeInsets.all(8.0),
-                                child: Image.asset('lib/assets/google.png', height: 20),
+                                child: Image.asset('assets/google.png', height: 20),
                               ),
                               const Text(
                                 'Sign In with Google',

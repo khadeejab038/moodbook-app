@@ -10,7 +10,7 @@ class MoodChart extends StatelessWidget {
     final moodItem = moods.firstWhere(
           (emoji) => emoji.title == mood,
       orElse: () => EmojiItem(
-        imagePath: 'lib/assets/neutral-face.png',
+        imagePath: 'assets/neutral-face.png',
         title: 'Neutral',
       ), // Default emoji
     );

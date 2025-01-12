@@ -30,12 +30,12 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
         // Update the password
         await user.updatePassword(_newPasswordController.text.trim());
 
-        showSnackBar(context, 'Password changed successfully!', Colors.green);
+        showSnackBar(context, 'Password changed successfully!', Color(0xFF8B4CFC));
 
         // Navigate back after successful password change
         Navigator.pop(context);
       } on FirebaseAuthException catch (e) {
-        showSnackBar(context, e.message ?? 'Password change failed', Colors.red);
+        showSnackBar(context, e.message ?? 'Password change failed', Color(0xFF8B4CFC));
       }
     }
   }

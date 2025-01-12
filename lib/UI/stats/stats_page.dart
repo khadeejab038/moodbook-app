@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../Widgets/bottom_nav_bar.dart';
-import 'mood_heatmap.dart'; // Import heatmap
-import 'mood_piechart.dart'; // Import Mood Distribution Chart
-import 'emotion_triggers.dart'; // Import Emotion Triggers Insight widget
+import 'mood_heatmap.dart';
+import 'mood_piechart.dart';
+import 'emotion_triggers.dart';
 
 class StatsPage extends StatelessWidget {
   @override
@@ -59,9 +59,10 @@ class StatsPage extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: Color(0xFFDED7FA).withOpacity(0.8),
                       borderRadius: BorderRadius.circular(12.0),
+
                     ),
-                    padding: EdgeInsets.all(16.0), // Optional padding inside the box
-                    child: MoodHeatmap(), // Heatmap widget
+                    padding: EdgeInsets.all(16.0),
+                    child: MoodHeatmap(), 
                   ),
                   SizedBox(height: 20),
                   Text(
@@ -80,7 +81,7 @@ class StatsPage extends StatelessWidget {
                       borderRadius: BorderRadius.circular(12.0),
                     ),
                     padding: EdgeInsets.all(16.0),
-                    child: MoodPieChart(), // Mood Distribution Pie Chart widget
+                    child: MoodPieChart(),
                   ),
                   SizedBox(height: 20),
                   Text(
@@ -99,11 +100,10 @@ class StatsPage extends StatelessWidget {
                       borderRadius: BorderRadius.circular(12.0),
                     ),
                     padding: EdgeInsets.all(16.0),
-                    child: EmotionTriggersInsight(), // Emotion Triggers Insight widget
+                    child: EmotionTriggersInsight(),
                   ),
-                  SizedBox(height: 20),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),

@@ -280,11 +280,10 @@ class _AddEmotionsState extends State<AddEmotions> {
                       // Show a SnackBar if no emotion is selected
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                          content: Text(
-                            'Please select at least one emotion before continuing.',
-                            style: TextStyle(fontFamily: 'Pangram'),
-                          ),
-                          backgroundColor: Colors.red,
+                          
+                          content: Text('Please select at least one emotion before continuing.'),
+                          backgroundColor: Color(0xFF8B4CFC),
+
                           duration: Duration(seconds: 2),
                         ),
                       );

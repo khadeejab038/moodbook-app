@@ -1,11 +1,16 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:firebase_auth/firebase_auth.dart'; // Import FirebaseAuth
+import 'package:firebase_auth/firebase_auth.dart';
 import 'Providers/moodEntry_provider.dart';
+import 'UI/splashscreen.dart';
+import 'UI/userAuthentication/signin_screen.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'Providers/checkin_provider.dart';
 import 'UI/home/home_screen.dart';
-import 'UI/userAuthentication/signin_screen.dart'; // Import your SignInScreen
+import 'UI/userAuthentication/signin_screen.dart'; 
+
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
