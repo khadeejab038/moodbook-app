@@ -3,19 +3,33 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
 import '../../Models/emoji_item.dart';
-import '../../Utils/emoji_data.dart'; // Import your emoji data
+import '../../Utils/emoji_data.dart';
 
-class DailyAverageMood extends StatelessWidget {
+class DailyAverageMood extends StatefulWidget {
+  @override
+  _DailyAverageMoodState createState() => _DailyAverageMoodState();
+}
+
+class _DailyAverageMoodState extends State<DailyAverageMood> {
   final ScrollController _scrollController = ScrollController();
 
-  // Get the correct emoji asset path for a given mood title
-  String _getMoodEmoji(String mood) {
+  // Mapping mood titles to numeric ratings
+  final Map<String, int> moodValues = {
+    "Terrible": 1,
+    "Bad": 2,
+    "Neutral": 3,
+    "Good": 4,
+    "Excellent": 5,
+  };
+
+  // Get the correct emoji asset path for a given mood rating
+  String _getMoodEmoji(int moodRating) {
     final moodItem = moods.firstWhere(
-          (emoji) => emoji.title == mood,
+          (emoji) => moodValues[emoji.title] == moodRating,
       orElse: () => EmojiItem(
         imagePath: 'lib/assets/neutral-face.png',
         title: 'Neutral',
-      ), // Default emoji
+      ),
     );
     return moodItem.imagePath;
   }
@@ -24,12 +38,12 @@ class DailyAverageMood extends StatelessWidget {
   Widget build(BuildContext context) {
     final userId = FirebaseAuth.instance.currentUser?.uid;
 
-    return FutureBuilder<QuerySnapshot>(
-      future: FirebaseFirestore.instance
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance
           .collection('mood_entries')
           .where('userId', isEqualTo: userId)
           .orderBy('timestamp', descending: false)
-          .get(),
+          .snapshots(), // Listen for real-time updates
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
           return Center(child: CircularProgressIndicator());
@@ -54,21 +68,21 @@ class DailyAverageMood extends StatelessWidget {
           final dateString = DateFormat('yyyy-MM-dd').format(date);
 
           if (moodData.containsKey(dateString)) {
-            // Get the most frequent mood of the day
+            // Calculate the average mood rating for the day
             final moodList = moodData[dateString]!;
-            final moodCount = Map.fromIterable(
-              moodList,
-              key: (m) => m,
-              value: (m) => moodList.where((item) => item == m).length,
+            final moodRatings = moodList.map((mood) => moodValues[mood] ?? 3).toList();
+            final averageMoodRating = (moodRatings.reduce((a, b) => a + b) / moodRatings.length).round();
+
+            // Find the corresponding emoji
+            final averageMoodTitle = moodValues.keys.firstWhere(
+                  (key) => moodValues[key] == averageMoodRating,
+              orElse: () => 'Neutral',
             );
-            final overallMood = moodCount.entries
-                .reduce((a, b) => a.value > b.value ? a : b)
-                .key;
 
             return {
               'day': DateFormat('E').format(date),
               'date': DateFormat('dd').format(date),
-              'emoji': _getMoodEmoji(overallMood),
+              'emoji': _getMoodEmoji(averageMoodRating),
               'isToday': index == 13,
             };
           }
@@ -87,11 +101,14 @@ class DailyAverageMood extends StatelessWidget {
           'date': DateFormat('dd').format(today.add(Duration(days: 1))),
           'emoji': '', // No emoji for the next day
           'isToday': false,
+          'isNextDay': true,
         });
 
-        // Scroll to the latest date
+        // Scroll to the right after the widget is built
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+          if (_scrollController.hasClients) {
+            _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+          }
         });
 
         return SingleChildScrollView(
@@ -100,21 +117,29 @@ class DailyAverageMood extends StatelessWidget {
           child: Row(
             children: days.map((day) {
               final isToday = day['isToday'];
+              final isNextDay = day['isNextDay'] ?? false;
+
               return Container(
                 margin: EdgeInsets.symmetric(horizontal: 8.0),
                 child: Align(
-                  alignment: Alignment.topCenter, // Aligns content to the top
+                  alignment: Alignment.topCenter,
                   child: Column(
-                    mainAxisSize: MainAxisSize.min, // Prevents stretching of the Column
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       // Date bubble
                       Container(
                         padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
                         decoration: BoxDecoration(
-                          color: isToday ? Color(0xFF8B4CFC) : Colors.white,
+                          color: isToday
+                              ? Color(0xFF8B4CFC)
+                              : isNextDay
+                              ? Colors.grey[300]
+                              : Colors.white,
                           borderRadius: BorderRadius.circular(25.0),
                           border: Border.all(
-                            color: isToday ? Color(0xFF8B4CFC) : Colors.transparent,
+                            color: isToday
+                                ? Color(0xFF8B4CFC)
+                                : Colors.transparent,
                             width: 2.0,
                           ),
                         ),
@@ -124,7 +149,11 @@ class DailyAverageMood extends StatelessWidget {
                               day['day'], // Day (e.g., "Mon")
                               style: TextStyle(
                                 fontFamily: 'Pangram',
-                                color: isToday ? Colors.white : Colors.black,
+                                color: isToday
+                                    ? Colors.white
+                                    : isNextDay
+                                    ? Colors.grey[700]
+                                    : Colors.black,
                                 fontWeight: FontWeight.w600,
                                 fontSize: 12,
                               ),
@@ -133,7 +162,11 @@ class DailyAverageMood extends StatelessWidget {
                               day['date'], // Date (e.g., "12")
                               style: TextStyle(
                                 fontFamily: 'Pangram',
-                                color: isToday ? Colors.white : Colors.black,
+                                color: isToday
+                                    ? Colors.white
+                                    : isNextDay
+                                    ? Colors.grey[700]
+                                    : Colors.black,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16,
                               ),
@@ -150,7 +183,9 @@ class DailyAverageMood extends StatelessWidget {
                         decoration: BoxDecoration(
                           color: isToday
                               ? Color(0xFF8B4CFC)
-                              : Colors.white, // Purple only for today
+                              : isNextDay
+                              ? Colors.grey[300]
+                              : Colors.white, // Grey for next day
                           shape: BoxShape.circle,
                         ),
                         child: Padding(

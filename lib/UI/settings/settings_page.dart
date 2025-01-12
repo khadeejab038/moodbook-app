@@ -1,6 +1,6 @@
 import 'package:firebasebackend/UI/settings/accountSettings/edit_profile_screen.dart';
 import 'package:firebasebackend/UI/settings/accountSettings/account_settings.dart';
-import 'package:firebasebackend/UI/settings/appPreferences/notification_settings_page.dart';
+import 'package:firebasebackend/UI/settings/appPreferences/notifications_settings_page.dart';
 import 'package:firebasebackend/UI/settings/appPreferences/theme_settings.dart';
 import 'package:firebasebackend/UI/settings/supportAndFeedback/contact_support_page.dart';
 import 'package:firebasebackend/UI/settings/supportAndFeedback/feedback_page.dart';
@@ -91,7 +91,7 @@ class SettingsPage extends StatelessWidget {
               subtitle: 'Set reminder preferences',
               onTap: () => Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => NotificationSettingsPage()),
+                MaterialPageRoute(builder: (context) => NotificationsSettingsPage()),
               ),
             ),
             SizedBox(height: 16),

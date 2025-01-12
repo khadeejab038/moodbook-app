@@ -4,9 +4,27 @@ import 'package:firebasebackend/UI/home/mood_chart.dart';
 import '../../Widgets/bottom_nav_bar.dart';
 import 'package:flutter/material.dart';
 import '../addMood/addMood_page1.dart';
+import 'check_in.dart';
 import 'daily_average_mood.dart';
+import 'package:provider/provider.dart';
+import '../../Providers/checkin_provider.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
+  @override
+  _HomeScreenState createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Ensure CheckIn reminders are loaded when HomeScreen is initialized
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+    if (userId != null) {
+      // Initialize and load reminders
+      Provider.of<CheckInProvider>(context, listen: false).loadCheckInReminders();
+    }
+  }
 
   Future<String?> _getUserName() async {
     User? user = FirebaseAuth.instance.currentUser;
@@ -85,24 +103,6 @@ class HomeScreen extends StatelessWidget {
                               );
                             }
                         ),
-                        Row(
-                          children: [
-                            SizedBox(width: 16),
-                            Icon(
-                              Icons.local_fire_department,
-                              size: 24,
-                              color: Colors.orange,
-                            ),
-                            Text(
-                              "5",
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.orange,
-                                fontFamily: 'Pangram',
-                              ),
-                            ),
-                          ],
-                        ),
                       ],
                     ),
                     SizedBox(height: 30),
@@ -113,99 +113,12 @@ class HomeScreen extends StatelessWidget {
               ),
               Divider(color: Colors.transparent),
               // Today's Check-in Section
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Today's check-in",
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: 'Pangram',
-                      ),
-                    ),
-                    SizedBox(height: 20),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 20.0,
-                        vertical: 12.0,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.pink[50],
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            children: [
-                              CircleAvatar(
-                                radius: 24,
-                                backgroundColor: Colors.pink[100],
-                                child: Icon(
-                                  Icons.check_circle,
-                                  color: Colors.pink,
-                                ),
-                              ),
-                              SizedBox(width: 8),
-                              Text(
-                                "Check-in",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                  fontFamily: 'Pangram',
-                                ),
-                              ),
-                            ],
-                          ),
-                          Row(
-                            children: [
-                              Text(
-                                "3/3",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                  fontFamily: 'Pangram',
-                                ),
-                              ),
-                              SizedBox(width: 8),
-                              Container(
-                                width: 40,
-                                height: 40,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  gradient: LinearGradient(
-                                    colors: [
-                                      Color(0xFFFF8E8E),
-                                      Color(0xFFFF3CBE),
-                                    ],
-                                    begin: Alignment.topLeft,
-                                    end: Alignment.bottomRight,
-                                  ),
-                                ),
-                                child: Center(
-                                  child: CircleAvatar(
-                                    radius: 16,
-                                    backgroundColor: Colors.pink[50],
-                                    child: Icon(
-                                      Icons.local_fire_department,
-                                      color: Colors.orange,
-                                      size: 20,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
+              Consumer<CheckInProvider>(
+                builder: (context, checkInProvider, child) {
+                  return CheckInWidget(); // The CheckInWidget now listens to changes from the provider
+                },
               ),
-              SizedBox(height: 20),
+
               // Mood Chart Section
               Expanded(
                 child: MoodChart(),

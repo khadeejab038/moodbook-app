@@ -59,7 +59,10 @@ class _AddEmotionsState extends State<AddEmotions> {
                           },
                         ),
                         const SizedBox(width: 130),
-                        const Text("2/4"),
+                        const Text(
+                          "2/4",
+                          style: TextStyle(fontFamily: 'Pangram', fontSize: 16),
+                        ),
                         const SizedBox(width: 100),
                         ElevatedButton(
                           onPressed: () {
@@ -85,7 +88,7 @@ class _AddEmotionsState extends State<AddEmotions> {
                       padding: const EdgeInsets.all(8.0),
                       child: Text(
                         "Choose the emotions that make you feel $currentMood",
-                        style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                        style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, fontFamily: 'Pangram'),
                         textAlign: TextAlign.center,
                       ),
                     ),
@@ -96,7 +99,7 @@ class _AddEmotionsState extends State<AddEmotions> {
                       width: 280,
                       child: Text(
                         "Select at least 1 emotion",
-                        style: TextStyle(fontSize: 16),
+                        style: TextStyle(fontSize: 16, fontFamily: 'Pangram'),
                         textAlign: TextAlign.center,
                       ),
                     ),
@@ -114,6 +117,7 @@ class _AddEmotionsState extends State<AddEmotions> {
                         },
                         decoration: InputDecoration(
                           labelText: '  Search emotions',
+                          labelStyle: const TextStyle(fontFamily: 'Pangram'),
                           filled: true,
                           fillColor: Colors.white,
                           border: OutlineInputBorder(
@@ -132,7 +136,7 @@ class _AddEmotionsState extends State<AddEmotions> {
                         padding: EdgeInsets.symmetric(horizontal: 20),
                         child: Text(
                           "Selected:",
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, fontFamily: 'Pangram'),
                         ),
                       ),
                       const SizedBox(height: 20),
@@ -153,7 +157,7 @@ class _AddEmotionsState extends State<AddEmotions> {
                                 const SizedBox(width: 5),
                                 Text(
                                   emotionTitle,
-                                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500, fontFamily: 'Pangram'),
                                 ),
                               ],
                             ),
@@ -172,22 +176,20 @@ class _AddEmotionsState extends State<AddEmotions> {
                           );
                         }).toList(),
                       ),
-
                     ],
 
                     const SizedBox(height: 20),
 
-                    // Display Recently Used Emotions if no search query
+                    // Recently Used Section
                     if (showRecentlyUsed && moodProvider.recentlyUsedEmotions.isNotEmpty) ...[
                       const Padding(
                         padding: EdgeInsets.symmetric(horizontal: 20),
                         child: Text(
                           "Recently Used:",
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, fontFamily: 'Pangram'),
                         ),
                       ),
                       const SizedBox(height: 20),
-
                       Wrap(
                         spacing: 12.0,
                         children: moodProvider.recentlyUsedEmotions.map((emotionTitle) {
@@ -217,7 +219,7 @@ class _AddEmotionsState extends State<AddEmotions> {
                       padding: EdgeInsets.symmetric(horizontal: 20),
                       child: Text(
                         "All Emotions:",
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, fontFamily: 'Pangram'),
                       ),
                     ),
                     const SizedBox(height: 20),
@@ -245,7 +247,7 @@ class _AddEmotionsState extends State<AddEmotions> {
                               ),
                               Text(
                                 emotion.title,
-                                style: const TextStyle(fontSize: 12),
+                                style: const TextStyle(fontSize: 12, fontFamily: 'Pangram'),
                               ),
                             ],
                           ),
@@ -278,7 +280,10 @@ class _AddEmotionsState extends State<AddEmotions> {
                       // Show a SnackBar if no emotion is selected
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                          content: Text('Please select at least one emotion before continuing.'),
+                          content: Text(
+                            'Please select at least one emotion before continuing.',
+                            style: TextStyle(fontFamily: 'Pangram'),
+                          ),
                           backgroundColor: Colors.red,
                           duration: Duration(seconds: 2),
                         ),

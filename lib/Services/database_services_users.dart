@@ -69,4 +69,81 @@ class DatabaseServicesUsers {
       throw Exception('No user logged in');
     }
   }
+
+  // Fetch reminders for a specific user
+  static Future<List<CheckInReminder>> fetchCheckInReminders(String userID) async {
+    try {
+      DocumentSnapshot userDoc = await _db.collection('users').doc(userID).get();
+
+      if (userDoc.exists) {
+        final data = userDoc.data() as Map<String, dynamic>;
+        if (data['checkInReminders'] != null) {
+          return (data['checkInReminders'] as List)
+              .map((item) => CheckInReminder.fromMap(item))
+              .toList();
+        }
+      }
+      return [];
+    } catch (e) {
+      throw Exception('Failed to fetch check-in reminders: $e');
+    }
+  }
+
+  // Add a reminder for a specific user
+  static Future<void> addCheckInReminder(String userID, CheckInReminder reminder) async {
+    try {
+      final reminders = await fetchCheckInReminders(userID);
+      reminders.add(reminder);
+
+      await _db.collection('users').doc(userID).update({
+        'checkInReminders': reminders.map((e) => e.toMap()).toList(),
+      });
+      print('Reminder added successfully.');
+    } catch (e) {
+      throw Exception('Failed to add check-in reminder: $e');
+    }
+  }
+
+  // Delete a reminder by index for a specific user
+  static Future<void> deleteCheckInReminder(String userID, int index) async {
+    try {
+      final reminders = await fetchCheckInReminders(userID);
+      if (index >= 0 && index < reminders.length) {
+        reminders.removeAt(index);
+
+        await _db.collection('users').doc(userID).update({
+          'checkInReminders': reminders.map((e) => e.toMap()).toList(),
+        });
+        print('Reminder deleted successfully.');
+      } else {
+        throw Exception('Invalid index for reminder deletion.');
+      }
+    } catch (e) {
+      throw Exception('Failed to delete check-in reminder: $e');
+    }
+  }
+
+  // Update a specific reminder's timestamp or isEnabled status
+  static Future<void> updateCheckInReminder(String userID, int index, {DateTime? timestamp, bool? isEnabled}) async {
+    try {
+      final reminders = await fetchCheckInReminders(userID);
+      if (index >= 0 && index < reminders.length) {
+        if (timestamp != null) {
+          reminders[index].timestamp = timestamp;
+        }
+        if (isEnabled != null) {
+          reminders[index].isEnabled = isEnabled;
+        }
+
+        await _db.collection('users').doc(userID).update({
+          'checkInReminders': reminders.map((e) => e.toMap()).toList(),
+        });
+        print('Reminder updated successfully.');
+      } else {
+        throw Exception('Invalid index for reminder update.');
+      }
+    } catch (e) {
+      throw Exception('Failed to update check-in reminder: $e');
+    }
+  }
 }
