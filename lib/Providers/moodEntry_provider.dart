@@ -1,8 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import '../Models/mood_entry.dart';
+import '../Services/database_services_mood_entries.dart';
 
 class MoodEntryProvider extends ChangeNotifier {
+  final String userID;
   MoodEntry _moodEntry = MoodEntry(
     timestamp: DateTime.now(),
     mood: '',
@@ -16,6 +18,8 @@ class MoodEntryProvider extends ChangeNotifier {
 
   final CollectionReference _collection =
   FirebaseFirestore.instance.collection('mood_entries');
+
+  MoodEntryProvider({required this.userID}); // Constructor to accept userID
 
   // Getter for mood entry
   MoodEntry get moodEntry => _moodEntry;
@@ -108,8 +112,6 @@ class MoodEntryProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-
-
   // Clear all selected reasons
   void clearSelectedReasons() {
     _moodEntry.setReasons = [];
@@ -127,5 +129,31 @@ class MoodEntryProvider extends ChangeNotifier {
     );
     notifyListeners();
   }
+
+  // Count the number of mood entries created today
+  Future<int> countMoodEntriesToday() async {
+    try {
+      // Fetch all mood entries for the current user
+      List<MoodEntry> allEntries = await DatabaseServices.fetchMoodEntries();
+
+      // Get today's date range
+      final now = DateTime.now();
+      final startOfDay = DateTime(now.year, now.month, now.day);
+      final endOfDay = DateTime(now.year, now.month, now.day, 23, 59, 59);
+
+      // Filter entries that were created today
+      final todayEntries = allEntries.where((entry) {
+        final entryDate = entry.getTimestamp;
+        return entryDate.isAfter(startOfDay) && entryDate.isBefore(endOfDay);
+      }).toList();
+
+      // Return the count of today's entries
+      return todayEntries.length;
+    } catch (e) {
+      print('Error counting mood entries for today: $e');
+      return 0; // Return zero in case of an error
+    }
+  }
+
 }
 
