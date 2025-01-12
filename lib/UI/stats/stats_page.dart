@@ -8,37 +8,19 @@ class StatsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        title: Text(
-          'Stats',
-          style: TextStyle(
-            fontFamily: 'Pangram',
-            fontWeight: FontWeight.bold,
-            color: Color(0xFF100F11),
-            fontSize: 20.0,
-          ),
-        ),
-        iconTheme: IconThemeData(color: Color(0xFF100F11)),
-      ),
-      body: SingleChildScrollView(
-        child: ConstrainedBox(
-          constraints: BoxConstraints(
-            minHeight: MediaQuery.of(context).size.height - kToolbarHeight - kBottomNavigationBarHeight,
-          ),
-          child: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Color(0xAAC7DFFF),
-                  Color(0xFFFFCEB7),
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
+      body: SafeArea(
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Color(0xAAC7DFFF),
+                Color(0xFFFFCEB7),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
             ),
+          ),
+          child: SingleChildScrollView(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Column(
@@ -59,10 +41,9 @@ class StatsPage extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: Color(0xFFDED7FA).withOpacity(0.8),
                       borderRadius: BorderRadius.circular(12.0),
-
                     ),
                     padding: EdgeInsets.all(16.0),
-                    child: MoodHeatmap(), 
+                    child: MoodHeatmap(),
                   ),
                   SizedBox(height: 20),
                   Text(
@@ -102,8 +83,8 @@ class StatsPage extends StatelessWidget {
                     padding: EdgeInsets.all(16.0),
                     child: EmotionTriggersInsight(),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

@@ -322,7 +322,7 @@ class SettingsPage extends StatelessWidget {
                     subtitle: 'Set reminder preferences',
                     onTap: () => Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => NotificationSettingsPage()),
+                      MaterialPageRoute(builder: (context) => NotificationsSettingsPage()),
                     ),
                   ),
                   SizedBox(height: 16),
