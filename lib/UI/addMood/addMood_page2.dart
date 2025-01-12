@@ -198,15 +198,27 @@ class _AddEmotionsState extends State<AddEmotions> {
                             onTap: () {
                               moodProvider.toggleEmotion(emotionTitle); // Select the emotion
                             },
-                            child: CircleAvatar(
-                              backgroundColor: Colors.grey[300],
-                              radius: 40,
-                              child: Image.asset(
-                                emojiItem.imagePath,
-                                width: 35,
-                                height: 35,
-                              ),
-                            ),
+                            child: Column(
+                              children: [
+                                CircleAvatar (
+                                  backgroundColor: moodProvider.selectedEmotions.contains(emotionTitle)
+                                      ? Colors.purple[100]
+                                      : Colors.grey[300],
+                                  radius: 40,
+                                  child: Image.asset(
+                                    emojiItem.imagePath,
+                                    width: 35,
+                                    height: 35,
+                                  ),
+                                ),
+                                Text(
+                                  emotionTitle,
+                                  style: const TextStyle(fontSize: 12, fontFamily: 'Pangram'),
+                                ),
+
+                              ],
+                            )
+
                           );
                         }).toList(),
                       ),
@@ -280,10 +292,8 @@ class _AddEmotionsState extends State<AddEmotions> {
                       // Show a SnackBar if no emotion is selected
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                          
                           content: Text('Please select at least one emotion before continuing.'),
                           backgroundColor: Color(0xFF8B4CFC),
-
                           duration: Duration(seconds: 2),
                         ),
                       );
