@@ -53,11 +53,11 @@ class BottomNavBar extends StatelessWidget {
           selectedItemColor: Color(0xFF8B4CFC),
           unselectedItemColor: Colors.grey,
           items: [
-            BottomNavigationBarItem(icon: Image.asset('lib/assets/home.png'), label: "Home"),
-            BottomNavigationBarItem(icon: Image.asset('lib/assets/stats.png'), label: "Stats"),
+            BottomNavigationBarItem(icon: Image.asset('assets/home.png'), label: "Home"),
+            BottomNavigationBarItem(icon: Image.asset('assets/stats.png'), label: "Stats"),
             BottomNavigationBarItem(icon: Icon(Icons.add, size: 0), label: ""), // Placeholder for FAB
-            BottomNavigationBarItem(icon: Image.asset('lib/assets/cal.png'), label: "History"),
-            BottomNavigationBarItem(icon: Image.asset('lib/assets/settings.png'), label: "Settings"),
+            BottomNavigationBarItem(icon: Image.asset('assets/cal.png'), label: "History"),
+            BottomNavigationBarItem(icon: Image.asset('assets/settings.png'), label: "Settings"),
           ],
           // Wrap in a Container to adjust height
           iconSize: 30, // Adjust icon size if needed

@@ -29,17 +29,14 @@ class _SignInScreenState extends State<SignInScreen> {
           password: _passwordController.text.trim(),
         );
 
-        showSnackBar(context, 'Sign-in successful!', Colors.green);
-        setState(() {
-          isloading=false;
-        });
+        showSnackBar(context, 'Sign-in successful!', Color(0xFF8B4CFC));
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => HomeScreen()),
         );
 
       } on FirebaseAuthException catch (e) {
-        showSnackBar(context, e.message ?? 'Sign-in failed', Colors.red);
+        showSnackBar(context, e.message ?? 'Sign-in failed', Color(0xFF8B4CFC));
       }
     }
   }
@@ -218,7 +215,7 @@ class _SignInScreenState extends State<SignInScreen> {
                             children: [
                               Padding(
                                 padding: const EdgeInsets.all(8.0),
-                                child: Image.asset('lib/assets/google.png', height: 20),
+                                child: Image.asset('assets/google.png', height: 20),
                               ),
 
                               const Text(

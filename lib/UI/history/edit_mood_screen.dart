@@ -276,7 +276,7 @@ class _EditMoodScreenState extends State<EditMoodScreen> {
                         if (selectedEmotions.isEmpty || reasonsController.text.isEmpty) {
                           // If no emotions or reasons selected
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Please select at least one emotion and one reason')),
+                            SnackBar(content: Text('Please select at least one emotion and one reason'), backgroundColor: Color(0xFF8B4CFC),),
                           );
                         } else {
                           // Prepare updated data
@@ -298,7 +298,7 @@ class _EditMoodScreenState extends State<EditMoodScreen> {
                           } catch (e) {
                             // Handle any errors
                             ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Error updating entry: $e')),
+                              SnackBar(content: Text('Error updating entry: $e'), backgroundColor: Color(0xFF8B4CFC)),
                             );
                           }
                         }

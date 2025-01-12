@@ -163,9 +163,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         await FirebaseAuth.instance.sendPasswordResetEmail(
           email: _emailController.text.trim(),
         );
-        showSnackBar(context, 'Password reset email sent!', Colors.green);
+        showSnackBar(context, 'Password reset email sent!', Color(0xFF8B4CFC));
       } on FirebaseAuthException catch (e) {
-        showSnackBar(context, e.message ?? 'Failed to send email', Colors.red);
+        showSnackBar(context, e.message ?? 'Failed to send email', Color(0xFF8B4CFC));
       }
     }
   }

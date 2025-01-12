@@ -246,11 +246,8 @@ class _AddReasonsState extends State<AddReasons> {
                     if (moodProvider.selectedReasons.isEmpty) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                          content: Text(
-                            'Please select at least one reason before continuing.',
-                            style: TextStyle(fontFamily: 'Pangram'),
-                          ),
-                          backgroundColor: Colors.red,
+                          content: Text('Please select at least one reason before continuing.'),
+                          backgroundColor: Color(0xFF8B4CFC),
                           duration: Duration(seconds: 2),
                         ),
                       );
