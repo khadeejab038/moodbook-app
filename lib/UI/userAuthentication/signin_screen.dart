@@ -16,19 +16,28 @@ class _SignInScreenState extends State<SignInScreen> {
 
   final _formKey = GlobalKey<FormState>();
 
+  bool isloading=false;
   Future<void> _signIn() async {
     if (_formKey.currentState!.validate()) {
+      setState(() {
+        isloading=true;
+      });
       try {
+
         await FirebaseAuth.instance.signInWithEmailAndPassword(
           email: _emailController.text.trim(),
           password: _passwordController.text.trim(),
         );
 
         showSnackBar(context, 'Sign-in successful!', Colors.green);
+        setState(() {
+          isloading=false;
+        });
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => HomeScreen()),
         );
+
       } on FirebaseAuthException catch (e) {
         showSnackBar(context, e.message ?? 'Sign-in failed', Colors.red);
       }
@@ -38,7 +47,8 @@ class _SignInScreenState extends State<SignInScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
+      resizeToAvoidBottomInset: false,
+      body: isloading?Center(child: CircularProgressIndicator()):Container(
         decoration: const BoxDecoration(
           gradient: RadialGradient(
             center: Alignment(-0.5, -0.5),
