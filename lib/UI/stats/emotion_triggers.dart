@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:intl/intl.dart';
 
 class EmotionTriggersInsight extends StatefulWidget {
   @override
@@ -10,7 +9,9 @@ class EmotionTriggersInsight extends StatefulWidget {
 
 class _EmotionTriggersInsightState extends State<EmotionTriggersInsight> {
   Map<String, Map<String, int>> emotionReasonCorrelation = {};
-  String selectedRange = "Today"; // Default selection
+  String selectedRange = "Today";
+  bool isLoading = true;
+  bool hasData = false;
 
   @override
   void initState() {
@@ -18,27 +19,43 @@ class _EmotionTriggersInsightState extends State<EmotionTriggersInsight> {
     _fetchEmotionTriggersData("Today");
   }
 
-  // Fetch data from Firestore for the selected date range
   Future<void> _fetchEmotionTriggersData(String range) async {
-    final userId = FirebaseAuth.instance.currentUser?.uid;
+    setState(() {
+      isLoading = true;
+      hasData = false;
+    });
 
-    // Calculate the start date based on the selected range
-    DateTime startDate;
-    if (range == "Today") {
-      startDate = DateTime.now();
-    } else if (range == "This Week") {
-      startDate = DateTime.now().subtract(Duration(days: 7));
-    } else if (range == "This Month") {
-      startDate = DateTime.now().subtract(Duration(days: 30));
-    } else { // "This Year"
-      startDate = DateTime.now().subtract(Duration(days: 365));
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+    if (userId == null) {
+      setState(() {
+        isLoading = false;
+      });
+      return;
     }
 
-    // Fetch mood entries based on the selected range
+    DateTime now = DateTime.now();
+    DateTime startDate;
+    DateTime endDate;
+
+    if (range == "Today") {
+      startDate = DateTime(now.year, now.month, now.day);
+      endDate = DateTime(now.year, now.month, now.day + 1).subtract(Duration(seconds: 1));
+    } else if (range == "This Week") {
+      startDate = now.subtract(Duration(days: 7));
+      endDate = now;
+    } else if (range == "This Month") {
+      startDate = now.subtract(Duration(days: 30));
+      endDate = now;
+    } else {
+      startDate = now.subtract(Duration(days: 365));
+      endDate = now;
+    }
+
     final snapshot = await FirebaseFirestore.instance
         .collection('mood_entries')
         .where('userId', isEqualTo: userId)
-        .where('timestamp', isGreaterThanOrEqualTo: startDate)
+        .where('timestamp', isGreaterThanOrEqualTo: Timestamp.fromDate(startDate))
+        .where('timestamp', isLessThanOrEqualTo: Timestamp.fromDate(endDate))
         .get();
 
     Map<String, Map<String, int>> emotionReasonMap = {};
@@ -62,9 +79,11 @@ class _EmotionTriggersInsightState extends State<EmotionTriggersInsight> {
 
     setState(() {
       emotionReasonCorrelation = emotionReasonMap;
-      selectedRange = range;
+      isLoading = false;
+      hasData = emotionReasonMap.isNotEmpty;
     });
   }
+
 
   String _getTimeText(int count) {
     return count == 1 ? "1 time" : "$count times";
@@ -74,38 +93,57 @@ class _EmotionTriggersInsightState extends State<EmotionTriggersInsight> {
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       child: Padding(
-        padding: const EdgeInsets.all(1.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            // Centering the dropdown
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 1.0),
-              child: DropdownButton<String>(
-                value: selectedRange,
-                onChanged: (String? newRange) {
-                  if (newRange != null) {
-                    _fetchEmotionTriggersData(newRange);
-                  }
-                },
-                items: <String>['Today', 'This Week', 'This Month', 'This Year']
-                    .map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(
-                      value,
-                      style: TextStyle(
-                        fontFamily: 'Pangram', // Pangram font for dropdown
-                      ),
-                    ),
-                  );
-                }).toList(),
-              ),
+            DropdownButton<String>(
+              value: selectedRange,
+              onChanged: (String? newRange) {
+                if (newRange != null) {
+                  _fetchEmotionTriggersData(newRange);
+                }
+              },
+              items: <String>['Today', 'This Week', 'This Month', 'This Year']
+                  .map<DropdownMenuItem<String>>((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(
+                    value,
+                    style: TextStyle(fontFamily: 'Pangram', fontSize: 16),
+                  ),
+                );
+              }).toList(),
             ),
-            if (emotionReasonCorrelation.isEmpty)
-              Center(child: CircularProgressIndicator()),
-            ...emotionReasonCorrelation.entries.map(
-                  (emotionEntry) {
+            if (isLoading)
+              Center(
+                child: Column(
+                  children: [
+                    CircularProgressIndicator(),
+                    SizedBox(height: 16),
+                    Text(
+                      "Loading...",
+                      style: TextStyle(fontFamily: 'Pangram', fontSize: 16),
+                    ),
+                  ],
+                ),
+              )
+            else if (!hasData)
+              Center(
+                child: Column(
+                  children: [
+                    //Icon(Icons.sentiment_dissatisfied, size: 40, color: Colors.grey),
+                    SizedBox(height: 16),
+                    Text(
+                      "No mood data available for the selected period.\nLog your moods consistently to generate insights.",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontFamily: 'Pangram', fontSize: 16, color: Colors.grey),
+                    ),
+                  ],
+                ),
+              )
+            else
+              ...emotionReasonCorrelation.entries.map((emotionEntry) {
                 return Card(
                   margin: EdgeInsets.symmetric(vertical: 8.0),
                   elevation: 5,
@@ -122,42 +160,38 @@ class _EmotionTriggersInsightState extends State<EmotionTriggersInsight> {
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
-                            fontFamily: 'Pangram', // Pangram font for text
+                            fontFamily: 'Pangram',
                           ),
                         ),
                         SizedBox(height: 10),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
-                          children: emotionEntry.value.entries.map(
-                                (reasonEntry) {
-                              return Padding(
-                                padding: const EdgeInsets.symmetric(vertical: 4.0),
-                                child: Row(
-                                  children: [
-                                    Icon(Icons.arrow_right, size: 18, color: Colors.black),
-                                    SizedBox(width: 8),
-                                    Expanded(
-                                      child: Text(
-                                        "${reasonEntry.key}: ${_getTimeText(reasonEntry.value)}",
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          color: Colors.black87,
-                                          fontFamily: 'Pangram', // Pangram font
-                                        ),
+                          children: emotionEntry.value.entries.map((reasonEntry) {
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 4.0),
+                              child: Row(
+                                children: [
+                                  Icon(Icons.arrow_right, size: 18, color: Colors.black),
+                                  SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      "${reasonEntry.key}: ${_getTimeText(reasonEntry.value)}",
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontFamily: 'Pangram',
                                       ),
                                     ),
-                                  ],
-                                ),
-                              );
-                            },
-                          ).toList(),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }).toList(),
                         ),
                       ],
                     ),
                   ),
                 );
-              },
-            ).toList(),
+              }).toList(),
           ],
         ),
       ),

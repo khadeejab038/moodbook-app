@@ -87,7 +87,7 @@ class CheckInProvider extends ChangeNotifier {
   }
 
   /// Get the total number of check-in reminders
-  int getTotalCheckInReminders() {
+  int getTotalCheckInRemindersCount() {
     return _checkInReminders.length;
   }
 
@@ -95,4 +95,5 @@ class CheckInProvider extends ChangeNotifier {
   int getEnabledCheckInRemindersCount() {
     return _checkInReminders.where((reminder) => reminder.isEnabled).length;
   }
+
 }

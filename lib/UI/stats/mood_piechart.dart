@@ -93,6 +93,7 @@ class _MoodPieChartState extends State<MoodPieChart> {
                   view,
                   style: TextStyle(
                     fontFamily: 'Pangram', // Pangram font
+                    fontSize: 16,
                   ),
                 ),
               ))
@@ -105,15 +106,49 @@ class _MoodPieChartState extends State<MoodPieChart> {
             ),
           ],
         ),
-        //SizedBox(height: 20),
+        SizedBox(height: 20),
         FutureBuilder<Map<String, double>>(
           future: _fetchMoodData(selectedView),
           builder: (context, snapshot) {
             if (!snapshot.hasData) {
-              return Center(child: CircularProgressIndicator());
+              return Center(
+                child: Column(
+                  children: [
+                    CircularProgressIndicator(),
+                    SizedBox(height: 16),
+                    Text(
+                      "Loading...",
+                      style: TextStyle(
+                        fontFamily: 'Pangram', // Pangram font
+                        fontSize: 16,
+                      ),
+                    ),
+                  ],
+                ),
+              );
             }
 
             final data = snapshot.data!;
+            if (data.values.every((value) => value == 0)) {
+              return Center(
+                child: Column(
+                  children: [
+                    Icon(Icons.sentiment_dissatisfied, size: 40, color: Colors.grey),
+                    SizedBox(height: 16),
+                    Text(
+                      "No mood data available for the selected period.\nLog your moods consistently to generate insights.",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontFamily: 'Pangram', // Pangram font
+                        fontSize: 16,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }
+
             return AspectRatio(
               aspectRatio: 1.3,
               child: PieChart(
@@ -127,7 +162,7 @@ class _MoodPieChartState extends State<MoodPieChart> {
                       radius: 80,
                       titleStyle: TextStyle(
                         fontFamily: 'Pangram', // Pangram font for title
-                        fontSize: 12,
+                        fontSize: 14,
                         color: Colors.black,
                       ),
                     ),

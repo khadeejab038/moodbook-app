@@ -21,7 +21,7 @@ class CheckInWidget extends StatelessWidget {
 
           // Get the total number of enabled check-in reminders set by the user
           final checkInProvider = Provider.of<CheckInProvider>(context);
-          final totalReminders = checkInProvider.getEnabledCheckInRemindersCount();
+          final totalReminders = checkInProvider.getTotalCheckInRemindersCount();
 
           return GestureDetector(
             onTap: () {
