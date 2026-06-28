@@ -2,13 +2,13 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'Providers/moodEntry_provider.dart';
-import 'UI/splashscreen.dart';
-import 'UI/userAuthentication/signin_screen.dart';
+import 'controllers/mood_entry_controller.dart';
+import 'views/splash_screen.dart';
+import 'views/user_authentication/signin_screen.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
-import 'Providers/checkin_provider.dart';
-import 'UI/home/home_screen.dart';
-import 'UI/userAuthentication/signin_screen.dart'; 
+import 'controllers/check_in_controller.dart';
+import 'views/home/home_screen.dart';
+import 'views/user_authentication/signin_screen.dart'; 
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
@@ -24,8 +24,8 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         // Provide default empty providers here
-        ChangeNotifierProvider(create: (context) => MoodEntryProvider(userID: '')),
-        ChangeNotifierProvider(create: (context) => CheckInProvider(userID: '')),
+        ChangeNotifierProvider(create: (context) => MoodEntryController(userID: '')),
+        ChangeNotifierProvider(create: (context) => CheckInController(userID: '')),
       ],
       child: MaterialApp(
         home: AuthWrapper(), // Wrapper to handle auth state
@@ -51,8 +51,8 @@ class AuthWrapper extends StatelessWidget {
           // Now that we have the userID, update the providers with the actual user ID
           return MultiProvider(
             providers: [
-              ChangeNotifierProvider(create: (context) => MoodEntryProvider(userID: userID)),
-              ChangeNotifierProvider(create: (context) => CheckInProvider(userID: userID)),
+              ChangeNotifierProvider(create: (context) => MoodEntryController(userID: userID)),
+              ChangeNotifierProvider(create: (context) => CheckInController(userID: userID)),
             ],
             child: HomeScreen(), // Navigate to the Home Screen
           );
