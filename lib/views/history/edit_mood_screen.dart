@@ -6,6 +6,7 @@ import '../../models/emoji_data.dart';
 import '../../models/reasons_data.dart';
 import '../widgets/date_time_picker.dart';
 import '../widgets/responsive_extension.dart';
+import '../widgets/snack_bar_helper.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_text_styles.dart';
 
@@ -322,9 +323,7 @@ class _EditMoodScreenState extends State<EditMoodScreen> {
                       ),
                       onPressed: () {
                         if (selectedEmotions.isEmpty || reasonsController.text.isEmpty) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: const Text('Please select at least one emotion and one reason'), backgroundColor: AppColors.primary),
-                          );
+                          showSnackBar(context, 'Please select at least one emotion and one reason');
                         } else {
                           // Prepare updated data
                           final updatedMoodEntry = MoodEntry(
@@ -340,9 +339,7 @@ class _EditMoodScreenState extends State<EditMoodScreen> {
                                 widget.moodEntryDoc.id, updatedMoodEntry);
                             Navigator.of(context).pop();
                           } catch (e) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Error updating entry: $e'), backgroundColor: AppColors.primary),
-                            );
+                            showSnackBar(context, 'Error updating entry: $e');
                           }
                         }
                       },

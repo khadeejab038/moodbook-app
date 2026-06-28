@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'snack_bar_helper.dart';
 
 Future<void> selectDateAndTime(BuildContext context, DateTime selectedDateTime, Function(DateTime) onDateTimeChanged) async {
   final DateTime? pickedDate = await showDatePicker(
@@ -24,12 +25,7 @@ Future<void> selectDateAndTime(BuildContext context, DateTime selectedDateTime, 
       );
 
       if (combinedDateTime.isAfter(DateTime.now())) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("Future dates and times are not allowed."),
-            duration: Duration(seconds: 2),
-          ),
-        );
+        showSnackBar(context, "Future dates and times are not allowed.");
       } else {
         onDateTimeChanged(combinedDateTime);
       }

@@ -7,6 +7,7 @@ import '../../theme/app_colors.dart';
 import '../../theme/app_text_styles.dart';
 import 'add_mood_screen3_reasons.dart';
 import '../widgets/responsive_extension.dart';
+import '../widgets/snack_bar_helper.dart';
 
 class AddEmotions extends StatefulWidget {
   const AddEmotions({super.key});
@@ -270,13 +271,7 @@ class _AddEmotionsState extends State<AddEmotions> {
                   ),
                   onPressed: () {
                     if (moodProvider.selectedEmotions.isEmpty) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Please select at least one emotion before continuing.'),
-                          backgroundColor: AppColors.primary,
-                          duration: Duration(seconds: 2),
-                        ),
-                      );
+                      showSnackBar(context, 'Please select at least one emotion before continuing.');
                     } else {
                       Navigator.push(context, MaterialPageRoute(builder: (context) => const AddReasons()));
                     }

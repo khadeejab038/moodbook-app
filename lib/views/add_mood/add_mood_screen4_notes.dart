@@ -7,6 +7,7 @@ import '../../theme/app_text_styles.dart';
 import '../home/home_screen.dart';
 import 'add_mood_screen5_popup.dart';
 import '../widgets/responsive_extension.dart';
+import '../widgets/snack_bar_helper.dart';
 
 class AddNotes extends StatefulWidget {
   const AddNotes({super.key});
@@ -170,9 +171,7 @@ class _AddNotesState extends State<AddNotes> {
                       showPopupDialog(moodEntry.getMood);
                     } catch (e) {
                       print('Error: $e');
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Error saving mood entry'), backgroundColor: AppColors.primary),
-                      );
+                      showSnackBar(context, 'Error saving mood entry');
                     }
                   },
                   child: Text(

@@ -374,15 +374,11 @@ void _confirmDeleteAccount(BuildContext context) {
                     await deleteUserAccount();
                     print("deleted user");
                   } catch (e) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Error deleting account: $e'), backgroundColor: AppColors.primary),
-                    );
+                    showSnackBar(context, 'Error deleting account: $e');
                   }
                 }
               } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: const Text('Please enter your password to proceed.'), backgroundColor: AppColors.primary),
-                );
+                showSnackBar(context, 'Please enter your password to proceed.');
               }
             },
           ),

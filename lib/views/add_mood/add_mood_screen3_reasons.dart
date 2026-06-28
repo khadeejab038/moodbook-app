@@ -7,6 +7,7 @@ import '../../theme/app_text_styles.dart';
 import '../home/home_screen.dart';
 import 'add_mood_screen4_notes.dart';
 import '../widgets/responsive_extension.dart';
+import '../widgets/snack_bar_helper.dart';
 
 class AddReasons extends StatefulWidget {
   const AddReasons({super.key});
@@ -199,13 +200,7 @@ class _AddReasonsState extends State<AddReasons> {
                   ),
                   onPressed: () {
                     if (moodProvider.selectedReasons.isEmpty) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Please select at least one reason before continuing.'),
-                          backgroundColor: AppColors.primary,
-                          duration: Duration(seconds: 2),
-                        ),
-                      );
+                      showSnackBar(context, 'Please select at least one reason before continuing.');
                     } else {
                       Navigator.push(context, MaterialPageRoute(builder: (context) => const AddNotes()));
                     }

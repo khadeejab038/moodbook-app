@@ -9,6 +9,7 @@ import 'edit_mood_screen.dart';
 import '../widgets/responsive_extension.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_text_styles.dart';
+import '../widgets/snack_bar_helper.dart';
 
 class HistoryPage extends StatefulWidget {
   @override
@@ -223,12 +224,7 @@ class _HistoryTileState extends State<HistoryTile> {
     try {
       await FirebaseFirestore.instance.collection('mood_entries').doc(widget.entryId).delete();
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error deleting entry: $e'),
-          backgroundColor: AppColors.primary,
-        ),
-      );
+      showSnackBar(context, 'Error deleting entry: $e');
     }
   }
 
@@ -247,20 +243,10 @@ class _HistoryTileState extends State<HistoryTile> {
           ),
         );
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text('Mood entry not found'),
-            backgroundColor: AppColors.primary,
-          ),
-        );
+        showSnackBar(context, 'Mood entry not found');
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error fetching entry: $e'),
-          backgroundColor: AppColors.primary,
-        ),
-      );
+      showSnackBar(context, 'Error fetching entry: $e');
     }
   }
 

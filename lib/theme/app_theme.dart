@@ -51,10 +51,13 @@ class AppTheme {
       );
 
   static SnackBarThemeData _snackBarTheme(Color bg) => SnackBarThemeData(
-    backgroundColor: bg,
-    contentTextStyle: AppTextStyles.body.copyWith(color: Colors.white),
+    backgroundColor: bg.withOpacity(0.8),
+    contentTextStyle: AppTextStyles.body.copyWith(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w500),
     behavior: SnackBarBehavior.floating,
-    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(12),
+      side: BorderSide(color: bg.withOpacity(0.3), width: 1),
+    ),
   );
 
   // ── Light Theme ──────────────────────────────────────────────────────────

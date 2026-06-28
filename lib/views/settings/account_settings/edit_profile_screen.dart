@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../models/database/user_database.dart';
 import '../../../models/user.dart' as model;
 import '../../../views/widgets/responsive_extension.dart';
+import '../../../views/widgets/snack_bar_helper.dart';
 import '../../../theme/app_colors.dart';
 import '../../../theme/app_text_styles.dart';
 
@@ -38,9 +39,7 @@ class _EditProfileState extends State<EditProfile> {
         });
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to fetch user data: $e'), backgroundColor: AppColors.primary),
-      );
+      showSnackBar(context, 'Failed to fetch user data: $e');
       setState(() {
         isLoading = false;
       });
@@ -116,25 +115,17 @@ class _EditProfileState extends State<EditProfile> {
           currentUser.email = email;
           await UserDatabase.updateUserInFirestore(currentUser.userID, currentUser);
 
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Profile updated successfully!'), backgroundColor: AppColors.primary),
-          );
+          showSnackBar(context, 'Profile updated successfully!');
           Navigator.pop(context);
         }
       } on auth.FirebaseAuthException catch (e) {
         if (e.code == 'requires-recent-login') {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Please log in again to update your email.'), backgroundColor: AppColors.primary),
-          );
+          showSnackBar(context, 'Please log in again to update your email.');
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Failed to update email: ${e.message}'), backgroundColor: AppColors.primary),
-          );
+          showSnackBar(context, 'Failed to update email: ${e.message}');
         }
       } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to update profile: $e'), backgroundColor: AppColors.primary),
-        );
+        showSnackBar(context, 'Failed to update profile: $e');
       }
     }
   }
