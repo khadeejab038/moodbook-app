@@ -1,4 +1,4 @@
-package com.example.firebasebackend
+package com.example.moodbook
 
 import io.flutter.embedding.android.FlutterActivity
 

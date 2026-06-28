@@ -238,6 +238,7 @@ import 'package:firebasebackend/views/settings/support_and_feedback/feedback_pag
 import 'package:flutter/material.dart';
 import '../../models/database/user_database.dart';
 import '../home/widgets/bottom_nav_bar.dart';
+import '../widgets/snack_bar_helper.dart';
 import '../../main.dart';
 import '../user_authentication/signin_screen.dart';
 import 'about/about.dart';
@@ -284,18 +285,36 @@ class SettingsPage extends StatelessWidget {
                   _buildSectionTitle('Account Settings'),
                   _buildSettingsTile(
                     title: 'Profile Management',
-                    subtitle: 'Edit name, email, and avatar',
-                    onTap: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => EditProfile()),
-                    ),
+                    subtitle: 'Edit name and email',
+                    onTap: () {
+                      final user = FirebaseAuth.instance.currentUser;
+                      final isGoogleUser = user != null &&
+                          user.providerData.any((u) => u.providerId == 'google.com');
+                      if (isGoogleUser) {
+                        showSnackBar(context, 'Profile editing is not available for Google accounts.', Color(0xFF8B4CFC));
+                      } else {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => EditProfile()),
+                        );
+                      }
+                    },
                   ),
                   _buildSettingsTile(
                     title: 'Change Password',
-                    onTap: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => ChangePasswordScreen()),
-                    ),
+                    onTap: () {
+                      final user = FirebaseAuth.instance.currentUser;
+                      final isGoogleUser = user != null &&
+                          user.providerData.any((u) => u.providerId == 'google.com');
+                      if (isGoogleUser) {
+                        showSnackBar(context, 'Password change is not available for Google accounts.', Color(0xFF8B4CFC));
+                      } else {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => ChangePasswordScreen()),
+                        );
+                      }
+                    },
                   ),
 
                   _buildSettingsTile(

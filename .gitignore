@@ -50,7 +50,7 @@ android/key.properties
 # Local configuration files
 android/local.properties
 
-# Firebase Configuration files (highly recommended for public/shared repos)
+# Firebase Configuration files
 android/app/google-services.json
 ios/Runner/GoogleService-Info.plist
 
