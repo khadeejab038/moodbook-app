@@ -2,6 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebasebackend/views/user_authentication/signup_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import '../../models/database/user_database.dart';
+import '../../models/user.dart' as AppUser;
 import '../widgets/snack_bar_helper.dart';
 import 'forgot_password_screen.dart';
 import '../home/home_screen.dart';
@@ -61,7 +63,23 @@ class _SignInScreenState extends State<SignInScreen> {
         idToken: googleAuth.idToken,
       );
 
-      await FirebaseAuth.instance.signInWithCredential(credential);
+      final UserCredential userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
+      final User? user = userCredential.user;
+
+      if (user != null) {
+        // Check if the user document exists in Firestore
+        final AppUser.User? existingUser = await UserDatabase.fetchUserFromFirestore(user.uid);
+        if (existingUser == null) {
+          // If the user document does not exist, create and save a new one
+          final AppUser.User newUser = AppUser.User(
+            userID: user.uid,
+            name: user.displayName ?? 'Google User',
+            email: user.email ?? '',
+            createdAt: DateTime.now(),
+          );
+          await UserDatabase.saveUserToFirestore(newUser);
+        }
+      }
 
       showSnackBar(context, 'Sign-in successful!', Color(0xFF8B4CFC));
       Navigator.pushReplacement(
