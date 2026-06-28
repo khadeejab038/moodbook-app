@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../../theme/app_colors.dart';
 import '../../../theme/app_text_styles.dart';
+import '../../widgets/responsive_extension.dart';
 
 class MoodPieChart extends StatefulWidget {
   @override
@@ -70,6 +71,73 @@ class _MoodPieChartState extends State<MoodPieChart> {
     return moodCounts;
   }
 
+  String _getMoodEmoji(String mood) {
+    switch (mood) {
+      case 'Excellent':
+        return 'assets/heart-eyes.png';
+      case 'Good':
+        return 'assets/halo.png';
+      case 'Neutral':
+        return 'assets/neutral-face.png';
+      case 'Bad':
+        return 'assets/disappointed.png';
+      case 'Terrible':
+        return 'assets/angry.png';
+      default:
+        return 'assets/neutral-face.png';
+    }
+  }
+
+  Widget _buildSectionBadge({
+    required BuildContext context,
+    required String moodName,
+    required double percentage,
+  }) {
+    final emojiPath = _getMoodEmoji(moodName);
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset(
+              emojiPath,
+              width: context.w(3.5),
+              height: context.w(3.5),
+            ),
+            SizedBox(width: context.w(1)),
+            Text(
+              "${percentage.toStringAsFixed(0)}%",
+              style: AppTextStyles.caption.copyWith(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: context.w(2.8),
+                shadows: const [
+                  Shadow(blurRadius: 3.0, color: Colors.black54, offset: Offset(1, 1))
+                ],
+              ),
+            ),
+          ],
+        ),
+        SizedBox(height: context.h(0.2)),
+        Text(
+          moodName,
+          style: AppTextStyles.caption.copyWith(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: context.w(2.6),
+            shadows: const [
+              Shadow(blurRadius: 3.0, color: Colors.black54, offset: Offset(1, 1))
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -129,25 +197,24 @@ class _MoodPieChartState extends State<MoodPieChart> {
               child: PieChart(
                 PieChartData(
                   sections: data.entries
+                      .where((entry) => entry.value > 0)
                       .map(
                         (entry) => PieChartSectionData(
                       color: AppColors.forMood(entry.key),
                       value: entry.value,
-                      title: entry.value > 0 ? '${entry.key} (${entry.value.toStringAsFixed(1)}%)' : '',
-                      radius: 80,
-                      titleStyle: AppTextStyles.caption.copyWith(
-                        fontSize: 12,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        shadows: [
-                          const Shadow(blurRadius: 2.0, color: Colors.black45, offset: Offset(1, 1))
-                        ]
+                      radius: 100,
+                      showTitle: false,
+                      badgeWidget: _buildSectionBadge(
+                        context: context,
+                        moodName: entry.key,
+                        percentage: entry.value,
                       ),
+                      badgePositionPercentageOffset: 0.55,
                     ),
                   )
                       .toList(),
-                  sectionsSpace: 4,
-                  centerSpaceRadius: 20,
+                  sectionsSpace: 2,
+                  centerSpaceRadius: 0,
                 ),
               ),
             );
