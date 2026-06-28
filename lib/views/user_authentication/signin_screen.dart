@@ -7,6 +7,7 @@ import '../../models/user.dart' as AppUser;
 import '../widgets/snack_bar_helper.dart';
 import 'forgot_password_screen.dart';
 import '../home/home_screen.dart';
+import '../widgets/responsive_extension.dart';
 
 class SignInScreen extends StatefulWidget {
   @override
@@ -100,8 +101,9 @@ class _SignInScreenState extends State<SignInScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: false,
       body: isloading?Center(child: CircularProgressIndicator()):Container(
+        height: double.infinity,
+        width: double.infinity,
         decoration: const BoxDecoration(
           gradient: RadialGradient(
             center: Alignment(-0.5, -0.5),
@@ -115,46 +117,46 @@ class _SignInScreenState extends State<SignInScreen> {
           ),
         ),
         child: SafeArea(
-          child: Column(
-            children: [
-              SizedBox(height: 40),
-              AppBar(
-                backgroundColor: Colors.transparent,
-                elevation: 0,
-                title: Padding(
-                  padding: const EdgeInsets.only(top: 25.0),
-                  child: Center(
-                    child: const Text(
-                      'Welcome to MoodBook!',
-                      style: TextStyle(
-                        fontFamily: 'Pangram',
-                        fontWeight: FontWeight.w600,
-                        fontSize: 26,
-                        color: Color(0xFFFFFFFF),
-                        shadows: [
-                          Shadow(
-                            offset: Offset(2.0, 2.0),
-                            blurRadius: 4.0,
-                            color: Color(0x80000000),
-                          ),
-                        ],
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                SizedBox(height: context.h(2.5)),
+                AppBar(
+                  backgroundColor: Colors.transparent,
+                  elevation: 0,
+                  title: Padding(
+                    padding: EdgeInsets.only(top: context.h(3)),
+                    child: Center(
+                      child: const Text(
+                        'Welcome to MoodBook!',
+                        style: TextStyle(
+                          fontFamily: 'Pangram',
+                          fontWeight: FontWeight.w600,
+                          fontSize: 26,
+                          color: Color(0xFFFFFFFF),
+                          shadows: [
+                            Shadow(
+                              offset: Offset(2.0, 2.0),
+                              blurRadius: 4.0,
+                              color: Color(0x80000000),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
 
-              SizedBox(height: 60),
+                SizedBox(height: context.h(3.5)),
 
-              Container(
-                height: 500,
-                width: 350,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20.0),
-                ),
+                Container(
+                  width: context.w(90).clamp(300.0, 360.0),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(context.w(5)),
+                  ),
                 child: Padding(
-                  padding: const EdgeInsets.all(30.0),
+                  padding: EdgeInsets.all(context.w(8)),
 
                   child: Form(
                     key: _formKey,
@@ -163,13 +165,13 @@ class _SignInScreenState extends State<SignInScreen> {
                       children: [
                         TextFormField(
                           controller: _emailController,
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
                             hintText: 'Enter your Email',
-                            hintStyle: TextStyle(
+                            hintStyle: const TextStyle(
                               fontFamily: 'Pangram',
                               fontWeight: FontWeight.w500,
                             ),
-                            prefixIcon: Icon(Icons.email_outlined, size: 20,),
+                            prefixIcon: Icon(Icons.email_outlined, size: context.w(5)),
                           ),
                           validator: (value) {
                             if (value == null || !value.contains('@')) {
@@ -178,17 +180,17 @@ class _SignInScreenState extends State<SignInScreen> {
                             return null;
                           },
                         ),
-                        const SizedBox(height: 30),
+                        SizedBox(height: context.h(3.5)),
 
                         TextFormField(
                           controller: _passwordController,
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
                             hintText: 'Enter your Password',
-                            hintStyle: TextStyle(
+                            hintStyle: const TextStyle(
                               fontFamily: 'Pangram',
                               fontWeight: FontWeight.w500,
                             ),
-                            prefixIcon: Icon(Icons.key_outlined, size: 20,),
+                            prefixIcon: Icon(Icons.key_outlined, size: context.w(5)),
                           ),
                           obscureText: true,
                           validator: (value) {
@@ -199,10 +201,10 @@ class _SignInScreenState extends State<SignInScreen> {
                           },
                         ),
 
-                        const SizedBox(height: 10),
+                        SizedBox(height: context.h(1.2)),
 
-                        Padding(
-                          padding: const EdgeInsets.only(left: 160.0),
+                        Align(
+                          alignment: Alignment.centerRight,
                           child: GestureDetector(
                             onTap: () {
                               Navigator.push(
@@ -224,15 +226,15 @@ class _SignInScreenState extends State<SignInScreen> {
                           ),
                         ),
 
-                        const SizedBox(height: 20),
+                        SizedBox(height: context.h(2.5)),
 
                         ElevatedButton(
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Color(0xB2C9FAFB),
                             foregroundColor: Colors.black,
-                            minimumSize: const Size(double.infinity, 50), // Wider button
+                            minimumSize: Size(double.infinity, context.h(6)), // Wider button
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15.0), // No rounded edges
+                              borderRadius: BorderRadius.circular(context.w(3.5)), // No rounded edges
                             ),
 
                             elevation: 5, // Adds shadow
@@ -249,15 +251,15 @@ class _SignInScreenState extends State<SignInScreen> {
                         ),
 
 
-                        const SizedBox(height: 20),
+                        SizedBox(height: context.h(2.5)),
 
                         ElevatedButton(
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Color(0xB2C9FAFB),
                             foregroundColor: Colors.black, // Text color
-                            minimumSize: const Size(double.infinity, 50), // Wider button
+                            minimumSize: Size(double.infinity, context.h(6)), // Wider button
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15.0), // Slightly rounded edges
+                              borderRadius: BorderRadius.circular(context.w(3.5)), // Slightly rounded edges
                             ),
 
                             elevation: 5, // Adds shadow
@@ -268,8 +270,8 @@ class _SignInScreenState extends State<SignInScreen> {
                               mainAxisSize: MainAxisSize.min,
                             children: [
                               Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Image.asset('assets/google.png', height: 20),
+                                padding: EdgeInsets.all(context.w(2)),
+                                child: Image.asset('assets/google.png', height: context.h(2.5)),
                               ),
 
                               const Text(
@@ -284,7 +286,7 @@ class _SignInScreenState extends State<SignInScreen> {
                         ),
 
 
-                        const SizedBox(height: 30),
+                        SizedBox(height: context.h(3.5)),
 
 
                         GestureDetector(
@@ -329,6 +331,7 @@ class _SignInScreenState extends State<SignInScreen> {
           ),
         ),
       ),
+    ),
     );
   }
 }

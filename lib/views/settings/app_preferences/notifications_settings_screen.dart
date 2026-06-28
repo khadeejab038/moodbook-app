@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../models/user.dart';
 import '../../../controllers/check_in_controller.dart';
+import '../../../theme/app_colors.dart';
+import '../../../theme/app_text_styles.dart';
 
 class NotificationsSettingsPage extends StatefulWidget {
   @override
@@ -64,47 +66,59 @@ class _NotificationsSettingsPageState extends State<NotificationsSettingsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
+    final subtitleColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight;
+
     return Scaffold(
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
         title: Text(
           'Notification Settings',
-          style: TextStyle(
-            fontFamily: 'Pangram',
-            fontWeight: FontWeight.bold,
-          ),
+          style: AppTextStyles.pageTitle.copyWith(color: textColor),
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
-        iconTheme: IconThemeData(color: Color(0xFF100F11)),
+        iconTheme: IconThemeData(color: textColor),
       ),
-      body: Consumer<CheckInController>(
-        builder: (context, provider, child) {
+      body: Container(
+        height: double.infinity,
+        width: double.infinity,
+        decoration: BoxDecoration(
+          gradient: isDark ? AppColors.pageGradientDark : AppColors.pageGradientLight,
+        ),
+        child: SafeArea(
+          child: Consumer<CheckInController>(
+            builder: (context, provider, child) {
           final checkInReminders = provider.checkInReminders;
 
           return ListView(
-            padding: EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(16.0),
             children: [
               Text(
                 'Manage your mood check-in reminders.',
-                style: TextStyle(
-                  fontFamily: 'Pangram',
-                  fontSize: 16,
-                  color: Color(0xFF100F11),
+                style: AppTextStyles.body.copyWith(
+                  color: textColor,
                 ),
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               ListView.builder(
                 shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
+                physics: const NeverScrollableScrollPhysics(),
                 itemCount: checkInReminders.length,
                 itemBuilder: (context, index) {
                   final reminder = checkInReminders[index];
 
                   return Card(
+                    color: isDark ? AppColors.cardDark : Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      side: isDark ? BorderSide(color: Colors.grey.shade800) : BorderSide.none,
+                    ),
                     child: ListTile(
                       title: Text(
                         'Reminder at ${TimeOfDay.fromDateTime(reminder.timestamp).format(context)}',
-                        style: TextStyle(fontFamily: 'Pangram'),
+                        style: AppTextStyles.bodySemiBold.copyWith(color: textColor),
                       ),
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
@@ -115,7 +129,7 @@ class _NotificationsSettingsPageState extends State<NotificationsSettingsPage> {
                                 _toggleCheckInReminder(context, index, value),
                           ),
                           IconButton(
-                            icon: Icon(Icons.delete, color: Colors.red),
+                            icon: const Icon(Icons.delete, color: AppColors.error),
                             onPressed: () =>
                                 _deleteCheckInReminder(context, index),
                           ),
@@ -126,13 +140,16 @@ class _NotificationsSettingsPageState extends State<NotificationsSettingsPage> {
                   );
                 },
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               ElevatedButton.icon(
-                icon: Icon(Icons.add),
-                label: Text('Add Reminder'),
+                icon: const Icon(Icons.add, color: Colors.white),
+                label: Text('Add Reminder', style: AppTextStyles.button.copyWith(color: Colors.white)),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFF8B4CFC),
-                  foregroundColor: Colors.black,
+                  backgroundColor: AppColors.primary,
+                  minimumSize: const Size(double.infinity, 50),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
                 onPressed: () => _addCheckInReminder(context),
               ),
@@ -140,6 +157,8 @@ class _NotificationsSettingsPageState extends State<NotificationsSettingsPage> {
           );
         },
       ),
-    );
+     ),
+    ),
+   );
   }
 }
