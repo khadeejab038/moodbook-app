@@ -285,7 +285,7 @@ class SettingsPage extends StatelessWidget {
                   _buildSectionTitle('Account Settings'),
                   _buildSettingsTile(
                     title: 'Profile Management',
-                    subtitle: 'Edit name, email, and avatar',
+                    subtitle: 'Edit name and email',
                     onTap: () {
                       final user = FirebaseAuth.instance.currentUser;
                       final isGoogleUser = user != null &&

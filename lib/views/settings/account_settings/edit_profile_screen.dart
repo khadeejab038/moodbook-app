@@ -496,29 +496,6 @@ class _EditProfileState extends State<EditProfile> {
                         ],
                       ),
                       const SizedBox(height: 70),
-                      Center(
-                        child: GestureDetector(
-                          onTap: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text(
-                                  "profile picture clicked!"), backgroundColor: Color(0xFF8B4CFC),),
-                            );
-                          },
-                          child: CircleAvatar(
-                            radius: 100,
-                            backgroundColor: Colors.grey[300],
-                            child: ClipOval(
-                              child: Image.asset(
-                                'assets/avatars/avatar.jpeg',
-                                fit: BoxFit.cover,
-                                width: 200,
-                                height: 200,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 30),
                       const Align(
                         alignment: Alignment.centerLeft,
                         child: Text(
