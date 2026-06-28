@@ -1,0 +1,389 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../main.dart';
+import '../../theme/app_colors.dart';
+import '../../theme/app_text_styles.dart';
+import '../../theme/theme_provider.dart';
+import '../user_authentication/signin_screen.dart';
+import '../widgets/bottom_nav_bar.dart';
+import '../widgets/snack_bar_helper.dart';
+import '../widgets/responsive_extension.dart';
+import 'about/about.dart';
+import 'account_settings/change_password_screen.dart';
+import 'account_settings/edit_profile_screen.dart';
+import 'account_settings/account_settings.dart';
+import 'app_preferences/notifications_settings_screen.dart';
+import 'data_management/data_management.dart';
+import 'support_and_feedback/contact_support_page.dart';
+import 'support_and_feedback/feedback_page.dart';
+
+class SettingsPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
+    final subtitleColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight;
+
+    return Scaffold(
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: isDark ? AppColors.pageGradientDark : AppColors.pageGradientLight,
+        ),
+        child: Column(
+          children: [
+            Padding(
+              padding: EdgeInsets.fromLTRB(context.w(4), context.h(8.75), context.w(4), context.w(4)),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Settings',
+                  style: AppTextStyles.pageTitle.copyWith(
+                    color: textColor,
+                    fontSize: context.w(5),
+                  ),
+                ),
+              ),
+            ),
+            Expanded(
+              child: ListView(
+                padding: EdgeInsets.all(context.w(4)),
+                children: [
+                  // Account Settings
+                  _buildSectionTitle(context, 'Account Settings', textColor),
+                  _buildSettingsTile(
+                    context: context,
+                    textColor: textColor,
+                    subtitleColor: subtitleColor,
+                    title: 'Profile Management',
+                    subtitle: 'Edit name and email',
+                    onTap: () {
+                      final user = FirebaseAuth.instance.currentUser;
+                      final isGoogleUser = user != null &&
+                          user.providerData.any((u) => u.providerId == 'google.com');
+                      if (isGoogleUser) {
+                        showSnackBar(context, 'Profile editing is not available for Google accounts.', AppColors.primary);
+                      } else {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => EditProfile()),
+                        );
+                      }
+                    },
+                  ),
+                  _buildSettingsTile(
+                    context: context,
+                    textColor: textColor,
+                    subtitleColor: subtitleColor,
+                    title: 'Change Password',
+                    onTap: () {
+                      final user = FirebaseAuth.instance.currentUser;
+                      final isGoogleUser = user != null &&
+                          user.providerData.any((u) => u.providerId == 'google.com');
+                      if (isGoogleUser) {
+                        showSnackBar(context, 'Password change is not available for Google accounts.', AppColors.primary);
+                      } else {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => ChangePasswordScreen()),
+                        );
+                      }
+                    },
+                  ),
+                  _buildSettingsTile(
+                    context: context,
+                    textColor: textColor,
+                    subtitleColor: subtitleColor,
+                    title: 'Logout',
+                    onTap: () => AccountSettings.handleLogout(context),
+                  ),
+                  _buildSettingsTile(
+                    context: context,
+                    textColor: textColor,
+                    subtitleColor: subtitleColor,
+                    title: 'Delete Account',
+                    onTap: () => _confirmDeleteAccount(context),
+                  ),
+
+                  SizedBox(height: context.h(2)),
+
+                  // App Preferences
+                  _buildSectionTitle(context, 'App Preferences', textColor),
+                  _buildSwitchTile(
+                    textColor: textColor,
+                    title: 'Dark Mode',
+                    value: themeProvider.themeMode == ThemeMode.dark,
+                    onChanged: (value) => themeProvider.setDark(value),
+                  ),
+                  _buildSettingsTile(
+                    context: context,
+                    textColor: textColor,
+                    subtitleColor: subtitleColor,
+                    title: 'Notification Settings',
+                    subtitle: 'Set reminder preferences',
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => NotificationsSettingsPage()),
+                    ),
+                  ),
+                  SizedBox(height: context.h(2)),
+
+                  // Data Management
+                  _buildSectionTitle(context, 'Data Management', textColor),
+                  _buildSettingsTile(
+                    context: context,
+                    textColor: textColor,
+                    subtitleColor: subtitleColor,
+                    title: 'Export Data',
+                    onTap: () => DataManagement.exportData(context),
+                  ),
+                  _buildSettingsTile(
+                    context: context,
+                    textColor: textColor,
+                    subtitleColor: subtitleColor,
+                    title: 'Clear Mood Logs',
+                    onTap: () => DataManagement.clearMoodLogs(context),
+                  ),
+                  SizedBox(height: context.h(2)),
+
+                  // Support and Feedback
+                  _buildSectionTitle(context, 'Support and Feedback', textColor),
+                  _buildSettingsTile(
+                    context: context,
+                    textColor: textColor,
+                    subtitleColor: subtitleColor,
+                    title: 'Help Center',
+                    onTap: () => _openWebPage('https://moodbook.com/helpCenter'),
+                  ),
+                  _buildSettingsTile(
+                    context: context,
+                    textColor: textColor,
+                    subtitleColor: subtitleColor,
+                    title: 'Contact Support',
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => ContactSupportPage()),
+                    ),
+                  ),
+                  _buildSettingsTile(
+                    context: context,
+                    textColor: textColor,
+                    subtitleColor: subtitleColor,
+                    title: 'Feedback',
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => FeedbackPage()),
+                    ),
+                  ),
+                  SizedBox(height: context.h(2)),
+
+                  // About
+                  _buildSectionTitle(context, 'About', textColor),
+                  _buildSettingsTile(
+                    context: context,
+                    textColor: textColor,
+                    subtitleColor: subtitleColor,
+                    title: 'About MoodBook',
+                    subtitle: 'Version 1.0.0',
+                    onTap: () => About.showCustomAboutDialog(context),
+                  ),
+                  SizedBox(height: context.h(2)),
+
+                  // Legal
+                  _buildSectionTitle(context, 'Legal', textColor),
+                  _buildSettingsTile(
+                    context: context,
+                    textColor: textColor,
+                    subtitleColor: subtitleColor,
+                    title: 'Privacy Policy',
+                    onTap: () => _openWebPage('https://moodbook.com/privacy'),
+                  ),
+                  _buildSettingsTile(
+                    context: context,
+                    textColor: textColor,
+                    subtitleColor: subtitleColor,
+                    title: 'Terms of Service',
+                    onTap: () => _openWebPage('https://moodbook.com/terms'),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+      bottomNavigationBar: BottomNavBar(currentIndex: 4),
+    );
+  }
+
+  Widget _buildSectionTitle(BuildContext context, String title, Color textColor) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: context.h(1.5)),
+      child: Text(
+        title,
+        style: AppTextStyles.settingsSection.copyWith(
+          fontSize: context.w(4.5),
+          color: textColor,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSettingsTile({
+    required BuildContext context,
+    required Color textColor,
+    required Color subtitleColor,
+    required String title,
+    String? subtitle,
+    required VoidCallback onTap,
+  }) {
+    return ListTile(
+      title: Text(
+        title,
+        style: AppTextStyles.settingsTile.copyWith(color: textColor),
+      ),
+      subtitle: subtitle != null
+          ? Text(
+        subtitle,
+        style: AppTextStyles.settingsTile.copyWith(
+          color: subtitleColor,
+        ),
+      )
+          : null,
+      onTap: onTap,
+      trailing: Icon(Icons.arrow_forward_ios, size: context.w(4), color: subtitleColor),
+    );
+  }
+
+  Widget _buildSwitchTile({
+    required Color textColor,
+    required String title,
+    required bool value,
+    required ValueChanged<bool> onChanged,
+  }) {
+    return SwitchListTile(
+      title: Text(
+        title,
+        style: AppTextStyles.settingsTile.copyWith(color: textColor),
+      ),
+      value: value,
+      onChanged: onChanged,
+    );
+  }
+
+  void _openWebPage(String url) {
+    // Open a web page
+  }
+}
+
+Future<void> deleteUserAccount() async {
+  try {
+    User? user = FirebaseAuth.instance.currentUser;
+
+    if (user == null) {
+      print('No user is signed in.');
+      return;
+    }
+
+    String userId = user.uid;
+
+    // Step 1: Delete Firestore documents associated with the user
+    await FirebaseFirestore.instance.collection('users').doc(userId).delete();
+
+    QuerySnapshot moodEntries = await FirebaseFirestore.instance
+        .collection('mood_entries')
+        .where('userId', isEqualTo: userId)
+        .get();
+
+    for (var doc in moodEntries.docs) {
+      await FirebaseFirestore.instance.collection('mood_entries').doc(doc.id).delete();
+    }
+
+    // Step 2: Delete the user account from Firebase Authentication
+    await user.delete();
+    print('User account and associated data successfully deleted.');
+
+    await FirebaseAuth.instance.signOut();
+
+    navigatorKey.currentState?.pushReplacement(
+      MaterialPageRoute(builder: (context) => SignInScreen()),
+    );
+
+  } catch (e) {
+    print('Error while deleting user account: $e');
+  }
+}
+
+// Confirm Delete Account Dialog
+void _confirmDeleteAccount(BuildContext context) {
+  final TextEditingController passwordController = TextEditingController();
+  final isDark = Theme.of(context).brightness == Brightness.dark;
+  final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
+
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
+        title: Text('Delete Account', style: AppTextStyles.heading2.copyWith(color: textColor)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text('Are you sure you want to delete your account? This action cannot be undone.',
+                style: AppTextStyles.body.copyWith(color: textColor)),
+            const SizedBox(height: 10),
+            TextField(
+              controller: passwordController,
+              obscureText: true,
+              style: AppTextStyles.body.copyWith(color: textColor),
+              decoration: InputDecoration(
+                labelText: 'Enter your password',
+                labelStyle: AppTextStyles.inputLabel.copyWith(color: isDark ? Colors.grey.shade400 : Colors.grey.shade700),
+                hintText: 'Password',
+                hintStyle: AppTextStyles.inputHint.copyWith(color: isDark ? Colors.grey.shade500 : Colors.grey.shade400),
+                filled: true,
+                fillColor: isDark ? AppColors.cardDark : Colors.grey.shade100,
+                border: const OutlineInputBorder(),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            child: Text('Cancel', style: AppTextStyles.link.copyWith(color: AppColors.primary)),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+          TextButton(
+            child: Text('Delete', style: AppTextStyles.link.copyWith(color: AppColors.error)),
+            onPressed: () async {
+              Navigator.of(context).pop(); // Close the dialog
+              final String password = passwordController.text.trim();
+
+              if (password.isNotEmpty) {
+                final currentUser = FirebaseAuth.instance.currentUser;
+
+                if (currentUser != null) {
+                  try {
+                    await currentUser.reauthenticateWithCredential(
+                      EmailAuthProvider.credential(
+                        email: currentUser.email!,
+                        password: password,
+                      ),
+                    );
+                    await deleteUserAccount();
+                    print("deleted user");
+                  } catch (e) {
+                    showSnackBar(context, 'Error deleting account: $e');
+                  }
+                }
+              } else {
+                showSnackBar(context, 'Please enter your password to proceed.');
+              }
+            },
+          ),
+        ],
+      );
+    },
+  );
+}

@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../../../theme/app_colors.dart';
+import '../../../theme/app_text_styles.dart';
+import '../../widgets/responsive_extension.dart';
 
 class MoodPieChart extends StatefulWidget {
   @override
@@ -15,14 +18,6 @@ class _MoodPieChartState extends State<MoodPieChart> {
     "Neutral": 3,
     "Good": 4,
     "Excellent": 5,
-  };
-
-  final Map<String, Color> moodColors = {
-    "Terrible": Colors.red[300]!,
-    "Bad": Colors.orange[200]!,
-    "Neutral": Colors.yellow[300]!,
-    "Good": Colors.lightGreen[200]!,
-    "Excellent": Colors.green[300]!,
   };
 
   String selectedView = 'Today'; // Default view
@@ -76,8 +71,78 @@ class _MoodPieChartState extends State<MoodPieChart> {
     return moodCounts;
   }
 
+  String _getMoodEmoji(String mood) {
+    switch (mood) {
+      case 'Excellent':
+        return 'assets/heart-eyes.png';
+      case 'Good':
+        return 'assets/halo.png';
+      case 'Neutral':
+        return 'assets/neutral-face.png';
+      case 'Bad':
+        return 'assets/disappointed.png';
+      case 'Terrible':
+        return 'assets/angry.png';
+      default:
+        return 'assets/neutral-face.png';
+    }
+  }
+
+  Widget _buildSectionBadge({
+    required BuildContext context,
+    required String moodName,
+    required double percentage,
+  }) {
+    final emojiPath = _getMoodEmoji(moodName);
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset(
+              emojiPath,
+              width: context.w(3.5),
+              height: context.w(3.5),
+            ),
+            SizedBox(width: context.w(1)),
+            Text(
+              "${percentage.toStringAsFixed(0)}%",
+              style: AppTextStyles.caption.copyWith(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: context.w(2.8),
+                shadows: const [
+                  Shadow(blurRadius: 3.0, color: Colors.black54, offset: Offset(1, 1))
+                ],
+              ),
+            ),
+          ],
+        ),
+        SizedBox(height: context.h(0.2)),
+        Text(
+          moodName,
+          style: AppTextStyles.caption.copyWith(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: context.w(2.6),
+            shadows: const [
+              Shadow(blurRadius: 3.0, color: Colors.black54, offset: Offset(1, 1))
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
+
     return Column(
       children: [
         // Dropdown for time period selection
@@ -86,14 +151,14 @@ class _MoodPieChartState extends State<MoodPieChart> {
           children: [
             DropdownButton<String>(
               value: selectedView,
+              dropdownColor: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
+              style: AppTextStyles.body.copyWith(color: textColor),
               items: ['Today', 'This Week', 'This Month', 'This Year']
                   .map((view) => DropdownMenuItem(
                 value: view,
                 child: Text(
                   view,
-                  style: TextStyle(
-                    fontFamily: 'Pangram', // Pangram font
-                  ),
+                  style: AppTextStyles.body.copyWith(color: textColor),
                 ),
               ))
                   .toList(),
@@ -105,7 +170,6 @@ class _MoodPieChartState extends State<MoodPieChart> {
             ),
           ],
         ),
-        //SizedBox(height: 20),
         FutureBuilder<Map<String, double>>(
           future: _fetchMoodData(selectedView),
           builder: (context, snapshot) {
@@ -114,27 +178,43 @@ class _MoodPieChartState extends State<MoodPieChart> {
             }
 
             final data = snapshot.data!;
+            final hasData = data.values.any((val) => val > 0);
+
+            if (!hasData) {
+              return Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Center(
+                  child: Text(
+                    "No data recorded for this period",
+                    style: AppTextStyles.body.copyWith(color: textColor),
+                  ),
+                ),
+              );
+            }
+
             return AspectRatio(
               aspectRatio: 1.3,
               child: PieChart(
                 PieChartData(
                   sections: data.entries
+                      .where((entry) => entry.value > 0)
                       .map(
                         (entry) => PieChartSectionData(
-                      color: moodColors[entry.key],
+                      color: AppColors.forMood(entry.key),
                       value: entry.value,
-                      title: '${entry.key} (${entry.value.toStringAsFixed(1)}%)',
-                      radius: 80,
-                      titleStyle: TextStyle(
-                        fontFamily: 'Pangram', // Pangram font for title
-                        fontSize: 12,
-                        color: Colors.black,
+                      radius: 100,
+                      showTitle: false,
+                      badgeWidget: _buildSectionBadge(
+                        context: context,
+                        moodName: entry.key,
+                        percentage: entry.value,
                       ),
+                      badgePositionPercentageOffset: 0.55,
                     ),
                   )
                       .toList(),
-                  sectionsSpace: 4,
-                  centerSpaceRadius: 20,
+                  sectionsSpace: 2,
+                  centerSpaceRadius: 0,
                 ),
               ),
             );

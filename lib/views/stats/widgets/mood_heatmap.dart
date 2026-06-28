@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
+import '../../../theme/app_colors.dart';
+import '../../../theme/app_text_styles.dart';
 
 class MoodHeatmap extends StatefulWidget {
   @override
@@ -19,21 +21,21 @@ class _MoodHeatmapState extends State<MoodHeatmap> {
 
   DateTime _currentMonth = DateTime.now();
 
-  // Calculate mood color based on mood value
-  Color _getMoodColor(int? moodValue) {
+  // Calculate mood color based on average mood value
+  Color _getMoodColor(int? moodValue, bool isDark) {
     switch (moodValue) {
       case 1:
-        return Colors.red[300]!;
+        return AppColors.moodTerrible;
       case 2:
-        return Colors.orange[200]!;
+        return AppColors.moodBad;
       case 3:
-        return Colors.yellow[300]!;
+        return AppColors.moodNeutral;
       case 4:
-        return Colors.lightGreen[200]!;
+        return AppColors.moodGood;
       case 5:
-        return Colors.green[300]!;
+        return AppColors.moodExcellent;
       default:
-        return Colors.grey[300]!; // No data
+        return isDark ? Colors.grey.shade800 : Colors.grey.shade300;
     }
   }
 
@@ -50,6 +52,8 @@ class _MoodHeatmapState extends State<MoodHeatmap> {
   @override
   Widget build(BuildContext context) {
     final userId = FirebaseAuth.instance.currentUser?.uid;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
 
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance
@@ -102,8 +106,8 @@ class _MoodHeatmapState extends State<MoodHeatmap> {
               margin: EdgeInsets.all(4.0),
               decoration: BoxDecoration(
                 color: isFutureDate
-                    ? Colors.grey[300]!
-                    : _getMoodColor(averageMoodValue),
+                    ? (isDark ? Colors.grey.shade900 : Colors.grey.shade200)
+                    : _getMoodColor(averageMoodValue, isDark),
                 borderRadius: BorderRadius.circular(15.0),
               ),
               height: 40.0,
@@ -111,15 +115,13 @@ class _MoodHeatmapState extends State<MoodHeatmap> {
               child: Center(
                 child: Text(
                   "${currentDate.day}",
-                  style: TextStyle(
-                    fontFamily: 'Pangram',
+                  style: AppTextStyles.bodyBold.copyWith(
                     fontSize: 12,
-                    fontWeight: FontWeight.bold,
                     color: isFutureDate
-                        ? Colors.grey[100]
+                        ? (isDark ? Colors.grey.shade700 : Colors.grey.shade400)
                         : averageMoodValue != null
                         ? Colors.white
-                        : Colors.black38,
+                        : (isDark ? Colors.grey.shade400 : Colors.black54),
                   ),
                 ),
               ),
@@ -135,27 +137,30 @@ class _MoodHeatmapState extends State<MoodHeatmap> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 IconButton(
-                  icon: Icon(Icons.arrow_back),
+                  icon: Icon(Icons.arrow_back, color: textColor),
                   onPressed: () => _changeMonth(-1),
                 ),
                 Text(
                   "${DateFormat('MMMM yyyy').format(_currentMonth)}",
-                  style: TextStyle(
-                    fontFamily: 'Pangram',
+                  style: AppTextStyles.bodyBold.copyWith(
                     fontSize: 16,
-                    fontWeight: FontWeight.bold,
+                    color: textColor,
                   ),
                 ),
                 IconButton(
-                  icon: Icon(Icons.arrow_forward),
+                  icon: Icon(Icons.arrow_forward, color: textColor),
                   onPressed: () => _changeMonth(1),
                 ),
               ],
             ),
             SizedBox(height: 10),
             // Heatmap
-            Wrap(
-              children: heatmapSquares,
+            SizedBox(
+              width: double.infinity,
+              child: Wrap(
+                alignment: WrapAlignment.center,
+                children: heatmapSquares,
+              ),
             ),
           ],
         );

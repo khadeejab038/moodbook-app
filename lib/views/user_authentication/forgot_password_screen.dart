@@ -147,6 +147,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../widgets/snack_bar_helper.dart';
+import '../widgets/responsive_extension.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   @override
@@ -174,6 +175,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
+        height: double.infinity,
+        width: double.infinity,
         decoration: const BoxDecoration(
           gradient: RadialGradient(
             center: Alignment(-0.5, -0.5),
@@ -187,39 +190,41 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           ),
         ),
         child: SafeArea(
-          child: Column(
-            children: [
-              AppBar(
-                backgroundColor: Colors.transparent,
-                elevation: 0,
-                leading: IconButton(
-                  icon: Icon(Icons.arrow_back, color: Colors.white), // White back button
-                  onPressed: () {
-                    Navigator.pop(context); // Go back to the previous screen
-                  },
-                ),
-                title: Padding(
-                  padding: const EdgeInsets.only(top: 25.0, left: 40),
-                  child: const Text(
-                    'Change Password',
-                    style: TextStyle(
-                      fontFamily: 'Pangram',
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                AppBar(
+                  backgroundColor: Colors.transparent,
+                  elevation: 0,
+                  leading: IconButton(
+                    icon: Icon(Icons.arrow_back, color: Colors.white), // White back button
+                    onPressed: () {
+                      Navigator.pop(context); // Go back to the previous screen
+                    },
+                  ),
+                  title: Padding(
+                    padding: EdgeInsets.only(top: context.h(3)),
+                    child: Center(
+                      child: const Text(
+                        'Change Password',
+                        style: TextStyle(
+                          fontFamily: 'Pangram',
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
+                      ),
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 150),
-              Container(
-                height: 250,
-                width: 350,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20.0),
-                ),
+                SizedBox(height: context.h(3.5)),
+                Container(
+                  width: context.w(90).clamp(300.0, 360.0),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(context.w(5)),
+                  ),
                 child: Padding(
-                  padding: const EdgeInsets.all(25.0),
+                  padding: EdgeInsets.all(context.w(6.5)),
                   child: Form(
                     key: _formKey,
                     child: Column(
@@ -229,7 +234,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                           controller: _emailController,
                           decoration: InputDecoration(
                             hintText: 'Enter your Email',
-                            prefixIcon: Icon(Icons.email, size: 20),
+                            prefixIcon: Icon(Icons.email, size: context.w(5)),
                           ),
                           validator: (value) {
                             if (value == null || !value.contains('@')) {
@@ -238,14 +243,14 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                             return null;
                           },
                         ),
-                        const SizedBox(height: 30),
+                        SizedBox(height: context.h(3.5)),
                         ElevatedButton(
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Color(0xB2C9FAFB),
                             foregroundColor: Colors.black,
-                            minimumSize: const Size(double.infinity, 50),
+                            minimumSize: Size(double.infinity, context.h(6)),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15.0),
+                              borderRadius: BorderRadius.circular(context.w(3.5)),
                             ),
                             elevation: 5,
                             shadowColor: Color(0xFFCCEFFF),
@@ -262,6 +267,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           ),
         ),
       ),
+    ),
     );
   }
 }

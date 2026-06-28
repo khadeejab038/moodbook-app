@@ -118,6 +118,12 @@ class MoodEntryController extends ChangeNotifier {
     notifyListeners();
   }
 
+  // Clear all selected emotions
+  void clearSelectedEmotions() {
+    _moodEntry.setEmotions = [];
+    notifyListeners();
+  }
+
   // Clear all fields
   void clear() {
     _moodEntry = MoodEntry(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../models/database/mood_entry_database.dart';
+import '../../widgets/snack_bar_helper.dart';
 
 class DataManagement {
   // Static method to handle data export functionality
@@ -20,10 +21,7 @@ class DataManagement {
           TextButton(
             onPressed: () {
               // Handle export logic here
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Data export started!'), backgroundColor: Color(0xFF8B4CFC),),
-
-              );
+              showSnackBar(context, 'Data export started!');
               Navigator.of(context).pop();
             },
             child: Text('Export'),

@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
-import '../../models/emoji_item.dart';
-import '../../models/emoji_data.dart';
+import '../../../models/emoji_item.dart';
+import '../../../models/emoji_data.dart';
+import '../../widgets/responsive_extension.dart';
+import '../../../theme/app_colors.dart';
+import '../../../theme/app_text_styles.dart';
 
 class DailyAverageMood extends StatefulWidget {
   @override
@@ -27,7 +30,7 @@ class _DailyAverageMoodState extends State<DailyAverageMood> {
     final moodItem = moods.firstWhere(
           (emoji) => moodValues[emoji.title] == moodRating,
       orElse: () => EmojiItem(
-        imagePath: 'lib/assets/neutral-face.png',
+        imagePath: 'assets/neutral-face.png',
         title: 'Neutral',
       ),
     );
@@ -37,6 +40,11 @@ class _DailyAverageMoodState extends State<DailyAverageMood> {
   @override
   Widget build(BuildContext context) {
     final userId = FirebaseAuth.instance.currentUser?.uid;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
+    final bubbleUnselectedBg = isDark ? AppColors.cardDark : Colors.white;
+    final nextDayBg = isDark ? Colors.grey.shade800 : Colors.grey.shade300;
+    final nextDayTextColor = isDark ? Colors.grey.shade400 : Colors.grey.shade700;
 
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance
@@ -72,12 +80,6 @@ class _DailyAverageMoodState extends State<DailyAverageMood> {
             final moodList = moodData[dateString]!;
             final moodRatings = moodList.map((mood) => moodValues[mood] ?? 3).toList();
             final averageMoodRating = (moodRatings.reduce((a, b) => a + b) / moodRatings.length).round();
-
-            // Find the corresponding emoji
-            final averageMoodTitle = moodValues.keys.firstWhere(
-                  (key) => moodValues[key] == averageMoodRating,
-              orElse: () => 'Neutral',
-            );
 
             return {
               'day': DateFormat('E').format(date),
@@ -119,8 +121,20 @@ class _DailyAverageMoodState extends State<DailyAverageMood> {
               final isToday = day['isToday'];
               final isNextDay = day['isNextDay'] ?? false;
 
+              final Color dateBubbleColor = isToday
+                  ? AppColors.primary
+                  : isNextDay
+                  ? nextDayBg
+                  : bubbleUnselectedBg;
+
+              final Color dateTextColor = isToday
+                  ? Colors.white
+                  : isNextDay
+                  ? nextDayTextColor
+                  : textColor;
+
               return Container(
-                margin: EdgeInsets.symmetric(horizontal: 8.0),
+                margin: EdgeInsets.symmetric(horizontal: context.w(2)),
                 child: Align(
                   alignment: Alignment.topCenter,
                   child: Column(
@@ -128,85 +142,71 @@ class _DailyAverageMoodState extends State<DailyAverageMood> {
                     children: [
                       // Date bubble
                       Container(
-                        padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
+                        padding: EdgeInsets.symmetric(vertical: context.h(1), horizontal: context.w(3)),
                         decoration: BoxDecoration(
-                          color: isToday
-                              ? Color(0xFF8B4CFC)
-                              : isNextDay
-                              ? Colors.grey[300]
-                              : Colors.white,
-                          borderRadius: BorderRadius.circular(25.0),
-                          border: Border.all(
-                            color: isToday
-                                ? Color(0xFF8B4CFC)
-                                : Colors.transparent,
-                            width: 2.0,
-                          ),
+                          color: dateBubbleColor,
+                          borderRadius: BorderRadius.circular(context.w(6.25)),
+                          border: isToday
+                              ? Border.all(
+                            color: AppColors.primary,
+                            width: context.w(0.5),
+                          )
+                              : (isDark ? Border.all(color: Colors.grey.shade800) : null),
                         ),
                         child: Column(
                           children: [
                             Text(
                               day['day'], // Day (e.g., "Mon")
-                              style: TextStyle(
-                                fontFamily: 'Pangram',
-                                color: isToday
-                                    ? Colors.white
-                                    : isNextDay
-                                    ? Colors.grey[700]
-                                    : Colors.black,
+                              style: AppTextStyles.caption.copyWith(
+                                color: dateTextColor,
                                 fontWeight: FontWeight.w600,
-                                fontSize: 12,
+                                fontSize: context.w(3),
                               ),
                             ),
                             Text(
                               day['date'], // Date (e.g., "12")
-                              style: TextStyle(
-                                fontFamily: 'Pangram',
-                                color: isToday
-                                    ? Colors.white
-                                    : isNextDay
-                                    ? Colors.grey[700]
-                                    : Colors.black,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
+                              style: AppTextStyles.bodyBold.copyWith(
+                                color: dateTextColor,
+                                fontSize: context.w(4),
                               ),
                             ),
                           ],
                         ),
                       ),
-                      SizedBox(height: 5), // Space between date bubble and emoji
+                      SizedBox(height: context.h(0.6)), // Space between date bubble and emoji
                       // Emoji or transparent placeholder
                       day['emoji'].isNotEmpty
                           ? Container(
-                        height: 45, // Size for emoji space
-                        width: 45,
+                        height: context.w(11.25), // Size for emoji space
+                        width: context.w(11.25),
                         decoration: BoxDecoration(
                           color: isToday
-                              ? Color(0xFF8B4CFC)
+                              ? AppColors.primary
                               : isNextDay
-                              ? Colors.grey[300]
-                              : Colors.white, // Grey for next day
+                              ? nextDayBg
+                              : bubbleUnselectedBg,
                           shape: BoxShape.circle,
+                          border: isDark ? Border.all(color: Colors.grey.shade800) : null,
                         ),
                         child: Padding(
-                          padding: EdgeInsets.all(10.0),
+                          padding: EdgeInsets.all(context.w(2.5)),
                           child: Container(
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              color: Colors.white,
+                              color: Colors.white, // keep emoji background white or transparent
                             ),
                             child: Image.asset(
                               day['emoji'],
-                              height: 40,
-                              width: 40,
+                              height: context.w(10),
+                              width: context.w(10),
                             ),
                           ),
                         ),
                       )
                           : Container(
-                        height: 45, // Transparent placeholder of same size as emoji
-                        width: 45,
-                        color: Colors.transparent, // Ensures space is reserved
+                        height: context.w(11.25),
+                        width: context.w(11.25),
+                        color: Colors.transparent,
                       ),
                     ],
                   ),
