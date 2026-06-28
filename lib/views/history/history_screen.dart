@@ -18,6 +18,14 @@ class HistoryPage extends StatefulWidget {
 
 class _HistoryPageState extends State<HistoryPage> {
   String _sortingOption = 'newest'; // Default sorting option
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   int moodToValue(String mood) {
     switch (mood.toLowerCase()) {
@@ -107,6 +115,55 @@ class _HistoryPageState extends State<HistoryPage> {
                 ],
               ),
             ),
+            // Search Bar
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: context.w(4), vertical: context.h(1)),
+              child: TextField(
+                controller: _searchController,
+                onChanged: (value) {
+                  setState(() {
+                    _searchQuery = value;
+                  });
+                },
+                style: AppTextStyles.body.copyWith(color: textColor),
+                decoration: InputDecoration(
+                  hintText: 'Search emotions, reasons, or notes...',
+                  hintStyle: AppTextStyles.inputHint.copyWith(
+                    color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+                  ),
+                  filled: true,
+                  fillColor: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
+                  contentPadding: EdgeInsets.symmetric(horizontal: context.w(4), vertical: context.h(1.2)),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(context.w(7.5))),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(context.w(7.5)),
+                    borderSide: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade300),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(context.w(7.5)),
+                    borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+                  ),
+                  prefixIcon: Icon(
+                    Icons.search,
+                    color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+                  ),
+                  suffixIcon: _searchQuery.isNotEmpty
+                      ? IconButton(
+                          icon: Icon(
+                            Icons.clear,
+                            color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+                          ),
+                          onPressed: () {
+                            _searchController.clear();
+                            setState(() {
+                              _searchQuery = '';
+                            });
+                          },
+                        )
+                      : null,
+                ),
+              ),
+            ),
             Expanded(
               child: StreamBuilder<QuerySnapshot>(
                 stream: FirebaseFirestore.instance
@@ -142,24 +199,50 @@ class _HistoryPageState extends State<HistoryPage> {
 
                   var moodEntries = snapshot.data!.docs;
 
-                  // Sort the entries based on the selected sorting option
+                  final filteredEntries = moodEntries.where((entry) {
+                    if (_searchQuery.isEmpty) return true;
+                    final query = _searchQuery.toLowerCase();
+                    final emotions = List<String>.from(entry['emotions'] ?? []);
+                    final reasons = List<String>.from(entry['reasons'] ?? []);
+                    final note = (entry['notes'] as String? ?? '').toLowerCase();
+
+                    final matchesEmotions = emotions.any((e) => e.toLowerCase().contains(query));
+                    final matchesReasons = reasons.any((r) => r.toLowerCase().contains(query));
+                    final matchesNote = note.contains(query);
+
+                    return matchesEmotions || matchesReasons || matchesNote;
+                  }).toList();
+
+                  if (filteredEntries.isEmpty) {
+                    return Center(
+                      child: Text(
+                        'No matching entries found.',
+                        style: AppTextStyles.body.copyWith(
+                          fontSize: context.w(4),
+                          color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+                        ),
+                      ),
+                    );
+                  }
+
+                  // Sort the filtered entries
                   if (_sortingOption == 'newest') {
-                    moodEntries.sort((a, b) => (b['timestamp'] as Timestamp)
+                    filteredEntries.sort((a, b) => (b['timestamp'] as Timestamp)
                         .compareTo(a['timestamp'] as Timestamp));
                   } else if (_sortingOption == 'oldest') {
-                    moodEntries.sort((a, b) => (a['timestamp'] as Timestamp)
+                    filteredEntries.sort((a, b) => (a['timestamp'] as Timestamp)
                         .compareTo(b['timestamp'] as Timestamp));
                   } else if (_sortingOption == 'best') {
-                    moodEntries.sort((a, b) => moodToValue(b['mood']).compareTo(moodToValue(a['mood'])));
+                    filteredEntries.sort((a, b) => moodToValue(b['mood']).compareTo(moodToValue(a['mood'])));
                   } else if (_sortingOption == 'worst') {
-                    moodEntries.sort((a, b) => moodToValue(a['mood']).compareTo(moodToValue(b['mood'])));
+                    filteredEntries.sort((a, b) => moodToValue(a['mood']).compareTo(moodToValue(b['mood'])));
                   }
 
                   return ListView.builder(
                     padding: EdgeInsets.all(context.w(4)),
-                    itemCount: moodEntries.length,
+                    itemCount: filteredEntries.length,
                     itemBuilder: (context, index) {
-                      final entry = moodEntries[index];
+                      final entry = filteredEntries[index];
 
                       // Find the matching mood or default to Neutral
                       final emojiItem = moods.firstWhere(
