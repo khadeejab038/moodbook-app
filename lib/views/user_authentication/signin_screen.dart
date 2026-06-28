@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebasebackend/views/user_authentication/signup_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import '../widgets/snack_bar_helper.dart';
 import 'forgot_password_screen.dart';
 import '../home/home_screen.dart';
@@ -37,6 +38,43 @@ class _SignInScreenState extends State<SignInScreen> {
 
       } on FirebaseAuthException catch (e) {
         showSnackBar(context, e.message ?? 'Sign-in failed', Color(0xFF8B4CFC));
+      }
+    }
+  }
+
+  Future<void> _signInWithGoogle() async {
+    setState(() {
+      isloading = true;
+    });
+    try {
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+      if (googleUser == null) {
+        setState(() {
+          isloading = false;
+        });
+        return; // User cancelled
+      }
+
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      final OAuthCredential credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      await FirebaseAuth.instance.signInWithCredential(credential);
+
+      showSnackBar(context, 'Sign-in successful!', Color(0xFF8B4CFC));
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => HomeScreen()),
+      );
+    } catch (e) {
+      showSnackBar(context, 'Google Sign-In failed: $e', Color(0xFF8B4CFC));
+    } finally {
+      if (mounted) {
+        setState(() {
+          isloading = false;
+        });
       }
     }
   }
@@ -207,9 +245,7 @@ class _SignInScreenState extends State<SignInScreen> {
                             elevation: 5, // Adds shadow
                             shadowColor: Color(0xFFCCEFFF),
                           ),
-                          onPressed: () {
-                            // Add your Google sign-in logic here
-                          },
+                          onPressed: _signInWithGoogle,
                           child: Row(
                               mainAxisSize: MainAxisSize.min,
                             children: [
