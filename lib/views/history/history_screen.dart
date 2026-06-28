@@ -7,6 +7,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'edit_mood_screen.dart';
 import '../widgets/responsive_extension.dart';
+import '../../theme/app_colors.dart';
+import '../../theme/app_text_styles.dart';
 
 class HistoryPage extends StatefulWidget {
   @override
@@ -29,7 +31,7 @@ class _HistoryPageState extends State<HistoryPage> {
       case 'excellent':
         return 5;
       default:
-        return 3; // Default to neutral if mood is unrecognized
+        return 3;
     }
   }
 
@@ -37,14 +39,19 @@ class _HistoryPageState extends State<HistoryPage> {
   Widget build(BuildContext context) {
     // Get the current user's ID
     final currentUser = FirebaseAuth.instance.currentUser;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
 
     // Check if the user is logged in
     if (currentUser == null) {
-      return Center(
-        child: Text(
-          'You are not logged in. Please sign in to view your mood history.',
-          style: TextStyle(fontFamily: 'Pangram', fontSize: context.w(4)),
+      return Scaffold(
+        body: Center(
+          child: Text(
+            'You are not logged in. Please sign in to view your mood history.',
+            style: AppTextStyles.body.copyWith(fontSize: context.w(4), color: textColor),
+          ),
         ),
+        bottomNavigationBar: BottomNavBar(currentIndex: 3),
       );
     }
 
@@ -53,14 +60,7 @@ class _HistoryPageState extends State<HistoryPage> {
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Color(0xBACFFF).withOpacity(0.67),
-              Color(0xFFFFCEB7),
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
+          gradient: isDark ? AppColors.pageGradientDark : AppColors.pageGradientLight,
         ),
         child: Column(
           children: [
@@ -72,15 +72,13 @@ class _HistoryPageState extends State<HistoryPage> {
                 children: [
                   Text(
                     'History',
-                    style: TextStyle(
-                      fontFamily: 'Pangram',
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF100F11),
+                    style: AppTextStyles.pageTitle.copyWith(
+                      color: textColor,
                       fontSize: context.w(5),
                     ),
                   ),
                   PopupMenuButton<String>(
-                    icon: Icon(Icons.sort, color: Color(0xFF100F11)),
+                    icon: Icon(Icons.sort, color: textColor),
                     onSelected: (value) {
                       setState(() {
                         _sortingOption = value;
@@ -89,19 +87,19 @@ class _HistoryPageState extends State<HistoryPage> {
                     itemBuilder: (context) => [
                       PopupMenuItem(
                         value: 'newest',
-                        child: Text('Newest First', style: TextStyle(fontFamily: 'Pangram')),
+                        child: Text('Newest First', style: AppTextStyles.body),
                       ),
                       PopupMenuItem(
                         value: 'oldest',
-                        child: Text('Oldest First', style: TextStyle(fontFamily: 'Pangram')),
+                        child: Text('Oldest First', style: AppTextStyles.body),
                       ),
                       PopupMenuItem(
                         value: 'best',
-                        child: Text('Best First', style: TextStyle(fontFamily: 'Pangram')),
+                        child: Text('Best First', style: AppTextStyles.body),
                       ),
                       PopupMenuItem(
                         value: 'worst',
-                        child: Text('Worst First', style: TextStyle(fontFamily: 'Pangram')),
+                        child: Text('Worst First', style: AppTextStyles.body),
                       ),
                     ],
                   ),
@@ -122,10 +120,9 @@ class _HistoryPageState extends State<HistoryPage> {
                     return Center(
                       child: Text(
                         'An error occurred: ${snapshot.error}',
-                        style: TextStyle(
-                          fontFamily: 'Pangram',
+                        style: AppTextStyles.body.copyWith(
                           fontSize: context.w(4),
-                          color: Colors.red,
+                          color: AppColors.error,
                         ),
                       ),
                     );
@@ -134,10 +131,9 @@ class _HistoryPageState extends State<HistoryPage> {
                     return Center(
                       child: Text(
                         'No mood entries found.',
-                        style: TextStyle(
-                          fontFamily: 'Pangram',
+                        style: AppTextStyles.body.copyWith(
                           fontSize: context.w(4),
-                          color: Colors.grey,
+                          color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
                         ),
                       ),
                     );
@@ -173,8 +169,8 @@ class _HistoryPageState extends State<HistoryPage> {
                       return HistoryTile(
                         mood: entry['mood'] ?? 'No mood',
                         emoji: Image.asset(
-                          emojiItem.imagePath, // Use the image path for the Image.asset widget
-                          width: context.w(8), // Set the desired emoji size
+                          emojiItem.imagePath,
+                          width: context.w(8),
                           height: context.w(8),
                           fit: BoxFit.contain,
                         ),
@@ -182,7 +178,7 @@ class _HistoryPageState extends State<HistoryPage> {
                         feelings: entry['emotions']?.join(', ') ?? 'No emotions',
                         reason: entry['reasons']?.join(', ') ?? 'No reason',
                         note: entry['notes'] ?? 'No note',
-                        entryId: entry.id, // Pass the document ID for deletion/edit
+                        entryId: entry.id,
                       );
                     },
                   );
@@ -197,7 +193,6 @@ class _HistoryPageState extends State<HistoryPage> {
   }
 }
 
-
 class HistoryTile extends StatefulWidget {
   final String mood;
   final String timestamp;
@@ -205,11 +200,11 @@ class HistoryTile extends StatefulWidget {
   final String reason;
   final String note;
   final String entryId;
-  final Widget emoji; // Accept emoji as a Widget instead of String
+  final Widget emoji;
 
   HistoryTile({
     required this.mood,
-    required this.emoji, // Updated type
+    required this.emoji,
     required this.timestamp,
     required this.feelings,
     required this.reason,
@@ -224,27 +219,27 @@ class HistoryTile extends StatefulWidget {
 class _HistoryTileState extends State<HistoryTile> {
   bool _isNoteExpanded = false;
 
-  // Method to delete the entry from Firestore
   void _deleteEntry() async {
     try {
       await FirebaseFirestore.instance.collection('mood_entries').doc(widget.entryId).delete();
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error deleting entry: $e'), backgroundColor: Color(0xFF8B4CFC),));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error deleting entry: $e'),
+          backgroundColor: AppColors.primary,
+        ),
+      );
     }
   }
 
-  // Method to edit the entry (placeholder, implement functionality later)
   void _editEntry() async {
     try {
-      // Fetch the mood entry from Firestore
       DocumentSnapshot document = await FirebaseFirestore.instance
           .collection('mood_entries')
           .doc(widget.entryId)
           .get();
 
-      // Check if the document exists
       if (document.exists) {
-        // Navigate to the EditMoodScreen
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -253,34 +248,46 @@ class _HistoryTileState extends State<HistoryTile> {
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Mood entry not found'), backgroundColor: Color(0xFF8B4CFC),),
+          SnackBar(
+            content: const Text('Mood entry not found'),
+            backgroundColor: AppColors.primary,
+          ),
         );
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error fetching entry: $e'), backgroundColor: Color(0xFF8B4CFC),),
+        SnackBar(
+          content: Text('Error fetching entry: $e'),
+          backgroundColor: AppColors.primary,
+        ),
       );
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    String displayedNote = widget.note.length > 40
-        ? widget.note.substring(0, 40) // Display first 40 characters
-        : widget.note; // If note is less than or equal to 40 characters, display full note
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
+    final subtitleColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight;
+    final cardBg = isDark ? AppColors.cardDark : Colors.white;
 
-    bool showReadMore = widget.note.length > 40; // Only show Read more if note > 40 characters
+    String displayedNote = widget.note.length > 40
+        ? widget.note.substring(0, 40)
+        : widget.note;
+
+    bool showReadMore = widget.note.length > 40;
 
     if (_isNoteExpanded && widget.note.length > 40) {
-      displayedNote = widget.note; // Show the full note if expanded
+      displayedNote = widget.note;
     }
 
     return Container(
       margin: EdgeInsets.symmetric(vertical: context.h(1)),
       padding: EdgeInsets.all(context.w(4)),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: cardBg,
         borderRadius: BorderRadius.circular(context.w(3)),
+        border: isDark ? Border.all(color: Colors.grey.shade800) : null,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -288,76 +295,100 @@ class _HistoryTileState extends State<HistoryTile> {
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              widget.emoji, // Display the emoji image
+              widget.emoji,
               SizedBox(width: context.w(2)),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     widget.mood,
-                    style: TextStyle(
-                        fontSize: context.w(4.5),
-                        fontWeight: FontWeight.bold,
-                        fontFamily: 'Pangram'),
+                    style: AppTextStyles.bodyBold.copyWith(
+                      fontSize: context.w(4.5),
+                      color: textColor,
+                    ),
                   ),
                   SizedBox(height: context.h(0.5)),
                   Text(
                     widget.timestamp,
-                    style: TextStyle(
-                        fontSize: context.w(3),
-                        color: Colors.grey,
-                        fontFamily: 'Pangram'),
+                    style: AppTextStyles.caption.copyWith(
+                      fontSize: context.w(3),
+                      color: subtitleColor,
+                    ),
                   ),
                 ],
               ),
               Spacer(),
-              Column(
+              Row(
                 children: [
-                  Row(
-                    children: [
-                      TextButton(
-                        onPressed: _deleteEntry,
-                        child: Text(
-                          'Delete',
-                          style: TextStyle(color: Colors.red, fontFamily: 'Pangram'),
-                        ),
-                      ),
-                      Container(
-                        width: context.w(0.25),
-                        height: context.h(3),
-                        color: Colors.grey.withOpacity(0.5),
-                      ),
-                      TextButton(
-                        onPressed: _editEntry,
-                        child: Text('Edit', style: TextStyle(fontFamily: 'Pangram')),
-                      ),
-                    ],
+                  TextButton(
+                    onPressed: _deleteEntry,
+                    child: Text(
+                      'Delete',
+                      style: AppTextStyles.link.copyWith(color: AppColors.error, fontSize: context.w(3.5)),
+                    ),
+                  ),
+                  Container(
+                    width: context.w(0.25),
+                    height: context.h(3),
+                    color: isDark ? Colors.grey.shade800 : Colors.grey.withOpacity(0.5),
+                  ),
+                  TextButton(
+                    onPressed: _editEntry,
+                    child: Text(
+                      'Edit',
+                      style: AppTextStyles.link.copyWith(color: AppColors.primary, fontSize: context.w(3.5)),
+                    ),
                   ),
                 ],
               ),
             ],
           ),
           SizedBox(height: context.h(1)),
-          Text(
-            'You felt ${widget.feelings}\nBecause of ${widget.reason}',
-            style: TextStyle(
-                fontSize: context.w(4), fontWeight: FontWeight.w500, fontFamily: 'Pangram'),
+          RichText(
+            text: TextSpan(
+              style: AppTextStyles.body.copyWith(
+                fontSize: context.w(4),
+                color: textColor,
+              ),
+              children: [
+                const TextSpan(
+                  text: 'You felt ',
+                  style: TextStyle(fontWeight: FontWeight.normal),
+                ),
+                TextSpan(
+                  text: widget.feelings,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+                const TextSpan(
+                  text: '\nBecause of ',
+                  style: TextStyle(fontWeight: FontWeight.normal),
+                ),
+                TextSpan(
+                  text: widget.reason,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
           ),
           SizedBox(height: context.h(1)),
           Text(
             'Note: $displayedNote',
-            style: TextStyle(
-                fontSize: context.w(3.5), color: Colors.grey, fontFamily: 'Pangram'),
+            style: AppTextStyles.body.copyWith(
+              fontSize: context.w(3.5),
+              color: subtitleColor,
+            ),
           ),
-          if (showReadMore) // Only show Read more if note length > 40
+          if (showReadMore)
             TextButton(
               onPressed: () {
                 setState(() {
                   _isNoteExpanded = !_isNoteExpanded;
                 });
               },
-              child: Text(_isNoteExpanded ? '- Read less' : '+ Read more',
-                  style: TextStyle(fontFamily: 'Pangram')),
+              child: Text(
+                _isNoteExpanded ? '- Read less' : '+ Read more',
+                style: AppTextStyles.link.copyWith(color: AppColors.primary),
+              ),
             ),
         ],
       ),

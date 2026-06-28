@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import '../../../models/database/user_database.dart';
 import '../../../models/user.dart' as model;
 import '../../../views/widgets/responsive_extension.dart';
+import '../../../theme/app_colors.dart';
+import '../../../theme/app_text_styles.dart';
 
 class EditProfile extends StatefulWidget {
   const EditProfile({super.key});
@@ -15,7 +17,7 @@ class _EditProfileState extends State<EditProfile> {
   final _formKey = GlobalKey<FormState>();
   String name = "";
   String email = "";
-  String currentEmail = ""; // To store the user's current email
+  String currentEmail = "";
   bool isLoading = true;
 
   @override
@@ -26,8 +28,7 @@ class _EditProfileState extends State<EditProfile> {
 
   Future<void> _fetchUserData() async {
     try {
-      model.User? currentUser = await UserDatabase
-          .fetchCurrentUser(); // Using model.User
+      model.User? currentUser = await UserDatabase.fetchCurrentUser();
       if (currentUser != null) {
         setState(() {
           name = currentUser.name;
@@ -38,7 +39,7 @@ class _EditProfileState extends State<EditProfile> {
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to fetch user data: $e'), backgroundColor: Color(0xFF8B4CFC),),
+        SnackBar(content: Text('Failed to fetch user data: $e'), backgroundColor: AppColors.primary),
       );
       setState(() {
         isLoading = false;
@@ -49,27 +50,35 @@ class _EditProfileState extends State<EditProfile> {
   // Function to prompt user for their password (necessary for re-authentication)
   Future<String?> _promptForPassword() async {
     String? password = '';
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
+
     await showDialog<String>(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('Enter Password'),
+          backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
+          title: Text('Enter Password', style: AppTextStyles.heading2.copyWith(color: textColor)),
           content: TextField(
             obscureText: true,
+            style: AppTextStyles.body.copyWith(color: textColor),
             onChanged: (value) {
               password = value;
             },
-            decoration: InputDecoration(hintText: 'Password'),
+            decoration: InputDecoration(
+              hintText: 'Password',
+              hintStyle: AppTextStyles.inputHint.copyWith(color: isDark ? Colors.grey.shade500 : Colors.grey.shade400),
+            ),
           ),
           actions: <Widget>[
             TextButton(
-              child: Text('Cancel'),
+              child: Text('Cancel', style: AppTextStyles.link.copyWith(color: AppColors.primary)),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             TextButton(
-              child: Text('Submit'),
+              child: Text('Submit', style: AppTextStyles.link.copyWith(color: AppColors.primary)),
               onPressed: () {
                 Navigator.of(context).pop(password);
               },
@@ -87,54 +96,44 @@ class _EditProfileState extends State<EditProfile> {
         final auth.User? firebaseUser = auth.FirebaseAuth.instance.currentUser;
 
         if (firebaseUser != null && email != currentEmail) {
-          // Prompt user for password to re-authenticate
           String? userPassword = await _promptForPassword();
 
           if (userPassword != null && userPassword.isNotEmpty) {
-            // Re-authenticate user
-            final auth.AuthCredential credential = auth.EmailAuthProvider
-                .credential(
+            final auth.AuthCredential credential = auth.EmailAuthProvider.credential(
               email: currentEmail,
               password: userPassword,
             );
             await firebaseUser.reauthenticateWithCredential(credential);
-
-            // Update email in Firebase Authentication
             await firebaseUser.updateEmail(email);
           } else {
             throw Exception("Password not provided.");
           }
         }
 
-        // Update user data in Firestore
-        model.User? currentUser = await UserDatabase
-            .fetchCurrentUser();
+        model.User? currentUser = await UserDatabase.fetchCurrentUser();
         if (currentUser != null) {
           currentUser.name = name;
           currentUser.email = email;
-          await UserDatabase.updateUserInFirestore(
-              currentUser.userID, currentUser);
+          await UserDatabase.updateUserInFirestore(currentUser.userID, currentUser);
 
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Profile updated successfully!'), backgroundColor: Color(0xFF8B4CFC),),
+            const SnackBar(content: Text('Profile updated successfully!'), backgroundColor: AppColors.primary),
           );
           Navigator.pop(context);
         }
       } on auth.FirebaseAuthException catch (e) {
         if (e.code == 'requires-recent-login') {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-                content: Text('Please log in again to update your email.'), backgroundColor: Color(0xFF8B4CFC),),
+            const SnackBar(content: Text('Please log in again to update your email.'), backgroundColor: AppColors.primary),
           );
-          // Optionally, you can redirect the user to the login screen.
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Failed to update email: ${e.message}'), backgroundColor: Color(0xFF8B4CFC),),
+            SnackBar(content: Text('Failed to update email: ${e.message}'), backgroundColor: AppColors.primary),
           );
         }
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to update profile: $e'), backgroundColor: Color(0xFF8B4CFC),),
+          SnackBar(content: Text('Failed to update profile: $e'), backgroundColor: AppColors.primary),
         );
       }
     }
@@ -142,379 +141,158 @@ class _EditProfileState extends State<EditProfile> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
+    final subtitleColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight;
+    final containerBg = isDark ? AppColors.surfaceDark : Colors.white;
+
     return Scaffold(
-      body: SafeArea(
-        child: isLoading
-            ? const Center(child: CircularProgressIndicator())
-            : Stack(
-          children: [
-            Container(
-              height: MediaQuery
-                  .of(context)
-                  .size
-                  .height, // Full screen height
-              width: MediaQuery
-                  .of(context)
-                  .size
-                  .width, // Full screen width
-              decoration: const BoxDecoration(
-                gradient: RadialGradient(
-                  center: Alignment.center,
-                  radius: 1.4,
-                  colors: [
-                    Color(0xFFCCEFFF),
-                    Color(0xFFEFF9F2),
-                    Color(0xFFCFCFCF),
-                  ],
-                  stops: [0.3, 0.8, 1],
-                ),
-              ),
-              child: SingleChildScrollView(
-                padding: EdgeInsets.symmetric(
-                    horizontal: context.w(5), vertical: context.h(1.2)),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
+      body: Container(
+        height: double.infinity,
+        width: double.infinity,
+        decoration: BoxDecoration(
+          gradient: isDark ? AppColors.addMoodGradientDark : AppColors.addMoodGradient,
+        ),
+        child: SafeArea(
+          child: isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : SingleChildScrollView(
+            padding: EdgeInsets.symmetric(horizontal: context.w(5), vertical: context.h(1.2)),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  Row(
                     children: [
-                      Row(
-                        children: [
-                          BackButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                          ),
-                          SizedBox(width: context.w(20)),
-                          Text(
-                            "Edit Profile",
-                            style: TextStyle(
-                              fontSize: context.w(5),
-                              fontWeight: FontWeight.bold,
-                              fontFamily: 'Pangram',
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: context.h(8.75)),
-                      const Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          "Name",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontFamily: 'Pangram',
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: context.h(1.2)),
-                      TextFormField(
-                        initialValue: name,
-                        onChanged: (value) {
-                          setState(() {
-                            name = value;
-                          });
+                      BackButton(
+                        color: textColor,
+                        onPressed: () {
+                          Navigator.pop(context);
                         },
-                        validator: (value) {
-                          if (value == null || value
-                              .trim()
-                              .isEmpty) {
-                            return "Name cannot be empty";
-                          }
-                          return null;
-                        },
-                        decoration: InputDecoration(
-                          hintText: "Enter your name",
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(context.w(2.5)),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(context.w(2.5)),
-                            borderSide: const BorderSide(
-                                color: Colors.blue, width: 2),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(context.w(2.5)),
-                            borderSide: const BorderSide(
-                                color: Colors.grey, width: 1),
-                          ),
-                          filled: true,
-                          fillColor: Colors.white,
-                        ),
                       ),
-                      SizedBox(height: context.h(2.5)),
-                      const Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          "Email",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontFamily: 'Pangram',
-                            fontWeight: FontWeight.w500,
-                          ),
+                      SizedBox(width: context.w(20)),
+                      Text(
+                        "Edit Profile",
+                        style: AppTextStyles.pageTitle.copyWith(
+                          color: textColor,
+                          fontSize: context.w(5),
                         ),
-                      ),
-                      SizedBox(height: context.h(1.2)),
-                      TextFormField(
-                        initialValue: email,
-                        onChanged: (value) {
-                          setState(() {
-                            email = value;
-                          });
-                        },
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return "Email cannot be empty";
-                          }
-                          if (!RegExp(
-                              r"^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$")
-                              .hasMatch(value)) {
-                            return "Please enter a valid email";
-                          }
-                          return null;
-                        },
-                        decoration: InputDecoration(
-                          hintText: "Enter your email",
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(context.w(2.5)),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(context.w(2.5)),
-                            borderSide: const BorderSide(
-                                color: Colors.blue, width: 2),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(context.w(2.5)),
-                            borderSide: const BorderSide(
-                                color: Colors.grey, width: 1),
-                          ),
-                          filled: true,
-                          fillColor: Colors.white,
-                        ),
-                      ),
-                      SizedBox(height: context.h(3.5)),
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xB2C9FAFB),
-                          foregroundColor: Colors.black,
-                          minimumSize: Size(double.infinity, context.h(6)),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(context.w(3.75)),
-                          ),
-                          elevation: 5,
-                          shadowColor: const Color(0xFFCCEFFF),
-                        ),
-                        onPressed: _updateUserProfile,
-                        child: const Text('Update Profile'),
                       ),
                     ],
                   ),
-                ),
+                  SizedBox(height: context.h(8.75)),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      "Name",
+                      style: AppTextStyles.bodyBold.copyWith(
+                        fontSize: 16,
+                        color: textColor,
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: context.h(1.2)),
+                  TextFormField(
+                    initialValue: name,
+                    style: AppTextStyles.body.copyWith(color: textColor),
+                    onChanged: (value) {
+                      setState(() {
+                        name = value;
+                      });
+                    },
+                    validator: (value) {
+                      if (value == null || value.trim().isEmpty) {
+                        return "Name cannot be empty";
+                      }
+                      return null;
+                    },
+                    decoration: InputDecoration(
+                      hintText: "Enter your name",
+                      hintStyle: AppTextStyles.inputHint.copyWith(color: subtitleColor),
+                      filled: true,
+                      fillColor: containerBg,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(context.w(2.5)),
+                        borderSide: isDark ? BorderSide(color: Colors.grey.shade800) : const BorderSide(color: Colors.grey),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(context.w(2.5)),
+                        borderSide: isDark ? BorderSide(color: Colors.grey.shade800) : const BorderSide(color: Colors.grey),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(context.w(2.5)),
+                        borderSide: const BorderSide(color: AppColors.primary, width: 2),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: context.h(2.5)),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      "Email",
+                      style: AppTextStyles.bodyBold.copyWith(
+                        fontSize: 16,
+                        color: textColor,
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: context.h(1.2)),
+                  TextFormField(
+                    initialValue: email,
+                    style: AppTextStyles.body.copyWith(color: textColor),
+                    onChanged: (value) {
+                      setState(() {
+                        email = value;
+                      });
+                    },
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return "Email cannot be empty";
+                      }
+                      if (!RegExp(r"^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$").hasMatch(value)) {
+                        return "Please enter a valid email";
+                      }
+                      return null;
+                    },
+                    decoration: InputDecoration(
+                      hintText: "Enter your email",
+                      hintStyle: AppTextStyles.inputHint.copyWith(color: subtitleColor),
+                      filled: true,
+                      fillColor: containerBg,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(context.w(2.5)),
+                        borderSide: isDark ? BorderSide(color: Colors.grey.shade800) : const BorderSide(color: Colors.grey),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(context.w(2.5)),
+                        borderSide: isDark ? BorderSide(color: Colors.grey.shade800) : const BorderSide(color: Colors.grey),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(context.w(2.5)),
+                        borderSide: const BorderSide(color: AppColors.primary, width: 2),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: context.h(3.5)),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: Colors.white,
+                      minimumSize: Size(double.infinity, context.h(6)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(context.w(3.75)),
+                      ),
+                      elevation: 0,
+                    ),
+                    onPressed: _updateUserProfile,
+                    child: Text('Update Profile', style: AppTextStyles.button.copyWith(color: Colors.white)),
+                  ),
+                ],
               ),
             ),
-          ],
+          ),
         ),
       ),
     );
   }
 }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       body: SafeArea(
-//         child: isLoading
-//             ? const Center(child: CircularProgressIndicator())
-//             : Stack(
-//           children: [
-//             Padding(
-//               padding: const EdgeInsets.all(16.0),
-//               child: Container(
-//                 height: MediaQuery
-//                     .of(context)
-//                     .size
-//                     .height,
-//                 decoration: const BoxDecoration(
-//                   gradient: RadialGradient(
-//                     center: Alignment.center,
-//                     radius: 1.4,
-//                     colors: [
-//                       Color(0xFFCCEFFF),
-//                       Color(0xFFEFF9F2),
-//                       Color(0xFFCFCFCF),
-//                     ],
-//                     stops: [0.3, 0.8, 1],
-//                   ),
-//                 ),
-//                 child: SingleChildScrollView(
-//                   padding: const EdgeInsets.symmetric(
-//                       horizontal: 20.0, vertical: 10.0),
-//                   child: Form(
-//                     key: _formKey,
-//                     child: Column(
-//                       children: [
-//                         Row(
-//                           children: [
-//                             BackButton(
-//                               onPressed: () {
-//                                 Navigator.pop(context);
-//                               },
-//                             ),
-//                             const SizedBox(width: 80),
-//                             const Text(
-//                               "Edit Profile",
-//                               style: TextStyle(
-//                                 fontSize: 20,
-//                                 fontWeight: FontWeight.bold,
-//                                 fontFamily: 'Pangram',
-//                               ),
-//                             ),
-//                           ],
-//                         ),
-//                         const SizedBox(height: 70),
-//                         Center(
-//                           child: GestureDetector(
-//                             onTap: () {
-//                               ScaffoldMessenger.of(context).showSnackBar(
-//                                 const SnackBar(content: Text(
-//                                     "Change profile picture clicked!")),
-//                               );
-//                             },
-//                             child: CircleAvatar(
-//                               radius: 100,
-//                               backgroundColor: Colors.grey[300],
-//                               child: ClipOval(
-//                                 child: Image.asset(
-//                                   'assets/avatar.jpeg',
-//                                   fit: BoxFit.cover, // Ensures the image fills the circle and is clipped
-//                                   width: 200, // Ensure the image fits the circle
-//                                   height: 200, // Ensure the image fits the circle
-//                                 ),
-//                               ),
-//                             ),
-//
-//                           ),
-//                         ),
-//                         const SizedBox(height: 30),
-//                         const Align(
-//                           alignment: Alignment.centerLeft,
-//                           child: Text(
-//                             "Name",
-//                             style: TextStyle(
-//                               fontSize: 16,
-//                               fontFamily: 'Pangram',
-//                               fontWeight: FontWeight.w500,
-//                             ),
-//                           ),
-//                         ),
-//                         const SizedBox(height: 10),
-//                         TextFormField(
-//                           initialValue: name,
-//                           onChanged: (value) {
-//                             setState(() {
-//                               name = value;
-//                             });
-//                           },
-//                           validator: (value) {
-//                             if (value == null || value
-//                                 .trim()
-//                                 .isEmpty) {
-//                               return "Name cannot be empty";
-//                             }
-//                             return null;
-//                           },
-//                           decoration: InputDecoration(
-//                             hintText: "Enter your name",
-//                             border: OutlineInputBorder(
-//                               borderRadius: BorderRadius.circular(10.0),
-//                             ),
-//                             focusedBorder: OutlineInputBorder(
-//                               borderRadius: BorderRadius.circular(10.0),
-//                               borderSide: BorderSide(
-//                                   color: Colors.blue, width: 2),
-//                             ),
-//                             enabledBorder: OutlineInputBorder(
-//                               borderRadius: BorderRadius.circular(10.0),
-//                               borderSide: BorderSide(
-//                                   color: Colors.grey, width: 1),
-//                             ),
-//                             filled: true,
-//                             fillColor: Colors.white,
-//                           ),
-//                         ),
-//                         const SizedBox(height: 20),
-//                         const Align(
-//                           alignment: Alignment.centerLeft,
-//                           child: Text(
-//                             "Email",
-//                             style: TextStyle(
-//                               fontSize: 16,
-//                               fontFamily: 'Pangram',
-//                               fontWeight: FontWeight.w500,
-//                             ),
-//                           ),
-//                         ),
-//                         const SizedBox(height: 10),
-//                         TextFormField(
-//                           initialValue: email,
-//                           onChanged: (value) {
-//                             setState(() {
-//                               email = value;
-//                             });
-//                           },
-//                           validator: (value) {
-//                             if (value == null || value.isEmpty) {
-//                               return "Email cannot be empty";
-//                             }
-//                             if (!RegExp(
-//                                 r"^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$")
-//                                 .hasMatch(value)) {
-//                               return "Please enter a valid email";
-//                             }
-//                             return null;
-//                           },
-//                           decoration: InputDecoration(
-//                             hintText: "Enter your email",
-//                             border: OutlineInputBorder(
-//                               borderRadius: BorderRadius.circular(10.0),
-//                             ),
-//                             focusedBorder: OutlineInputBorder(
-//                               borderRadius: BorderRadius.circular(10.0),
-//                               borderSide: BorderSide(
-//                                   color: Colors.blue, width: 2),
-//                             ),
-//                             enabledBorder: OutlineInputBorder(
-//                               borderRadius: BorderRadius.circular(10.0),
-//                               borderSide: BorderSide(
-//                                   color: Colors.grey, width: 1),
-//                             ),
-//                             filled: true,
-//                             fillColor: Colors.white,
-//                           ),
-//                         ),
-//                         const SizedBox(height: 30),
-//                         ElevatedButton(
-//                           style: ElevatedButton.styleFrom(
-//                             backgroundColor: Color(0xB2C9FAFB),
-//                             foregroundColor: Colors.black,
-//                             minimumSize: const Size(double.infinity, 50),
-//                             shape: RoundedRectangleBorder(
-//                               borderRadius: BorderRadius.circular(15.0),
-//                             ),
-//                             elevation: 5,
-//                             shadowColor: Color(0xFFCCEFFF),
-//                           ),
-//                           onPressed: _updateUserProfile,
-//                           child: const Text('Update Profile'),
-//                         ),
-//                       ],
-//                     ),
-//                   ),
-//                 ),
-//               ),
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }

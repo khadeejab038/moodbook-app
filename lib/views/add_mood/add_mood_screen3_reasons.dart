@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../controllers/mood_entry_controller.dart';
 import '../../models/reasons_data.dart';
+import '../../theme/app_colors.dart';
+import '../../theme/app_text_styles.dart';
 import '../home/home_screen.dart';
 import 'add_mood_screen4_notes.dart';
 import '../widgets/responsive_extension.dart';
@@ -19,6 +21,9 @@ class _AddReasonsState extends State<AddReasons> {
   @override
   Widget build(BuildContext context) {
     final moodProvider = Provider.of<MoodEntryController>(context);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
+    final subtitleColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight;
 
     final filteredReasons = allReasons
         .where((reason) => reason.toLowerCase().contains(searchQuery.toLowerCase()))
@@ -26,17 +31,8 @@ class _AddReasonsState extends State<AddReasons> {
 
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
-          gradient: RadialGradient(
-            center: Alignment.center,
-            radius: 1.4,
-            colors: [
-              Color(0xFFCCEFFF),
-              Color(0xFFEFF9F2),
-              Color(0xFFCFCFCF),
-            ],
-            stops: [0.3, 0.8, 1],
-          ),
+        decoration: BoxDecoration(
+          gradient: isDark ? AppColors.addMoodGradientDark : AppColors.addMoodGradient,
         ),
         width: double.infinity,
         height: double.infinity,
@@ -49,29 +45,21 @@ class _AddReasonsState extends State<AddReasons> {
                 child: Row(
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.arrow_back, color: Colors.black),
+                      icon: Icon(Icons.arrow_back, color: textColor),
                       onPressed: () => Navigator.pop(context),
                     ),
                     Expanded(
-                      child: Text(
-                        "3/4",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontFamily: 'Pangram',
-                          fontSize: context.w(4.5),
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                        ),
-                      ),
+                      child: Text("3/4", textAlign: TextAlign.center,
+                          style: AppTextStyles.stepIndicator.copyWith(color: textColor)),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.close, color: Colors.black),
+                      icon: Icon(Icons.close, color: textColor),
                       onPressed: () {
                         moodProvider.clear();
                         Navigator.pushAndRemoveUntil(
                           context,
                           MaterialPageRoute(builder: (context) => HomeScreen()),
-                              (route) => false,
+                          (route) => false,
                         );
                       },
                     ),
@@ -84,75 +72,53 @@ class _AddReasonsState extends State<AddReasons> {
                   child: Column(
                     children: [
                       SizedBox(height: context.h(2)),
-                      // Centered & Harmonious texts
                       Text(
                         "What's the reason making you feel this way?",
                         textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: context.w(6),
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'Pangram',
-                          color: Colors.black,
-                        ),
+                        style: AppTextStyles.heading1.copyWith(color: textColor, fontSize: context.w(6)),
                       ),
                       SizedBox(height: context.h(1.5)),
                       Text(
                         "Select reasons that reflected your emotions",
                         textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: context.w(3.75),
-                          fontFamily: 'Pangram',
-                          color: Colors.black54,
-                        ),
+                        style: AppTextStyles.subtitle.copyWith(color: subtitleColor, fontSize: context.w(3.75)),
                       ),
                       SizedBox(height: context.h(3)),
 
                       // Search Bar
                       TextField(
-                        onChanged: (value) {
-                          setState(() {
-                            searchQuery = value;
-                          });
-                        },
+                        onChanged: (value) => setState(() => searchQuery = value),
+                        style: AppTextStyles.body.copyWith(color: textColor),
                         decoration: InputDecoration(
-                          hintText: "Search reasons",
-                          hintStyle: const TextStyle(fontFamily: 'Pangram'),
-                          prefixIcon: const Icon(Icons.search),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(context.w(6)),
-                            borderSide: const BorderSide(color: Colors.grey, width: 1.5),
-                          ),
+                          hintText: 'Search reasons',
+                          hintStyle: AppTextStyles.inputHint.copyWith(color: subtitleColor),
+                          filled: true,
+                          fillColor: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(context.w(7.5))),
                           enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(context.w(6)),
-                            borderSide: const BorderSide(color: Colors.grey, width: 1.5),
+                            borderRadius: BorderRadius.circular(context.w(7.5)),
+                            borderSide: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade300),
                           ),
                           focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(context.w(6)),
-                            borderSide: const BorderSide(color: Colors.blue, width: 1.5),
+                            borderRadius: BorderRadius.circular(context.w(7.5)),
+                            borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
                           ),
+                          suffixIcon: Icon(Icons.search, color: subtitleColor),
                         ),
                       ),
                       SizedBox(height: context.h(3)),
 
-                      // Selected reasons section
+                      // Selected reasons
                       if (moodProvider.selectedReasons.isNotEmpty) ...[
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(
-                              "Selected (${moodProvider.selectedReasons.length})",
-                              style: TextStyle(fontSize: context.w(4.5), fontWeight: FontWeight.bold, fontFamily: 'Pangram'),
-                            ),
+                            Text("Selected:",
+                                style: AppTextStyles.heading2.copyWith(color: textColor, fontSize: context.w(4.5))),
                             TextButton(
-                              onPressed: () {
-                                setState(() {
-                                  moodProvider.clearSelectedReasons();
-                                });
-                              },
-                              child: Text(
-                                "Clear all",
-                                style: TextStyle(color: Colors.red, fontSize: context.w(3.75), fontFamily: 'Pangram', fontWeight: FontWeight.bold),
-                              ),
+                              onPressed: () => setState(() => moodProvider.clearSelectedReasons()),
+                              child: Text("Clear all",
+                                  style: AppTextStyles.link.copyWith(color: AppColors.error, fontSize: context.w(3.75))),
                             ),
                           ],
                         ),
@@ -164,20 +130,16 @@ class _AddReasonsState extends State<AddReasons> {
                             runSpacing: context.h(0.5),
                             children: moodProvider.selectedReasons.map((reason) {
                               return Chip(
-                                label: Text(
-                                  reason,
-                                  style: const TextStyle(fontFamily: 'Pangram'),
-                                ),
+                                label: Text(reason, style: AppTextStyles.chip.copyWith(
+                                  color: isDark ? Colors.white : AppColors.primaryDark,
+                                )),
+                                backgroundColor: isDark ? AppColors.primaryDark : AppColors.primaryLight,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(context.w(5)),
                                 ),
-                                onDeleted: () {
-                                  setState(() {
-                                    moodProvider.toggleReason(reason);
-                                  });
-                                },
-                                backgroundColor: Colors.grey[200],
-                                labelStyle: const TextStyle(color: Colors.black),
+                                side: BorderSide(color: AppColors.primary.withOpacity(0.4), width: 0.8),
+                                deleteIcon: Icon(Icons.close, size: context.w(4), color: isDark ? Colors.white : AppColors.primaryDark),
+                                onDeleted: () => setState(() => moodProvider.toggleReason(reason)),
                               );
                             }).toList(),
                           ),
@@ -185,13 +147,11 @@ class _AddReasonsState extends State<AddReasons> {
                         SizedBox(height: context.h(2.5)),
                       ],
 
-                      // Recently used section
+                      // Recently used
                       Align(
                         alignment: Alignment.centerLeft,
-                        child: Text(
-                          "Recently used",
-                          style: TextStyle(fontSize: context.w(4.5), fontWeight: FontWeight.bold, fontFamily: 'Pangram'),
-                        ),
+                        child: Text("Recently used",
+                            style: AppTextStyles.heading2.copyWith(color: textColor, fontSize: context.w(4.5))),
                       ),
                       SizedBox(height: context.h(1.5)),
                       Align(
@@ -199,20 +159,18 @@ class _AddReasonsState extends State<AddReasons> {
                         child: Wrap(
                           spacing: context.w(2.5),
                           runSpacing: context.h(0.5),
-                          children: moodProvider.recentlyUsedReasons.map((reason) {
-                            return _reasonChip(reason, moodProvider);
-                          }).toList(),
+                          children: moodProvider.recentlyUsedReasons
+                              .map((reason) => _reasonChip(reason, moodProvider, isDark, textColor))
+                              .toList(),
                         ),
                       ),
                       SizedBox(height: context.h(2.5)),
 
-                      // All reasons section
+                      // All reasons
                       Align(
                         alignment: Alignment.centerLeft,
-                        child: Text(
-                          "All reasons",
-                          style: TextStyle(fontSize: context.w(4.5), fontWeight: FontWeight.bold, fontFamily: 'Pangram'),
-                        ),
+                        child: Text("All reasons",
+                            style: AppTextStyles.heading2.copyWith(color: textColor, fontSize: context.w(4.5))),
                       ),
                       SizedBox(height: context.h(1.5)),
                       Align(
@@ -220,9 +178,9 @@ class _AddReasonsState extends State<AddReasons> {
                         child: Wrap(
                           spacing: context.w(2.5),
                           runSpacing: context.h(1.2),
-                          children: filteredReasons.map((reason) {
-                            return _reasonChip(reason, moodProvider);
-                          }).toList(),
+                          children: filteredReasons
+                              .map((reason) => _reasonChip(reason, moodProvider, isDark, textColor))
+                              .toList(),
                         ),
                       ),
                       SizedBox(height: context.h(4)),
@@ -235,10 +193,8 @@ class _AddReasonsState extends State<AddReasons> {
                 padding: EdgeInsets.fromLTRB(context.w(5), 0, context.w(5), context.h(3)),
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF8B4CFC),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(context.w(10)),
-                    ),
+                    backgroundColor: AppColors.primary,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(context.w(10))),
                     minimumSize: Size(context.w(85), context.h(7.5)),
                   ),
                   onPressed: () {
@@ -246,23 +202,15 @@ class _AddReasonsState extends State<AddReasons> {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                           content: Text('Please select at least one reason before continuing.'),
-                          backgroundColor: Color(0xFF8B4CFC),
+                          backgroundColor: AppColors.primary,
                           duration: Duration(seconds: 2),
                         ),
                       );
                     } else {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const AddNotes(),
-                        ),
-                      );
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => const AddNotes()));
                     }
                   },
-                  child: Text(
-                    "Continue",
-                    style: TextStyle(fontSize: context.w(4), color: Colors.white, fontFamily: 'Pangram', fontWeight: FontWeight.bold),
-                  ),
+                  child: Text("Continue", style: AppTextStyles.button.copyWith(color: Colors.white, fontSize: context.w(4))),
                 ),
               ),
             ],
@@ -272,28 +220,29 @@ class _AddReasonsState extends State<AddReasons> {
     );
   }
 
-  Widget _reasonChip(String reason, MoodEntryController moodProvider) {
+  Widget _reasonChip(String reason, MoodEntryController moodProvider, bool isDark, Color textColor) {
     final isSelected = moodProvider.selectedReasons.contains(reason);
     return GestureDetector(
-      onTap: () {
-        setState(() {
-          moodProvider.toggleReason(reason);
-        });
-      },
+      onTap: () => setState(() => moodProvider.toggleReason(reason)),
       child: Chip(
         label: Text(
           reason,
-          style: TextStyle(
-            color: isSelected ? Colors.white : Colors.black,
+          style: AppTextStyles.chip.copyWith(
+            color: isSelected
+                ? (isDark ? Colors.white : AppColors.primaryDark)
+                : textColor,
             fontWeight: FontWeight.w500,
-            fontFamily: 'Pangram',
           ),
         ),
-        backgroundColor: isSelected ? Colors.purple[200] : Colors.grey[300],
+        backgroundColor: isSelected
+            ? (isDark ? AppColors.primaryDark : AppColors.primaryLight)
+            : (isDark ? AppColors.cardDark : Colors.grey.shade300),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(context.w(5)),
-          side: BorderSide.none,
         ),
+        side: isSelected
+            ? BorderSide(color: AppColors.primary.withOpacity(0.4), width: 0.8)
+            : (isDark ? BorderSide(color: Colors.grey.shade800) : BorderSide.none),
       ),
     );
   }

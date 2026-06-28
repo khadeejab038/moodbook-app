@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../../../theme/app_colors.dart';
+import '../../../theme/app_text_styles.dart';
 
 class MoodPieChart extends StatefulWidget {
   @override
@@ -15,14 +17,6 @@ class _MoodPieChartState extends State<MoodPieChart> {
     "Neutral": 3,
     "Good": 4,
     "Excellent": 5,
-  };
-
-  final Map<String, Color> moodColors = {
-    "Terrible": Colors.red[300]!,
-    "Bad": Colors.orange[200]!,
-    "Neutral": Colors.yellow[300]!,
-    "Good": Colors.lightGreen[200]!,
-    "Excellent": Colors.green[300]!,
   };
 
   String selectedView = 'Today'; // Default view
@@ -78,6 +72,9 @@ class _MoodPieChartState extends State<MoodPieChart> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
+
     return Column(
       children: [
         // Dropdown for time period selection
@@ -86,14 +83,14 @@ class _MoodPieChartState extends State<MoodPieChart> {
           children: [
             DropdownButton<String>(
               value: selectedView,
+              dropdownColor: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
+              style: AppTextStyles.body.copyWith(color: textColor),
               items: ['Today', 'This Week', 'This Month', 'This Year']
                   .map((view) => DropdownMenuItem(
                 value: view,
                 child: Text(
                   view,
-                  style: TextStyle(
-                    fontFamily: 'Pangram', // Pangram font
-                  ),
+                  style: AppTextStyles.body.copyWith(color: textColor),
                 ),
               ))
                   .toList(),
@@ -105,7 +102,6 @@ class _MoodPieChartState extends State<MoodPieChart> {
             ),
           ],
         ),
-        //SizedBox(height: 20),
         FutureBuilder<Map<String, double>>(
           future: _fetchMoodData(selectedView),
           builder: (context, snapshot) {
@@ -114,6 +110,20 @@ class _MoodPieChartState extends State<MoodPieChart> {
             }
 
             final data = snapshot.data!;
+            final hasData = data.values.any((val) => val > 0);
+
+            if (!hasData) {
+              return Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Center(
+                  child: Text(
+                    "No data recorded for this period",
+                    style: AppTextStyles.body.copyWith(color: textColor),
+                  ),
+                ),
+              );
+            }
+
             return AspectRatio(
               aspectRatio: 1.3,
               child: PieChart(
@@ -121,14 +131,17 @@ class _MoodPieChartState extends State<MoodPieChart> {
                   sections: data.entries
                       .map(
                         (entry) => PieChartSectionData(
-                      color: moodColors[entry.key],
+                      color: AppColors.forMood(entry.key),
                       value: entry.value,
-                      title: '${entry.key} (${entry.value.toStringAsFixed(1)}%)',
+                      title: entry.value > 0 ? '${entry.key} (${entry.value.toStringAsFixed(1)}%)' : '',
                       radius: 80,
-                      titleStyle: TextStyle(
-                        fontFamily: 'Pangram', // Pangram font for title
+                      titleStyle: AppTextStyles.caption.copyWith(
                         fontSize: 12,
-                        color: Colors.black,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        shadows: [
+                          const Shadow(blurRadius: 2.0, color: Colors.black45, offset: Offset(1, 1))
+                        ]
                       ),
                     ),
                   )

@@ -6,6 +6,8 @@ import '../../models/emoji_data.dart';
 import '../../models/reasons_data.dart';
 import '../widgets/date_time_picker.dart';
 import '../widgets/responsive_extension.dart';
+import '../../theme/app_colors.dart';
+import '../../theme/app_text_styles.dart';
 
 class EditMoodScreen extends StatefulWidget {
   final DocumentSnapshot moodEntryDoc;
@@ -60,38 +62,42 @@ class _EditMoodScreenState extends State<EditMoodScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
+    final subtitleColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight;
+    final containerBg = isDark ? AppColors.cardDark : Colors.white;
+
     return Scaffold(
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: Text("Edit Mood Entry", style: TextStyle(fontFamily: 'Pangram', fontSize: context.w(5.5))),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        title: Text("Edit Mood Entry", style: AppTextStyles.pageTitle.copyWith(color: textColor, fontSize: context.w(5.5))),
+        iconTheme: IconThemeData(color: textColor),
       ),
       body: Container(
+        height: double.infinity,
+        width: double.infinity,
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Color(0xFFC3FFD4), // First color #C3FFD4
-              Color(0xFFCFCCFB), // Second color #CFCCFB
-              Color(0xFFEFF9F2), // Third color #EFF9F2
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
+          gradient: isDark ? AppColors.pageGradientDark : AppColors.pageGradientLight,
         ),
-        child: Padding(
-          padding: EdgeInsets.all(context.w(4)),
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
+        child: SafeArea(
+          child: Padding(
+            padding: EdgeInsets.all(context.w(4)),
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
                 // Editable Timestamp
-                Text("Timestamp", style: TextStyle(fontFamily: 'Pangram', fontSize: context.w(4))),
+                Text("Timestamp", style: AppTextStyles.bodyBold.copyWith(color: textColor, fontSize: context.w(4))),
                 Row(
                   children: [
                     Text(
                       "${selectedDateTime.toLocal()}".split('.')[0],
-                      style: TextStyle(fontSize: context.w(4), fontFamily: 'Pangram'),
+                      style: AppTextStyles.body.copyWith(color: textColor, fontSize: context.w(4)),
                     ),
                     IconButton(
-                      icon: Icon(Icons.edit, size: context.w(5)),
+                      icon: Icon(Icons.edit, size: context.w(5), color: AppColors.primary),
                       onPressed: () async {
                         await selectDateAndTime(
                             context,
@@ -108,21 +114,22 @@ class _EditMoodScreenState extends State<EditMoodScreen> {
                 ),
                 SizedBox(height: context.h(1.5)),
 
-                // Editable Mood (Replaced Dropdown with Emoji Picker)
-                Text("Mood", style: TextStyle(fontFamily: 'Pangram', fontSize: context.w(4))),
+                // Editable Mood
+                Text("Mood", style: AppTextStyles.bodyBold.copyWith(color: textColor, fontSize: context.w(4))),
+                SizedBox(height: context.h(1)),
                 Container(
                   height: context.h(15),
                   child: ListView.builder(
                     scrollDirection: Axis.horizontal,
-                    itemCount: moods.length, // Using the 'allEmotions' list from emoji_data.dart
+                    itemCount: moods.length,
                     itemBuilder: (context, index) {
                       final isSelected = selectedEmojiIndex == index;
 
                       return GestureDetector(
                         onTap: () {
                           setState(() {
-                            selectedMood = moods[index].title; // Update selected mood title
-                            selectedEmojiIndex = index; // Update the selected emoji index
+                            selectedMood = moods[index].title;
+                            selectedEmojiIndex = index;
                           });
                         },
                         child: AnimatedContainer(
@@ -132,8 +139,9 @@ class _EditMoodScreenState extends State<EditMoodScreen> {
                           height: isSelected ? context.w(20) : context.w(15),
                           alignment: Alignment.center,
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: containerBg,
                             shape: BoxShape.circle,
+                            border: isSelected ? Border.all(color: AppColors.primary, width: 2) : (isDark ? Border.all(color: Colors.grey.shade800) : null),
                             boxShadow: isSelected
                                 ? [
                               BoxShadow(
@@ -145,8 +153,8 @@ class _EditMoodScreenState extends State<EditMoodScreen> {
                                 : [],
                           ),
                           child: Image.asset(
-                            moods[index].imagePath, // Displaying the image based on selected mood
-                            width: isSelected ? context.w(10) : context.w(7.5), // Adjust image size based on selection
+                            moods[index].imagePath,
+                            width: isSelected ? context.w(10) : context.w(7.5),
                             height: isSelected ? context.w(10) : context.w(7.5),
                           ),
                         ),
@@ -157,7 +165,8 @@ class _EditMoodScreenState extends State<EditMoodScreen> {
                 SizedBox(height: context.h(1.5)),
 
                 // Editable Emotions
-                Text("Emotions", style: TextStyle(fontFamily: 'Pangram', fontSize: context.w(4))),
+                Text("Emotions", style: AppTextStyles.bodyBold.copyWith(color: textColor, fontSize: context.w(4))),
+                SizedBox(height: context.h(1)),
                 Wrap(
                   spacing: context.w(2),
                   runSpacing: context.h(0.5),
@@ -168,10 +177,8 @@ class _EditMoodScreenState extends State<EditMoodScreen> {
                       onTap: () {
                         setState(() {
                           if (isSelected) {
-                            // Remove the emotion and fix commas
                             selectedEmotions.remove(emotion.title);
                           } else {
-                            // Add the emotion and fix commas
                             selectedEmotions.add(emotion.title);
                           }
                         });
@@ -186,13 +193,18 @@ class _EditMoodScreenState extends State<EditMoodScreen> {
                               height: context.w(5),
                             ),
                             SizedBox(width: context.w(2)),
-                            Text(emotion.title),
+                            Text(
+                              emotion.title,
+                              style: AppTextStyles.chip.copyWith(
+                                color: isSelected ? (isDark ? Colors.white : AppColors.primaryDark) : textColor,
+                              ),
+                            ),
                           ],
                         ),
                         backgroundColor: isSelected
-                            ? Colors.purpleAccent[700] // Darker background when selected
-                            : Colors.grey[200], // Lighter background when not selected
-                        deleteIcon: isSelected ? Icon(Icons.close, size: context.w(4)) : null,
+                            ? (isDark ? AppColors.primaryDark : AppColors.primaryLight)
+                            : (isDark ? AppColors.cardDark : Colors.grey[200]),
+                        deleteIcon: isSelected ? Icon(Icons.close, size: 16, color: isDark ? Colors.white : AppColors.primaryDark) : null,
                         onDeleted: isSelected
                             ? () {
                           setState(() {
@@ -200,6 +212,10 @@ class _EditMoodScreenState extends State<EditMoodScreen> {
                           });
                         }
                             : null,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(context.w(5))),
+                        side: isSelected
+                            ? BorderSide(color: AppColors.primary.withOpacity(0.4), width: 0.8)
+                            : (isDark ? BorderSide(color: Colors.grey.shade800) : BorderSide.none),
                       ),
                     );
                   }).toList(),
@@ -207,7 +223,8 @@ class _EditMoodScreenState extends State<EditMoodScreen> {
                 SizedBox(height: context.h(1.5)),
 
                 // Editable Reasons
-                Text("Reasons", style: TextStyle(fontFamily: 'Pangram', fontSize: context.w(4))),
+                Text("Reasons", style: AppTextStyles.bodyBold.copyWith(color: textColor, fontSize: context.w(4))),
+                SizedBox(height: context.h(1)),
                 Wrap(
                   spacing: context.w(2),
                   runSpacing: context.h(0.5),
@@ -218,12 +235,10 @@ class _EditMoodScreenState extends State<EditMoodScreen> {
                       onTap: () {
                         setState(() {
                           if (isSelected) {
-                            // Remove the reason and fix commas
                             reasonsController.text = reasonsController.text
                                 .replaceAll(RegExp(',?\\b$reason\\b,?'), '')
-                                .trim(); // Remove leading/trailing spaces and commas
+                                .trim();
                           } else {
-                            // Add the reason and fix commas
                             reasonsController.text += (reasonsController.text.isEmpty
                                 ? ''
                                 : ', ') + reason;
@@ -231,11 +246,16 @@ class _EditMoodScreenState extends State<EditMoodScreen> {
                         });
                       },
                       child: Chip(
-                        label: Text(reason),
+                        label: Text(
+                          reason,
+                          style: AppTextStyles.chip.copyWith(
+                            color: isSelected ? (isDark ? Colors.white : AppColors.primaryDark) : textColor,
+                          ),
+                        ),
                         backgroundColor: isSelected
-                            ? Colors.purpleAccent[700] // Darker background when selected
-                            : Colors.grey[200], // Lighter background when not selected
-                        deleteIcon: isSelected ? Icon(Icons.close, size: context.w(4)) : null,
+                            ? (isDark ? AppColors.primaryDark : AppColors.primaryLight)
+                            : (isDark ? AppColors.cardDark : Colors.grey[200]),
+                        deleteIcon: isSelected ? Icon(Icons.close, size: 16, color: isDark ? Colors.white : AppColors.primaryDark) : null,
                         onDeleted: isSelected
                             ? () {
                           setState(() {
@@ -245,6 +265,10 @@ class _EditMoodScreenState extends State<EditMoodScreen> {
                           });
                         }
                             : null,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(context.w(5))),
+                        side: isSelected
+                            ? BorderSide(color: AppColors.primary.withOpacity(0.4), width: 0.8)
+                            : (isDark ? BorderSide(color: Colors.grey.shade800) : BorderSide.none),
                       ),
                     );
                   }).toList(),
@@ -252,15 +276,30 @@ class _EditMoodScreenState extends State<EditMoodScreen> {
                 SizedBox(height: context.h(1.5)),
 
                 // Editable Notes
-                Text("Notes", style: TextStyle(fontFamily: 'Pangram', fontSize: context.w(4))),
+                Text("Notes", style: AppTextStyles.bodyBold.copyWith(color: textColor, fontSize: context.w(4))),
+                SizedBox(height: context.h(1)),
                 TextFormField(
                   controller: notesController,
                   maxLines: 4,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     hintText: "Additional details...",
-                    border: OutlineInputBorder(),
+                    hintStyle: AppTextStyles.inputHint.copyWith(color: subtitleColor),
+                    filled: true,
+                    fillColor: containerBg,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(context.w(2.5)),
+                      borderSide: isDark ? BorderSide(color: Colors.grey.shade800) : const BorderSide(color: Colors.grey),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(context.w(2.5)),
+                      borderSide: isDark ? BorderSide(color: Colors.grey.shade800) : const BorderSide(color: Colors.grey),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(context.w(2.5)),
+                      borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+                    ),
                   ),
-                  style: const TextStyle(fontFamily: 'Pangram'),
+                  style: AppTextStyles.body.copyWith(color: textColor, fontWeight: FontWeight.normal),
                 ),
                 SizedBox(height: context.h(2.5)),
 
@@ -269,15 +308,22 @@ class _EditMoodScreenState extends State<EditMoodScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: isDark ? AppColors.cardDark : Colors.grey[400],
+                        minimumSize: Size(context.w(35), context.h(6)),
+                      ),
                       onPressed: () => Navigator.of(context).pop(), // Discard
-                      child: Text("Discard", style: TextStyle(fontFamily: 'Pangram')),
+                      child: Text("Discard", style: AppTextStyles.button.copyWith(color: isDark ? textColor : Colors.black)),
                     ),
                     ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        minimumSize: Size(context.w(35), context.h(6)),
+                      ),
                       onPressed: () {
                         if (selectedEmotions.isEmpty || reasonsController.text.isEmpty) {
-                          // If no emotions or reasons selected
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Please select at least one emotion and one reason'), backgroundColor: Color(0xFF8B4CFC),),
+                            SnackBar(content: const Text('Please select at least one emotion and one reason'), backgroundColor: AppColors.primary),
                           );
                         } else {
                           // Prepare updated data
@@ -285,26 +331,22 @@ class _EditMoodScreenState extends State<EditMoodScreen> {
                             timestamp: selectedDateTime,
                             mood: selectedMood,
                             emotions: selectedEmotions,
-                            reasons: reasonsController.text.split(',').map((e) => e.trim()).toList(),
+                            reasons: reasonsController.text.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList(),
                             notes: notesController.text,
                           );
 
                           try {
-                            // Call the update method from the database service
                             MoodEntryDatabase.updateMoodEntry(
                                 widget.moodEntryDoc.id, updatedMoodEntry);
-
-                            // Close the screen
                             Navigator.of(context).pop();
                           } catch (e) {
-                            // Handle any errors
                             ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Error updating entry: $e'), backgroundColor: Color(0xFF8B4CFC)),
+                              SnackBar(content: Text('Error updating entry: $e'), backgroundColor: AppColors.primary),
                             );
                           }
                         }
                       },
-                      child: Text("Save", style: TextStyle(fontFamily: 'Pangram')),
+                      child: Text("Save", style: AppTextStyles.button.copyWith(color: Colors.white)),
                     ),
                   ],
                 ),
@@ -312,6 +354,7 @@ class _EditMoodScreenState extends State<EditMoodScreen> {
             ),
           ),
         ),
+       ),
       ),
     );
   }

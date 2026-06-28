@@ -3,6 +3,8 @@ import 'package:firebasebackend/views/home/home_screen.dart';
 import 'package:flutter/material.dart';
 import '../../controllers/mood_entry_controller.dart';
 import '../../models/emoji_data.dart';
+import '../../theme/app_colors.dart';
+import '../../theme/app_text_styles.dart';
 import 'add_mood_screen3_reasons.dart';
 import '../widgets/responsive_extension.dart';
 
@@ -14,34 +16,27 @@ class AddEmotions extends StatefulWidget {
 }
 
 class _AddEmotionsState extends State<AddEmotions> {
-  String searchQuery = ''; // Search query to filter emotions
+  String searchQuery = '';
 
   @override
   Widget build(BuildContext context) {
     final moodProvider = Provider.of<MoodEntryController>(context);
     final currentMood = moodProvider.moodEntry.getMood.toLowerCase();
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
+    final subtitleColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight;
+    final unselectedCircleBg = isDark ? AppColors.cardDark : Colors.grey.shade300;
 
-    // Filtered emotions list based on the search query
     final filteredEmotions = allEmotions
         .where((emotion) => emotion.title.toLowerCase().contains(searchQuery.toLowerCase()))
         .toList();
 
-    // Determine whether to show the "Recently Used" section based on search query
     final showRecentlyUsed = searchQuery.isEmpty;
 
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
-          gradient: RadialGradient(
-            center: Alignment.center,
-            radius: 1.4,
-            colors: [
-              Color(0xFFCCEFFF),
-              Color(0xFFEFF9F2),
-              Color(0xFFCFCFCF),
-            ],
-            stops: [0.3, 0.8, 1],
-          ),
+        decoration: BoxDecoration(
+          gradient: isDark ? AppColors.addMoodGradientDark : AppColors.addMoodGradient,
         ),
         width: double.infinity,
         height: double.infinity,
@@ -54,29 +49,21 @@ class _AddEmotionsState extends State<AddEmotions> {
                 child: Row(
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.arrow_back, color: Colors.black),
+                      icon: Icon(Icons.arrow_back, color: textColor),
                       onPressed: () => Navigator.pop(context),
                     ),
                     Expanded(
-                      child: Text(
-                        "2/4",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontFamily: 'Pangram',
-                          fontSize: context.w(4.5),
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                        ),
-                      ),
+                      child: Text("2/4", textAlign: TextAlign.center,
+                          style: AppTextStyles.stepIndicator.copyWith(color: textColor)),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.close, color: Colors.black),
+                      icon: Icon(Icons.close, color: textColor),
                       onPressed: () {
                         moodProvider.clear();
                         Navigator.pushAndRemoveUntil(
                           context,
                           MaterialPageRoute(builder: (context) => HomeScreen()),
-                              (route) => false,
+                          (route) => false,
                         );
                       },
                     ),
@@ -89,66 +76,53 @@ class _AddEmotionsState extends State<AddEmotions> {
                   child: Column(
                     children: [
                       SizedBox(height: context.h(2)),
-                      // Harmonious Centered Headings
                       Text(
                         "Choose the emotions that make you feel $currentMood",
                         textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: context.w(6),
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'Pangram',
-                          color: Colors.black,
-                        ),
+                        style: AppTextStyles.heading1.copyWith(color: textColor, fontSize: context.w(6)),
                       ),
                       SizedBox(height: context.h(1.5)),
                       Text(
                         "Select at least 1 emotion",
                         textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: context.w(3.75),
-                          fontFamily: 'Pangram',
-                          color: Colors.black54,
-                        ),
+                        style: AppTextStyles.subtitle.copyWith(color: subtitleColor, fontSize: context.w(3.75)),
                       ),
                       SizedBox(height: context.h(3)),
 
                       // Search Bar
                       TextField(
-                        onChanged: (value) {
-                          setState(() {
-                            searchQuery = value;
-                          });
-                        },
+                        onChanged: (value) => setState(() => searchQuery = value),
+                        style: AppTextStyles.body.copyWith(color: textColor),
                         decoration: InputDecoration(
-                          labelText: 'Search emotions',
-                          labelStyle: const TextStyle(fontFamily: 'Pangram'),
+                          hintText: 'Search emotions',
+                          hintStyle: AppTextStyles.inputHint.copyWith(color: subtitleColor),
                           filled: true,
-                          fillColor: Colors.white,
-                          border: OutlineInputBorder(
+                          fillColor: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(context.w(7.5))),
+                          enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(context.w(7.5)),
+                            borderSide: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade300),
                           ),
-                          suffixIcon: const Icon(Icons.search),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(context.w(7.5)),
+                            borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+                          ),
+                          suffixIcon: Icon(Icons.search, color: subtitleColor),
                         ),
                       ),
                       SizedBox(height: context.h(3)),
 
-                      // Display Selected Emotions Section
+                      // Selected Emotions
                       if (moodProvider.selectedEmotions.isNotEmpty) ...[
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(
-                              "Selected:",
-                              style: TextStyle(fontSize: context.w(4.5), fontWeight: FontWeight.bold, fontFamily: 'Pangram'),
-                            ),
+                            Text("Selected:",
+                                style: AppTextStyles.heading2.copyWith(color: textColor, fontSize: context.w(4.5))),
                             TextButton(
-                              onPressed: () {
-                                moodProvider.clearSelectedEmotions();
-                              },
-                              child: Text(
-                                "Clear all",
-                                style: TextStyle(color: Colors.red, fontSize: context.w(3.75), fontFamily: 'Pangram', fontWeight: FontWeight.bold),
-                              ),
+                              onPressed: moodProvider.clearSelectedEmotions,
+                              child: Text("Clear all",
+                                  style: AppTextStyles.link.copyWith(color: AppColors.error, fontSize: context.w(3.75))),
                             ),
                           ],
                         ),
@@ -164,30 +138,22 @@ class _AddEmotionsState extends State<AddEmotions> {
                                 label: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    Image.asset(
-                                      emojiItem.imagePath,
-                                      width: context.w(5),
-                                      height: context.w(5),
-                                    ),
+                                    Image.asset(emojiItem.imagePath, width: context.w(5), height: context.w(5)),
                                     SizedBox(width: context.w(1.2)),
-                                    Text(
-                                      emotionTitle,
-                                      style: TextStyle(fontSize: context.w(3.5), fontWeight: FontWeight.w500, fontFamily: 'Pangram'),
-                                    ),
+                                    Text(emotionTitle,
+                                        style: AppTextStyles.chip.copyWith(
+                                          color: isDark ? Colors.white : AppColors.primaryDark,
+                                          fontSize: context.w(3.5),
+                                        )),
                                   ],
                                 ),
-                                backgroundColor: Colors.purple[100],
+                                backgroundColor: isDark ? AppColors.primaryDark : AppColors.primaryLight,
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(context.w(2)),
-                                  side: BorderSide(
-                                    color: Colors.purple[300]!,
-                                    width: 0.8,
-                                  ),
+                                  borderRadius: BorderRadius.circular(context.w(5)),
                                 ),
-                                deleteIcon: Icon(Icons.close, size: context.w(4), color: Colors.black),
-                                onDeleted: () {
-                                  moodProvider.toggleEmotion(emotionTitle);
-                                },
+                                side: BorderSide(color: AppColors.primary.withOpacity(0.4), width: 0.8),
+                                deleteIcon: Icon(Icons.close, size: context.w(4), color: isDark ? Colors.white : AppColors.primaryDark),
+                                onDeleted: () => moodProvider.toggleEmotion(emotionTitle),
                               );
                             }).toList(),
                           ),
@@ -195,35 +161,47 @@ class _AddEmotionsState extends State<AddEmotions> {
                         SizedBox(height: context.h(2.5)),
                       ],
 
-                      // Recently Used Section
+                      // Recently Used
                       if (showRecentlyUsed && moodProvider.recentlyUsedEmotions.isNotEmpty) ...[
                         Align(
                           alignment: Alignment.centerLeft,
-                          child: Text(
-                            "Recently Used:",
-                            style: TextStyle(fontSize: context.w(4.5), fontWeight: FontWeight.bold, fontFamily: 'Pangram'),
-                          ),
+                          child: Text("Recently Used:",
+                              style: AppTextStyles.heading2.copyWith(color: textColor, fontSize: context.w(4.5))),
                         ),
                         SizedBox(height: context.h(1.5)),
                         Align(
                           alignment: Alignment.centerLeft,
                           child: Wrap(
-                            spacing: context.w(3),
-                            runSpacing: context.h(0.5),
+                            spacing: context.w(5),
+                            runSpacing: context.h(1),
                             children: moodProvider.recentlyUsedEmotions.map((emotionTitle) {
                               final emojiItem = allEmotions.firstWhere((item) => item.title == emotionTitle);
+                              final isSelected = moodProvider.selectedEmotions.contains(emotionTitle);
                               return GestureDetector(
-                                onTap: () {
-                                  moodProvider.toggleEmotion(emotionTitle);
-                                },
-                                child: CircleAvatar(
-                                  backgroundColor: Colors.grey[300],
-                                  radius: context.w(10),
-                                  child: Image.asset(
-                                    emojiItem.imagePath,
-                                    width: context.w(8.75),
-                                    height: context.w(8.75),
-                                  ),
+                                onTap: () => moodProvider.toggleEmotion(emotionTitle),
+                                child: Column(
+                                  children: [
+                                    CircleAvatar(
+                                      backgroundColor: isSelected
+                                          ? (isDark ? AppColors.primaryDark : AppColors.primaryLight)
+                                          : unselectedCircleBg,
+                                      radius: context.w(10),
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          border: isSelected ? Border.all(color: AppColors.primary, width: 2) : null,
+                                        ),
+                                        child: ClipOval(
+                                          child: Padding(
+                                            padding: EdgeInsets.all(context.w(1)),
+                                            child: Image.asset(emojiItem.imagePath, fit: BoxFit.contain),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    Text(emotionTitle,
+                                        style: AppTextStyles.caption.copyWith(color: textColor, fontSize: context.w(3))),
+                                  ],
                                 ),
                               );
                             }).toList(),
@@ -232,13 +210,11 @@ class _AddEmotionsState extends State<AddEmotions> {
                         SizedBox(height: context.h(2.5)),
                       ],
 
-                      // Display All Emotions Section
+                      // All Emotions
                       Align(
                         alignment: Alignment.centerLeft,
-                        child: Text(
-                          "All Emotions:",
-                          style: TextStyle(fontSize: context.w(4.5), fontWeight: FontWeight.bold, fontFamily: 'Pangram'),
-                        ),
+                        child: Text("All Emotions:",
+                            style: AppTextStyles.heading2.copyWith(color: textColor, fontSize: context.w(4.5))),
                       ),
                       SizedBox(height: context.h(1.5)),
                       Align(
@@ -247,27 +223,31 @@ class _AddEmotionsState extends State<AddEmotions> {
                           spacing: context.w(5),
                           runSpacing: context.h(1),
                           children: filteredEmotions.map((emotion) {
+                            final isSelected = moodProvider.selectedEmotions.contains(emotion.title);
                             return GestureDetector(
-                              onTap: () {
-                                moodProvider.toggleEmotion(emotion.title);
-                              },
+                              onTap: () => moodProvider.toggleEmotion(emotion.title),
                               child: Column(
                                 children: [
                                   CircleAvatar(
-                                    backgroundColor: moodProvider.selectedEmotions.contains(emotion.title)
-                                        ? Colors.purple[100]
-                                        : Colors.grey[300],
+                                    backgroundColor: isSelected
+                                        ? (isDark ? AppColors.primaryDark : AppColors.primaryLight)
+                                        : unselectedCircleBg,
                                     radius: context.w(10),
-                                    child: Image.asset(
-                                      emotion.imagePath,
-                                      width: context.w(8.75),
-                                      height: context.w(8.75),
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        border: isSelected ? Border.all(color: AppColors.primary, width: 2) : null,
+                                      ),
+                                      child: ClipOval(
+                                        child: Padding(
+                                          padding: EdgeInsets.all(context.w(1)),
+                                          child: Image.asset(emotion.imagePath, fit: BoxFit.contain),
+                                        ),
+                                      ),
                                     ),
                                   ),
-                                  Text(
-                                    emotion.title,
-                                    style: TextStyle(fontSize: context.w(3), fontFamily: 'Pangram'),
-                                  ),
+                                  Text(emotion.title,
+                                      style: AppTextStyles.caption.copyWith(color: textColor, fontSize: context.w(3))),
                                 ],
                               ),
                             );
@@ -284,10 +264,8 @@ class _AddEmotionsState extends State<AddEmotions> {
                 padding: EdgeInsets.fromLTRB(context.w(5), 0, context.w(5), context.h(3)),
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF8B4CFC),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(context.w(10)),
-                    ),
+                    backgroundColor: AppColors.primary,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(context.w(10))),
                     minimumSize: Size(context.w(85), context.h(7.5)),
                   ),
                   onPressed: () {
@@ -295,23 +273,15 @@ class _AddEmotionsState extends State<AddEmotions> {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                           content: Text('Please select at least one emotion before continuing.'),
-                          backgroundColor: Color(0xFF8B4CFC),
+                          backgroundColor: AppColors.primary,
                           duration: Duration(seconds: 2),
                         ),
                       );
                     } else {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const AddReasons(),
-                        ),
-                      );
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => const AddReasons()));
                     }
                   },
-                  child: Text(
-                    'Continue',
-                    style: TextStyle(fontSize: context.w(4), color: Colors.white, fontFamily: 'Pangram', fontWeight: FontWeight.bold),
-                  ),
+                  child: Text('Continue', style: AppTextStyles.button.copyWith(color: Colors.white, fontSize: context.w(4))),
                 ),
               ),
             ],

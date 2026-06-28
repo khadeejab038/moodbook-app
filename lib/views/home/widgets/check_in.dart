@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../controllers/mood_entry_controller.dart';
-import '../../../controllers/check_in_controller.dart'; // Import CheckInController
-import '../../add_mood/add_mood_screen1_mood.dart'; // Import AddMood page
+import '../../../controllers/check_in_controller.dart';
+import '../../add_mood/add_mood_screen1_mood.dart';
 import '../../settings/app_preferences/notifications_settings_screen.dart';
 import '../../widgets/responsive_extension.dart';
+import '../../../theme/app_colors.dart';
+import '../../../theme/app_text_styles.dart';
 
 class CheckInWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
+
     return FutureBuilder<int>(
       future: Provider.of<MoodEntryController>(context, listen: false)
           .countMoodEntriesToday(), // Fetch the completed check-ins count
@@ -16,13 +21,26 @@ class CheckInWidget extends StatelessWidget {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(child: CircularProgressIndicator());
         } else if (snapshot.hasError) {
-          return Center(child: Text('Error: ${snapshot.error}'));
+          return Center(child: Text('Error: ${snapshot.error}', style: AppTextStyles.body.copyWith(color: textColor)));
         } else {
           final completedCheckIns = snapshot.data ?? 0;
 
           // Get the total number of enabled check-in reminders set by the user
           final checkInProvider = Provider.of<CheckInController>(context);
           final totalReminders = checkInProvider.getEnabledCheckInRemindersCount();
+
+          // Determine theme-aware check-in colors
+          final Color cardBg = totalReminders == 0
+              ? (isDark ? AppColors.cardDark : AppColors.checkInGoalBg)
+              : (isDark ? AppColors.cardDark : AppColors.checkInActiveBg);
+
+          final Color iconBg = totalReminders == 0
+              ? (isDark ? Colors.blue.withOpacity(0.2) : AppColors.checkInGoalIcon)
+              : (isDark ? Colors.pink.withOpacity(0.2) : AppColors.checkInActiveIcon);
+
+          final Color iconColor = totalReminders == 0
+              ? AppColors.checkInGoalAccent
+              : AppColors.checkInActiveAccent;
 
           return GestureDetector(
             onTap: () {
@@ -47,10 +65,9 @@ class CheckInWidget extends StatelessWidget {
                 children: [
                   Text(
                     "Today's check-in",
-                    style: TextStyle(
+                    style: AppTextStyles.heading2.copyWith(
                       fontSize: context.w(5),
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'Pangram',
+                      color: textColor,
                     ),
                   ),
                   SizedBox(height: context.h(2.5)),
@@ -60,8 +77,9 @@ class CheckInWidget extends StatelessWidget {
                       vertical: context.h(1.5),
                     ),
                     decoration: BoxDecoration(
-                      color: totalReminders == 0 ? Colors.blue[50] : Colors.pink[50],
+                      color: cardBg,
                       borderRadius: BorderRadius.circular(context.w(5)),
+                      border: isDark ? Border.all(color: Colors.grey.shade800) : null,
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -71,14 +89,12 @@ class CheckInWidget extends StatelessWidget {
                             children: [
                               CircleAvatar(
                                 radius: context.w(6),
-                                backgroundColor: totalReminders == 0
-                                    ? Colors.blue[100]
-                                    : Colors.pink[100],
+                                backgroundColor: iconBg,
                                 child: Icon(
                                   totalReminders == 0
                                       ? Icons.notifications
                                       : Icons.check_circle,
-                                  color: totalReminders == 0 ? Colors.blue : Colors.pink,
+                                  color: iconColor,
                                 ),
                               ),
                               SizedBox(width: context.w(2)),
@@ -87,10 +103,9 @@ class CheckInWidget extends StatelessWidget {
                                   totalReminders == 0
                                       ? "Set a goal for daily check-ins!"
                                       : "Check-in",
-                                  style: TextStyle(
+                                  style: AppTextStyles.bodySemiBold.copyWith(
                                     fontSize: context.w(3.75),
-                                    fontWeight: FontWeight.w600,
-                                    fontFamily: 'Pangram',
+                                    color: textColor,
                                   ),
                                   overflow: TextOverflow.ellipsis,
                                 ),
@@ -106,11 +121,10 @@ class CheckInWidget extends StatelessWidget {
                                   : completedCheckIns >= totalReminders
                                   ? "$totalReminders/$totalReminders"
                                   : "$completedCheckIns/$totalReminders",
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: context.w(4),
-                                  fontFamily: 'Pangram',
-                                ),
+                              style: AppTextStyles.bodyBold.copyWith(
+                                fontSize: context.w(4),
+                                color: textColor,
+                              ),
                             ),
                             SizedBox(width: context.w(2)),
                             Container(
@@ -119,12 +133,12 @@ class CheckInWidget extends StatelessWidget {
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
                                 color: totalReminders == 0
-                                    ? Colors.blue[100]
-                                    : Colors.pink[50],
+                                    ? iconBg
+                                    : (isDark ? Colors.pink.withOpacity(0.1) : AppColors.checkInActiveBg),
                               ),
                               child: Center(
                                 child: totalReminders == 0
-                                    ? Icon(Icons.arrow_forward, color: Colors.blue, size: context.w(5))
+                                    ? Icon(Icons.arrow_forward, color: iconColor, size: context.w(5))
                                     : Container(),
                               ),
                             ),

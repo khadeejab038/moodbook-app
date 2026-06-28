@@ -3,12 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'controllers/mood_entry_controller.dart';
-import 'views/splash_screen/splash_screen.dart';
-import 'views/user_authentication/signin_screen.dart';
-import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'controllers/check_in_controller.dart';
 import 'views/home/home_screen.dart';
-import 'views/user_authentication/signin_screen.dart'; 
+import 'views/user_authentication/signin_screen.dart';
+import 'theme/app_theme.dart';
+import 'theme/theme_provider.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
@@ -23,12 +22,22 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        // Provide default empty providers here
-        ChangeNotifierProvider(create: (context) => MoodEntryController(userID: '')),
-        ChangeNotifierProvider(create: (context) => CheckInController(userID: '')),
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
+        ChangeNotifierProvider(create: (_) => MoodEntryController(userID: '')),
+        ChangeNotifierProvider(create: (_) => CheckInController(userID: '')),
       ],
-      child: MaterialApp(
-        home: AuthWrapper(), // Wrapper to handle auth state
+      child: Consumer<ThemeProvider>(
+        builder: (context, themeProvider, _) {
+          return MaterialApp(
+            navigatorKey: navigatorKey,
+            debugShowCheckedModeBanner: false,
+            title: 'MoodBook',
+            theme: AppTheme.light,
+            darkTheme: AppTheme.dark,
+            themeMode: themeProvider.themeMode,
+            home: AuthWrapper(),
+          );
+        },
       ),
     );
   }
@@ -38,28 +47,26 @@ class AuthWrapper extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<User?>(
-      stream: FirebaseAuth.instance.authStateChanges(), // Listen to auth state changes
+      stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(child: CircularProgressIndicator()); // Show a loading spinner while checking authentication state
-        }
-
-        if (snapshot.hasData) {
-          // User is signed in
-          final userID = snapshot.data!.uid;
-
-          // Now that we have the userID, update the providers with the actual user ID
-          return MultiProvider(
-            providers: [
-              ChangeNotifierProvider(create: (context) => MoodEntryController(userID: userID)),
-              ChangeNotifierProvider(create: (context) => CheckInController(userID: userID)),
-            ],
-            child: HomeScreen(), // Navigate to the Home Screen
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
           );
         }
 
-        // User is not signed in
-        return SignInScreen(); // Show the Sign-In Screen
+        if (snapshot.hasData) {
+          final userID = snapshot.data!.uid;
+          return MultiProvider(
+            providers: [
+              ChangeNotifierProvider(create: (_) => MoodEntryController(userID: userID)),
+              ChangeNotifierProvider(create: (_) => CheckInController(userID: userID)),
+            ],
+            child: HomeScreen(),
+          );
+        }
+
+        return SignInScreen();
       },
     );
   }

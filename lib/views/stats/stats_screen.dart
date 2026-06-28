@@ -4,21 +4,20 @@ import 'widgets/mood_heatmap.dart';
 import 'widgets/mood_piechart.dart';
 import 'widgets/emotion_triggers.dart';
 import '../widgets/responsive_extension.dart';
+import '../../theme/app_colors.dart';
+import '../../theme/app_text_styles.dart';
 
 class StatsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
+    final cardBg = isDark ? AppColors.cardStatsDark : AppColors.cardStatsLight;
+
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Color(0xAAC7DFFF),
-              Color(0xFFFFCEB7),
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
+        decoration: BoxDecoration(
+          gradient: isDark ? AppColors.pageGradientDark : AppColors.pageGradientLight,
         ),
         child: SafeArea(
           child: Column(
@@ -29,10 +28,8 @@ class StatsPage extends StatelessWidget {
                   alignment: Alignment.centerLeft,
                   child: Text(
                     'Stats',
-                    style: TextStyle(
-                      fontFamily: 'Pangram',
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF100F11),
+                    style: AppTextStyles.pageTitle.copyWith(
+                      color: textColor,
                       fontSize: context.w(5),
                     ),
                   ),
@@ -48,17 +45,15 @@ class StatsPage extends StatelessWidget {
                         SizedBox(height: context.h(2.5)),
                         Text(
                           'Mood Calendar',
-                          style: TextStyle(
-                            fontFamily: 'Pangram',
-                            fontWeight: FontWeight.bold,
+                          style: AppTextStyles.heading2.copyWith(
                             fontSize: context.w(4.5),
-                            color: Color(0xFF100F11),
+                            color: textColor,
                           ),
                         ),
                         SizedBox(height: context.h(2)),
                         Container(
                           decoration: BoxDecoration(
-                            color: Color(0xFFDED7FA).withOpacity(0.8),
+                            color: cardBg,
                             borderRadius: BorderRadius.circular(context.w(3)),
                           ),
                           padding: EdgeInsets.all(context.w(4)),
@@ -67,17 +62,15 @@ class StatsPage extends StatelessWidget {
                         SizedBox(height: context.h(2.5)),
                         Text(
                           'Mood Distribution',
-                          style: TextStyle(
-                            fontFamily: 'Pangram',
-                            fontWeight: FontWeight.bold,
+                          style: AppTextStyles.heading2.copyWith(
                             fontSize: context.w(4.5),
-                            color: Color(0xFF100F11),
+                            color: textColor,
                           ),
                         ),
                         SizedBox(height: context.h(2)),
                         Container(
                           decoration: BoxDecoration(
-                            color: Color(0xFFDED7FA).withOpacity(0.8),
+                            color: cardBg,
                             borderRadius: BorderRadius.circular(context.w(3)),
                           ),
                           padding: EdgeInsets.all(context.w(4)),
@@ -86,17 +79,15 @@ class StatsPage extends StatelessWidget {
                         SizedBox(height: context.h(2.5)),
                         Text(
                           'Emotion Triggers',
-                          style: TextStyle(
-                            fontFamily: 'Pangram',
-                            fontWeight: FontWeight.bold,
+                          style: AppTextStyles.heading2.copyWith(
                             fontSize: context.w(4.5),
-                            color: Color(0xFF100F11),
+                            color: textColor,
                           ),
                         ),
                         SizedBox(height: context.h(2)),
                         Container(
                           decoration: BoxDecoration(
-                            color: Color(0xFFDED7FA).withOpacity(0.8),
+                            color: cardBg,
                             borderRadius: BorderRadius.circular(context.w(3)),
                           ),
                           padding: EdgeInsets.all(context.w(4)),
