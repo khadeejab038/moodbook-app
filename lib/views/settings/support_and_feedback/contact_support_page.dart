@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../widgets/responsive_extension.dart';
 
 class ContactSupportPage extends StatelessWidget {
   @override
@@ -11,7 +12,7 @@ class ContactSupportPage extends StatelessWidget {
           'Contact Support',
           style: TextStyle(
             fontFamily: 'Pangram',
-            fontSize: 24,
+            fontSize: context.w(6),
             fontWeight: FontWeight.bold,
             color: Colors.black,
           ),
@@ -29,77 +30,78 @@ class ContactSupportPage extends StatelessWidget {
             end: Alignment.bottomCenter,
           ),
         ),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.all(context.w(4)),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
               // Title
               Text(
                 'Need help? Get in touch!',
                 style: TextStyle(
                   fontFamily: 'Pangram',
-                  fontSize: 20,
+                  fontSize: context.w(5),
                   fontWeight: FontWeight.bold,
                   color: Colors.black,
                 ),
               ),
-              SizedBox(height: 20),
+              SizedBox(height: context.h(2.5)),
 
               // Email input field
               Text(
                 'Your Email:',
                 style: TextStyle(
                   fontFamily: 'Pangram',
-                  fontSize: 16,
+                  fontSize: context.w(4),
                   color: Colors.black,
                 ),
               ),
-              SizedBox(height: 10),
+              SizedBox(height: context.h(1.2)),
               TextField(
                 decoration: InputDecoration(
                   hintText: 'Enter your email...',
-                  hintStyle: TextStyle(
+                  hintStyle: const TextStyle(
                     color: Colors.grey,
                     fontFamily: 'Pangram',
                   ),
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12.0),
+                    borderRadius: BorderRadius.circular(context.w(3)),
                   ),
                   filled: true,
                   fillColor: Colors.white,
-                  contentPadding: EdgeInsets.all(16),
+                  contentPadding: EdgeInsets.all(context.w(4)),
                 ),
               ),
-              SizedBox(height: 20),
+              SizedBox(height: context.h(2.5)),
 
               // Support message text area
               Text(
                 'Your Message:',
                 style: TextStyle(
                   fontFamily: 'Pangram',
-                  fontSize: 16,
+                  fontSize: context.w(4),
                   color: Colors.black,
                 ),
               ),
-              SizedBox(height: 10),
+              SizedBox(height: context.h(1.2)),
               TextField(
                 maxLines: 5,
                 decoration: InputDecoration(
                   hintText: 'Describe your issue or request...',
-                  hintStyle: TextStyle(
+                  hintStyle: const TextStyle(
                     color: Colors.grey,
                     fontFamily: 'Pangram',
                   ),
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12.0),
+                    borderRadius: BorderRadius.circular(context.w(3)),
                   ),
                   filled: true,
                   fillColor: Colors.white,
-                  contentPadding: EdgeInsets.all(16),
+                  contentPadding: EdgeInsets.all(context.w(4)),
                 ),
               ),
-              SizedBox(height: 20),
+              SizedBox(height: context.h(2.5)),
 
               // Submit Button
               Center(
@@ -114,18 +116,18 @@ class ContactSupportPage extends StatelessWidget {
                     ),
                     shape: MaterialStateProperty.all(
                       RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(25.0),
+                        borderRadius: BorderRadius.circular(context.w(6.25)),
                       ),
                     ),
                     padding: MaterialStateProperty.all(
-                      EdgeInsets.symmetric(horizontal: 40.0, vertical: 12.0),
+                      EdgeInsets.symmetric(horizontal: context.w(10), vertical: context.h(1.5)),
                     ),
                   ),
                   child: Text(
                     'Send Message',
                     style: TextStyle(
                       fontFamily: 'Pangram',
-                      fontSize: 16,
+                      fontSize: context.w(4),
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
@@ -136,6 +138,7 @@ class ContactSupportPage extends StatelessWidget {
           ),
         ),
       ),
+    ),
     );
   }
 }

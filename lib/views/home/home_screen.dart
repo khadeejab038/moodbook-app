@@ -1,13 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebasebackend/views/home/mood_chart.dart';
-import 'widgets/bottom_nav_bar.dart';
+import 'package:firebasebackend/views/home/widgets/mood_chart.dart';
+import '../widgets/bottom_nav_bar.dart';
 import 'package:flutter/material.dart';
-import '../add_mood/add_mood_page_1.dart';
-import 'check_in.dart';
-import 'daily_average_mood.dart';
+import '../add_mood/add_mood_screen1_mood.dart';
+import 'widgets/check_in.dart';
+import 'widgets/daily_average_mood.dart';
 import 'package:provider/provider.dart';
 import '../../controllers/check_in_controller.dart';
+import '../widgets/responsive_extension.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -66,11 +67,11 @@ class _HomeScreenState extends State<HomeScreen> {
             children: [
               // Top Section (Greeting)
               Padding(
-                padding: const EdgeInsets.all(16.0),
+                padding: EdgeInsets.all(context.w(4)),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    SizedBox(height: 40),
+                    SizedBox(height: context.h(5)),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -94,7 +95,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 text: TextSpan(
                                   text: greetingText, // Display the correct greeting
                                   style: TextStyle(
-                                    fontSize: 24,
+                                    fontSize: context.w(6),
                                     fontWeight: FontWeight.bold,
                                     color: Colors.black,
                                     fontFamily: 'Pangram',
@@ -105,7 +106,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ],
                     ),
-                    SizedBox(height: 30),
+                    SizedBox(height: context.h(3.5)),
                     // Calendar Row
                     DailyAverageMood(),
                   ],

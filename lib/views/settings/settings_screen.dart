@@ -1,7 +1,7 @@
 // import 'package:firebasebackend/views/settings/account_settings/edit_profile_screen.dart';
 // import 'package:firebasebackend/views/settings/account_settings/account_settings.dart';
 // import 'package:firebasebackend/views/settings/app_preferences/notification_settings_page.dart';
-// import 'package:firebasebackend/views/settings/app_preferences/theme_settings.dart';
+// import 'package:firebasebackend/views/settings/app_preferences/theme_settings_toggle_button.dart';
 // import 'package:firebasebackend/views/settings/support_and_feedback/contact_support_page.dart';
 // import 'package:firebasebackend/views/settings/support_and_feedback/feedback_page.dart';
 // import 'package:flutter/material.dart';
@@ -231,19 +231,20 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebasebackend/models/database/user_database.dart';
 import 'package:firebasebackend/views/settings/account_settings/edit_profile_screen.dart';
 import 'package:firebasebackend/views/settings/account_settings/account_settings.dart';
-import 'package:firebasebackend/views/settings/app_preferences/notifications_settings_page.dart';
-import 'package:firebasebackend/views/settings/app_preferences/theme_settings.dart';
+import 'package:firebasebackend/views/settings/app_preferences/notifications_settings_screen.dart';
+import 'package:firebasebackend/views/settings/app_preferences/theme_settings_toggle_button.dart';
 import 'package:firebasebackend/views/settings/support_and_feedback/contact_support_page.dart';
 import 'package:firebasebackend/views/settings/support_and_feedback/feedback_page.dart';
 import 'package:flutter/material.dart';
 import '../../models/database/user_database.dart';
-import '../home/widgets/bottom_nav_bar.dart';
+import '../widgets/bottom_nav_bar.dart';
 import '../widgets/snack_bar_helper.dart';
 import '../../main.dart';
 import '../user_authentication/signin_screen.dart';
 import 'about/about.dart';
 import 'account_settings/change_password_screen.dart';
 import 'data_management/data_management.dart';
+import '../widgets/responsive_extension.dart';
 
 class SettingsPage extends StatelessWidget {
   @override
@@ -263,7 +264,7 @@ class SettingsPage extends StatelessWidget {
         child: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(16.0, 70.0, 16.0, 16.0),
+              padding: EdgeInsets.fromLTRB(context.w(4), context.h(8.75), context.w(4), context.w(4)),
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
@@ -272,17 +273,17 @@ class SettingsPage extends StatelessWidget {
                     fontFamily: 'Pangram',
                     fontWeight: FontWeight.bold,
                     color: Color(0xFF100F11),
-                    fontSize: 20.0,
+                    fontSize: context.w(5),
                   ),
                 ),
               ),
             ),
             Expanded(
               child: ListView(
-                padding: const EdgeInsets.all(16.0),
+                padding: EdgeInsets.all(context.w(4)),
                 children: [
                   // Account Settings
-                  _buildSectionTitle('Account Settings'),
+                  _buildSectionTitle(context, 'Account Settings'),
                   _buildSettingsTile(
                     title: 'Profile Management',
                     subtitle: 'Edit name and email',
@@ -327,10 +328,10 @@ class SettingsPage extends StatelessWidget {
                     onTap: () => _confirmDeleteAccount(context),
                   ),
 
-                  SizedBox(height: 16),
+                  SizedBox(height: context.h(2)),
 
                   // App Preferences
-                  _buildSectionTitle('App Preferences'),
+                  _buildSectionTitle(context, 'App Preferences'),
                   _buildSwitchTile(
                     title: 'Dark Mode',
                     value: false,
@@ -344,10 +345,10 @@ class SettingsPage extends StatelessWidget {
                       MaterialPageRoute(builder: (context) => NotificationsSettingsPage()),
                     ),
                   ),
-                  SizedBox(height: 16),
+                  SizedBox(height: context.h(2)),
 
                   // Data Management
-                  _buildSectionTitle('Data Management'),
+                  _buildSectionTitle(context, 'Data Management'),
                   _buildSettingsTile(
                     title: 'Export Data',
                     onTap: () => DataManagement.exportData(context),
@@ -356,10 +357,10 @@ class SettingsPage extends StatelessWidget {
                     title: 'Clear Mood Logs',
                     onTap: () => DataManagement.clearMoodLogs(context),
                   ),
-                  SizedBox(height: 16),
+                  SizedBox(height: context.h(2)),
 
                   // Support and Feedback
-                  _buildSectionTitle('Support and Feedback'),
+                  _buildSectionTitle(context, 'Support and Feedback'),
                   _buildSettingsTile(
                     title: 'Help Center',
                     onTap: () => _openWebPage('https://moodbook.com/helpCenter'),
@@ -378,19 +379,19 @@ class SettingsPage extends StatelessWidget {
                       MaterialPageRoute(builder: (context) => FeedbackPage()),
                     ),
                   ),
-                  SizedBox(height: 16),
+                  SizedBox(height: context.h(2)),
 
                   // About
-                  _buildSectionTitle('About'),
+                  _buildSectionTitle(context, 'About'),
                   _buildSettingsTile(
                     title: 'About MoodBook',
                     subtitle: 'Version 1.0.0',
                     onTap: () => About.showCustomAboutDialog(context),
                   ),
-                  SizedBox(height: 16),
+                  SizedBox(height: context.h(2)),
 
                   // Legal
-                  _buildSectionTitle('Legal'),
+                  _buildSectionTitle(context, 'Legal'),
                   _buildSettingsTile(
                     title: 'Privacy Policy',
                     onTap: () => _openWebPage('https://moodbook.com/privacy'),
@@ -409,13 +410,13 @@ class SettingsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildSectionTitle(String title) {
+  Widget _buildSectionTitle(BuildContext context, String title) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 12.0),
+      padding: EdgeInsets.symmetric(vertical: context.h(1.5)),
       child: Text(
         title,
         style: TextStyle(
-          fontSize: 18,
+          fontSize: context.w(4.5),
           fontWeight: FontWeight.w500,
           fontFamily: 'Pangram',
           color: Color(0xFF100F11),
@@ -429,25 +430,29 @@ class SettingsPage extends StatelessWidget {
     String? subtitle,
     required VoidCallback onTap,
   }) {
-    return ListTile(
-      title: Text(
-        title,
-        style: TextStyle(
-          fontFamily: 'Pangram',
-          fontWeight: FontWeight.normal,
-        ),
-      ),
-      subtitle: subtitle != null
-          ? Text(
-        subtitle,
-        style: TextStyle(
-          fontFamily: 'Pangram',
-          color: Color(0xFF100F11).withOpacity(0.74),
-        ),
-      )
-          : null,
-      onTap: onTap,
-      trailing: Icon(Icons.arrow_forward_ios, size: 16.0),
+    return Builder(
+      builder: (context) {
+        return ListTile(
+          title: Text(
+            title,
+            style: const TextStyle(
+              fontFamily: 'Pangram',
+              fontWeight: FontWeight.normal,
+            ),
+          ),
+          subtitle: subtitle != null
+              ? Text(
+            subtitle,
+            style: TextStyle(
+              fontFamily: 'Pangram',
+              color: Color(0xFF100F11).withOpacity(0.74),
+            ),
+          )
+              : null,
+          onTap: onTap,
+          trailing: Icon(Icons.arrow_forward_ios, size: context.w(4)),
+        );
+      }
     );
   }
 

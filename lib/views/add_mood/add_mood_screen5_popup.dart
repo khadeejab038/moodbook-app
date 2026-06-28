@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../home/home_screen.dart';
+import '../widgets/responsive_extension.dart';
 
 class AddMoodPopup extends StatelessWidget {
   final String mood;
@@ -49,44 +50,44 @@ class AddMoodPopup extends StatelessWidget {
 
     return Dialog(
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(30.0),
+        borderRadius: BorderRadius.circular(context.w(7.5)),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(20.0),
+        padding: EdgeInsets.all(context.w(5)),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Padding(
-              padding: const EdgeInsets.only(left: 20.0),
+              padding: EdgeInsets.only(left: context.w(5)),
               child: Image.asset(selectedMood['imagePath'] ?? 'assets/goodtogo.png'),
             ),
             Text(
               selectedMood['boldText'] ?? "Neutral days are an important part of the journey.",
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style: TextStyle(
                 fontFamily: 'Pangram',
-                fontSize: 20,
+                fontSize: context.w(5),
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 10),
+            SizedBox(height: context.h(1.2)),
             Text(
               selectedMood['regularText'] ?? "Staying consistent with tracking your mood will help you uncover patterns and discover what truly supports your well-being.",
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style: TextStyle(
                 fontFamily: 'Pangram',
-                fontSize: 14,
+                fontSize: context.w(3.5),
                 color: Colors.black38,
               ),
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: context.h(2.5)),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF8B4CFC),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(40),
+                  borderRadius: BorderRadius.circular(context.w(10)),
                 ),
-                minimumSize: const Size(200, 50),
+                minimumSize: Size(context.w(50), context.h(6)),
               ),
               onPressed: () {
                 Navigator.pushAndRemoveUntil(
@@ -95,11 +96,11 @@ class AddMoodPopup extends StatelessWidget {
                       (route) => false,
                 );
               },
-              child: const Text(
+              child: Text(
                 'Got it',
                 style: TextStyle(
                   fontFamily: 'Pangram',
-                  fontSize: 18,
+                  fontSize: context.w(4.5),
                   color: Colors.white,
                 ),
               ),

@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
-import '../../models/emoji_item.dart';
-import '../../models/emoji_data.dart';
+import '../../../models/emoji_item.dart';
+import '../../../models/emoji_data.dart';
+import '../../widgets/responsive_extension.dart';
 
 class DailyAverageMood extends StatefulWidget {
   @override
@@ -120,7 +121,7 @@ class _DailyAverageMoodState extends State<DailyAverageMood> {
               final isNextDay = day['isNextDay'] ?? false;
 
               return Container(
-                margin: EdgeInsets.symmetric(horizontal: 8.0),
+                margin: EdgeInsets.symmetric(horizontal: context.w(2)),
                 child: Align(
                   alignment: Alignment.topCenter,
                   child: Column(
@@ -128,19 +129,19 @@ class _DailyAverageMoodState extends State<DailyAverageMood> {
                     children: [
                       // Date bubble
                       Container(
-                        padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
+                        padding: EdgeInsets.symmetric(vertical: context.h(1), horizontal: context.w(3)),
                         decoration: BoxDecoration(
                           color: isToday
                               ? Color(0xFF8B4CFC)
                               : isNextDay
                               ? Colors.grey[300]
                               : Colors.white,
-                          borderRadius: BorderRadius.circular(25.0),
+                          borderRadius: BorderRadius.circular(context.w(6.25)),
                           border: Border.all(
                             color: isToday
                                 ? Color(0xFF8B4CFC)
                                 : Colors.transparent,
-                            width: 2.0,
+                            width: context.w(0.5),
                           ),
                         ),
                         child: Column(
@@ -155,7 +156,7 @@ class _DailyAverageMoodState extends State<DailyAverageMood> {
                                     ? Colors.grey[700]
                                     : Colors.black,
                                 fontWeight: FontWeight.w600,
-                                fontSize: 12,
+                                fontSize: context.w(3),
                               ),
                             ),
                             Text(
@@ -168,18 +169,18 @@ class _DailyAverageMoodState extends State<DailyAverageMood> {
                                     ? Colors.grey[700]
                                     : Colors.black,
                                 fontWeight: FontWeight.bold,
-                                fontSize: 16,
+                                fontSize: context.w(4),
                               ),
                             ),
                           ],
                         ),
                       ),
-                      SizedBox(height: 5), // Space between date bubble and emoji
+                      SizedBox(height: context.h(0.6)), // Space between date bubble and emoji
                       // Emoji or transparent placeholder
                       day['emoji'].isNotEmpty
                           ? Container(
-                        height: 45, // Size for emoji space
-                        width: 45,
+                        height: context.w(11.25), // Size for emoji space
+                        width: context.w(11.25),
                         decoration: BoxDecoration(
                           color: isToday
                               ? Color(0xFF8B4CFC)
@@ -189,7 +190,7 @@ class _DailyAverageMoodState extends State<DailyAverageMood> {
                           shape: BoxShape.circle,
                         ),
                         child: Padding(
-                          padding: EdgeInsets.all(10.0),
+                          padding: EdgeInsets.all(context.w(2.5)),
                           child: Container(
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
@@ -197,15 +198,15 @@ class _DailyAverageMoodState extends State<DailyAverageMood> {
                             ),
                             child: Image.asset(
                               day['emoji'],
-                              height: 40,
-                              width: 40,
+                              height: context.w(10),
+                              width: context.w(10),
                             ),
                           ),
                         ),
                       )
                           : Container(
-                        height: 45, // Transparent placeholder of same size as emoji
-                        width: 45,
+                        height: context.w(11.25), // Transparent placeholder of same size as emoji
+                        width: context.w(11.25),
                         color: Colors.transparent, // Ensures space is reserved
                       ),
                     ],

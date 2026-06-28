@@ -5,6 +5,7 @@ import '../../models/database/mood_entry_database.dart';
 import '../../models/emoji_data.dart';
 import '../../models/reasons_data.dart';
 import '../widgets/date_time_picker.dart';
+import '../widgets/responsive_extension.dart';
 
 class EditMoodScreen extends StatefulWidget {
   final DocumentSnapshot moodEntryDoc;
@@ -61,7 +62,7 @@ class _EditMoodScreenState extends State<EditMoodScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Edit Mood Entry", style: TextStyle(fontFamily: 'Pangram')),
+        title: Text("Edit Mood Entry", style: TextStyle(fontFamily: 'Pangram', fontSize: context.w(5.5))),
       ),
       body: Container(
         decoration: BoxDecoration(
@@ -76,21 +77,21 @@ class _EditMoodScreenState extends State<EditMoodScreen> {
           ),
         ),
         child: Padding(
-          padding: EdgeInsets.all(16.0),
+          padding: EdgeInsets.all(context.w(4)),
           child: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Editable Timestamp
-                Text("Timestamp", style: TextStyle(fontFamily: 'Pangram')),
+                Text("Timestamp", style: TextStyle(fontFamily: 'Pangram', fontSize: context.w(4))),
                 Row(
                   children: [
                     Text(
                       "${selectedDateTime.toLocal()}".split('.')[0],
-                      style: TextStyle(fontSize: 16, fontFamily: 'Pangram'),
+                      style: TextStyle(fontSize: context.w(4), fontFamily: 'Pangram'),
                     ),
                     IconButton(
-                      icon: Icon(Icons.edit),
+                      icon: Icon(Icons.edit, size: context.w(5)),
                       onPressed: () async {
                         await selectDateAndTime(
                             context,
@@ -105,12 +106,12 @@ class _EditMoodScreenState extends State<EditMoodScreen> {
                     ),
                   ],
                 ),
-                SizedBox(height: 12),
+                SizedBox(height: context.h(1.5)),
 
                 // Editable Mood (Replaced Dropdown with Emoji Picker)
-                Text("Mood", style: TextStyle(fontFamily: 'Pangram')),
+                Text("Mood", style: TextStyle(fontFamily: 'Pangram', fontSize: context.w(4))),
                 Container(
-                  height: 120,
+                  height: context.h(15),
                   child: ListView.builder(
                     scrollDirection: Axis.horizontal,
                     itemCount: moods.length, // Using the 'allEmotions' list from emoji_data.dart
@@ -125,10 +126,10 @@ class _EditMoodScreenState extends State<EditMoodScreen> {
                           });
                         },
                         child: AnimatedContainer(
-                          duration: Duration(milliseconds: 300),
-                          margin: EdgeInsets.symmetric(horizontal: 8),
-                          width: isSelected ? 80 : 60,
-                          height: isSelected ? 80 : 60,
+                          duration: const Duration(milliseconds: 300),
+                          margin: EdgeInsets.symmetric(horizontal: context.w(2)),
+                          width: isSelected ? context.w(20) : context.w(15),
+                          height: isSelected ? context.w(20) : context.w(15),
                           alignment: Alignment.center,
                           decoration: BoxDecoration(
                             color: Colors.white,
@@ -145,21 +146,21 @@ class _EditMoodScreenState extends State<EditMoodScreen> {
                           ),
                           child: Image.asset(
                             moods[index].imagePath, // Displaying the image based on selected mood
-                            width: isSelected ? 40 : 30, // Adjust image size based on selection
-                            height: isSelected ? 40 : 30,
+                            width: isSelected ? context.w(10) : context.w(7.5), // Adjust image size based on selection
+                            height: isSelected ? context.w(10) : context.w(7.5),
                           ),
                         ),
                       );
                     },
                   ),
                 ),
-                SizedBox(height: 12),
+                SizedBox(height: context.h(1.5)),
 
                 // Editable Emotions
-                Text("Emotions", style: TextStyle(fontFamily: 'Pangram')),
+                Text("Emotions", style: TextStyle(fontFamily: 'Pangram', fontSize: context.w(4))),
                 Wrap(
-                  spacing: 8.0,
-                  runSpacing: 4.0,
+                  spacing: context.w(2),
+                  runSpacing: context.h(0.5),
                   children: allEmotions.map((emotion) {
                     final isSelected = selectedEmotions.contains(emotion.title);
 
@@ -181,17 +182,17 @@ class _EditMoodScreenState extends State<EditMoodScreen> {
                           children: [
                             Image.asset(
                               emotion.imagePath,
-                              width: 20,
-                              height: 20,
+                              width: context.w(5),
+                              height: context.w(5),
                             ),
-                            SizedBox(width: 8),
+                            SizedBox(width: context.w(2)),
                             Text(emotion.title),
                           ],
                         ),
                         backgroundColor: isSelected
                             ? Colors.purpleAccent[700] // Darker background when selected
                             : Colors.grey[200], // Lighter background when not selected
-                        deleteIcon: isSelected ? Icon(Icons.close) : null,
+                        deleteIcon: isSelected ? Icon(Icons.close, size: context.w(4)) : null,
                         onDeleted: isSelected
                             ? () {
                           setState(() {
@@ -203,13 +204,13 @@ class _EditMoodScreenState extends State<EditMoodScreen> {
                     );
                   }).toList(),
                 ),
-                SizedBox(height: 12),
+                SizedBox(height: context.h(1.5)),
 
                 // Editable Reasons
-                Text("Reasons", style: TextStyle(fontFamily: 'Pangram')),
+                Text("Reasons", style: TextStyle(fontFamily: 'Pangram', fontSize: context.w(4))),
                 Wrap(
-                  spacing: 8.0,
-                  runSpacing: 4.0,
+                  spacing: context.w(2),
+                  runSpacing: context.h(0.5),
                   children: allReasons.map((reason) {
                     final isSelected = reasonsController.text.contains(reason);
 
@@ -234,7 +235,7 @@ class _EditMoodScreenState extends State<EditMoodScreen> {
                         backgroundColor: isSelected
                             ? Colors.purpleAccent[700] // Darker background when selected
                             : Colors.grey[200], // Lighter background when not selected
-                        deleteIcon: isSelected ? Icon(Icons.close) : null,
+                        deleteIcon: isSelected ? Icon(Icons.close, size: context.w(4)) : null,
                         onDeleted: isSelected
                             ? () {
                           setState(() {
@@ -248,20 +249,20 @@ class _EditMoodScreenState extends State<EditMoodScreen> {
                     );
                   }).toList(),
                 ),
-                SizedBox(height: 12),
+                SizedBox(height: context.h(1.5)),
 
                 // Editable Notes
-                Text("Notes", style: TextStyle(fontFamily: 'Pangram')),
+                Text("Notes", style: TextStyle(fontFamily: 'Pangram', fontSize: context.w(4))),
                 TextFormField(
                   controller: notesController,
                   maxLines: 4,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     hintText: "Additional details...",
                     border: OutlineInputBorder(),
                   ),
-                  style: TextStyle(fontFamily: 'Pangram'),
+                  style: const TextStyle(fontFamily: 'Pangram'),
                 ),
-                SizedBox(height: 20),
+                SizedBox(height: context.h(2.5)),
 
                 // Buttons
                 Row(

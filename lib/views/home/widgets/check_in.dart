@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../controllers/mood_entry_controller.dart';
-import '../../controllers/check_in_controller.dart'; // Import CheckInController
-import '../add_mood/add_mood_page_1.dart'; // Import AddMood page
-import '../settings/app_preferences/notifications_settings_page.dart';
+import '../../../controllers/mood_entry_controller.dart';
+import '../../../controllers/check_in_controller.dart'; // Import CheckInController
+import '../../add_mood/add_mood_screen1_mood.dart'; // Import AddMood page
+import '../../settings/app_preferences/notifications_settings_screen.dart';
+import '../../widgets/responsive_extension.dart';
 
 class CheckInWidget extends StatelessWidget {
   @override
@@ -40,57 +41,62 @@ class CheckInWidget extends StatelessWidget {
               );
             },
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              padding: EdgeInsets.symmetric(horizontal: context.w(5)),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     "Today's check-in",
                     style: TextStyle(
-                      fontSize: 20,
+                      fontSize: context.w(5),
                       fontWeight: FontWeight.bold,
                       fontFamily: 'Pangram',
                     ),
                   ),
-                  SizedBox(height: 20),
+                  SizedBox(height: context.h(2.5)),
                   Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20.0,
-                      vertical: 12.0,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: context.w(5),
+                      vertical: context.h(1.5),
                     ),
                     decoration: BoxDecoration(
                       color: totalReminders == 0 ? Colors.blue[50] : Colors.pink[50],
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(context.w(5)),
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Row(
-                          children: [
-                            CircleAvatar(
-                              radius: 24,
-                              backgroundColor: totalReminders == 0
-                                  ? Colors.blue[100]
-                                  : Colors.pink[100],
-                              child: Icon(
-                                totalReminders == 0
-                                    ? Icons.notifications
-                                    : Icons.check_circle,
-                                color: totalReminders == 0 ? Colors.blue : Colors.pink,
+                        Expanded(
+                          child: Row(
+                            children: [
+                              CircleAvatar(
+                                radius: context.w(6),
+                                backgroundColor: totalReminders == 0
+                                    ? Colors.blue[100]
+                                    : Colors.pink[100],
+                                child: Icon(
+                                  totalReminders == 0
+                                      ? Icons.notifications
+                                      : Icons.check_circle,
+                                  color: totalReminders == 0 ? Colors.blue : Colors.pink,
+                                ),
                               ),
-                            ),
-                            SizedBox(width: 8),
-                            Text(
-                              totalReminders == 0
-                                  ? "Set a goal for daily check-ins!"
-                                  : "Check-in",
-                              style: TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w600,
-                                fontFamily: 'Pangram',
+                              SizedBox(width: context.w(2)),
+                              Expanded(
+                                child: Text(
+                                  totalReminders == 0
+                                      ? "Set a goal for daily check-ins!"
+                                      : "Check-in",
+                                  style: TextStyle(
+                                    fontSize: context.w(3.75),
+                                    fontWeight: FontWeight.w600,
+                                    fontFamily: 'Pangram',
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                         Row(
                           children: [
@@ -101,15 +107,15 @@ class CheckInWidget extends StatelessWidget {
                                   ? "$totalReminders/$totalReminders"
                                   : "$completedCheckIns/$totalReminders",
                               style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                                fontFamily: 'Pangram',
-                              ),
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: context.w(4),
+                                  fontFamily: 'Pangram',
+                                ),
                             ),
-                            SizedBox(width: 8),
+                            SizedBox(width: context.w(2)),
                             Container(
-                              width: 40,
-                              height: 40,
+                              width: context.w(10),
+                              height: context.w(10),
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
                                 color: totalReminders == 0
@@ -118,7 +124,7 @@ class CheckInWidget extends StatelessWidget {
                               ),
                               child: Center(
                                 child: totalReminders == 0
-                                    ? Icon(Icons.arrow_forward, color: Colors.blue, size: 20)
+                                    ? Icon(Icons.arrow_forward, color: Colors.blue, size: context.w(5))
                                     : Container(),
                               ),
                             ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../widgets/responsive_extension.dart';
 
 class FeedbackPage extends StatelessWidget {
   @override
@@ -11,7 +12,7 @@ class FeedbackPage extends StatelessWidget {
           'Feedback',
           style: TextStyle(
             fontFamily: 'Pangram',
-            fontSize: 24,
+            fontSize: context.w(6),
             fontWeight: FontWeight.bold,
             color: Colors.black,
           ),
@@ -29,50 +30,51 @@ class FeedbackPage extends StatelessWidget {
             end: Alignment.bottomCenter,
           ),
         ),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.all(context.w(4)),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
               // Title
               Text(
                 'We value your feedback!',
                 style: TextStyle(
                   fontFamily: 'Pangram',
-                  fontSize: 20,
+                  fontSize: context.w(5),
                   fontWeight: FontWeight.bold,
                   color: Colors.black,
                 ),
               ),
-              SizedBox(height: 20),
+              SizedBox(height: context.h(2.5)),
 
               // Feedback text area
               Text(
                 'Please provide your feedback below:',
                 style: TextStyle(
                   fontFamily: 'Pangram',
-                  fontSize: 16,
+                  fontSize: context.w(4),
                   color: Colors.black,
                 ),
               ),
-              SizedBox(height: 10),
+              SizedBox(height: context.h(1.2)),
               TextField(
                 maxLines: 5,
                 decoration: InputDecoration(
                   hintText: 'Enter your feedback...',
-                  hintStyle: TextStyle(
+                  hintStyle: const TextStyle(
                     color: Colors.grey,
                     fontFamily: 'Pangram',
                   ),
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12.0),
+                    borderRadius: BorderRadius.circular(context.w(3)),
                   ),
                   filled: true,
                   fillColor: Colors.white,
-                  contentPadding: EdgeInsets.all(16),
+                  contentPadding: EdgeInsets.all(context.w(4)),
                 ),
               ),
-              SizedBox(height: 20),
+              SizedBox(height: context.h(2.5)),
 
               // Submit Button
               Center(
@@ -87,18 +89,18 @@ class FeedbackPage extends StatelessWidget {
                     ),
                     shape: MaterialStateProperty.all(
                       RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(25.0),
+                        borderRadius: BorderRadius.circular(context.w(6.25)),
                       ),
                     ),
                     padding: MaterialStateProperty.all(
-                      EdgeInsets.symmetric(horizontal: 40.0, vertical: 12.0),
+                      EdgeInsets.symmetric(horizontal: context.w(10), vertical: context.h(1.5)),
                     ),
                   ),
                   child: Text(
                     'Submit Feedback',
                     style: TextStyle(
                       fontFamily: 'Pangram',
-                      fontSize: 16,
+                      fontSize: context.w(4),
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
@@ -109,6 +111,7 @@ class FeedbackPage extends StatelessWidget {
           ),
         ),
       ),
+    ),
     );
   }
 }

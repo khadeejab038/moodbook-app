@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../models/emoji_item.dart';
 import '../../models/emoji_data.dart';
-import '../home/widgets/bottom_nav_bar.dart';
+import '../widgets/bottom_nav_bar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'edit_mood_screen.dart';
+import '../widgets/responsive_extension.dart';
 
 class HistoryPage extends StatefulWidget {
   @override
@@ -42,7 +43,7 @@ class _HistoryPageState extends State<HistoryPage> {
       return Center(
         child: Text(
           'You are not logged in. Please sign in to view your mood history.',
-          style: TextStyle(fontFamily: 'Pangram', fontSize: 16),
+          style: TextStyle(fontFamily: 'Pangram', fontSize: context.w(4)),
         ),
       );
     }
@@ -65,7 +66,7 @@ class _HistoryPageState extends State<HistoryPage> {
           children: [
             // History text and filter button
             Padding(
-              padding: const EdgeInsets.fromLTRB(16.0, 60.0, 16.0, 8.0),
+              padding: EdgeInsets.fromLTRB(context.w(4), context.h(7.5), context.w(4), context.h(1)),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -75,7 +76,7 @@ class _HistoryPageState extends State<HistoryPage> {
                       fontFamily: 'Pangram',
                       fontWeight: FontWeight.bold,
                       color: Color(0xFF100F11),
-                      fontSize: 20.0,
+                      fontSize: context.w(5),
                     ),
                   ),
                   PopupMenuButton<String>(
@@ -123,7 +124,7 @@ class _HistoryPageState extends State<HistoryPage> {
                         'An error occurred: ${snapshot.error}',
                         style: TextStyle(
                           fontFamily: 'Pangram',
-                          fontSize: 16,
+                          fontSize: context.w(4),
                           color: Colors.red,
                         ),
                       ),
@@ -135,7 +136,7 @@ class _HistoryPageState extends State<HistoryPage> {
                         'No mood entries found.',
                         style: TextStyle(
                           fontFamily: 'Pangram',
-                          fontSize: 16,
+                          fontSize: context.w(4),
                           color: Colors.grey,
                         ),
                       ),
@@ -158,7 +159,7 @@ class _HistoryPageState extends State<HistoryPage> {
                   }
 
                   return ListView.builder(
-                    padding: EdgeInsets.all(16.0),
+                    padding: EdgeInsets.all(context.w(4)),
                     itemCount: moodEntries.length,
                     itemBuilder: (context, index) {
                       final entry = moodEntries[index];
@@ -173,8 +174,8 @@ class _HistoryPageState extends State<HistoryPage> {
                         mood: entry['mood'] ?? 'No mood',
                         emoji: Image.asset(
                           emojiItem.imagePath, // Use the image path for the Image.asset widget
-                          width: 32.0, // Set the desired emoji size
-                          height: 32.0,
+                          width: context.w(8), // Set the desired emoji size
+                          height: context.w(8),
                           fit: BoxFit.contain,
                         ),
                         timestamp: DateFormat('dd/MM/yyyy hh:mm a').format((entry['timestamp'] as Timestamp).toDate()),
@@ -275,11 +276,11 @@ class _HistoryTileState extends State<HistoryTile> {
     }
 
     return Container(
-      margin: EdgeInsets.symmetric(vertical: 8.0),
-      padding: EdgeInsets.all(16.0),
+      margin: EdgeInsets.symmetric(vertical: context.h(1)),
+      padding: EdgeInsets.all(context.w(4)),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12.0),
+        borderRadius: BorderRadius.circular(context.w(3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -288,22 +289,22 @@ class _HistoryTileState extends State<HistoryTile> {
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               widget.emoji, // Display the emoji image
-              SizedBox(width: 8),
+              SizedBox(width: context.w(2)),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     widget.mood,
                     style: TextStyle(
-                        fontSize: 18,
+                        fontSize: context.w(4.5),
                         fontWeight: FontWeight.bold,
                         fontFamily: 'Pangram'),
                   ),
-                  SizedBox(height: 4),
+                  SizedBox(height: context.h(0.5)),
                   Text(
                     widget.timestamp,
                     style: TextStyle(
-                        fontSize: 12,
+                        fontSize: context.w(3),
                         color: Colors.grey,
                         fontFamily: 'Pangram'),
                   ),
@@ -322,8 +323,8 @@ class _HistoryTileState extends State<HistoryTile> {
                         ),
                       ),
                       Container(
-                        width: 1.0,
-                        height: 24.0,
+                        width: context.w(0.25),
+                        height: context.h(3),
                         color: Colors.grey.withOpacity(0.5),
                       ),
                       TextButton(
@@ -336,17 +337,17 @@ class _HistoryTileState extends State<HistoryTile> {
               ),
             ],
           ),
-          SizedBox(height: 8),
+          SizedBox(height: context.h(1)),
           Text(
             'You felt ${widget.feelings}\nBecause of ${widget.reason}',
             style: TextStyle(
-                fontSize: 16, fontWeight: FontWeight.w500, fontFamily: 'Pangram'),
+                fontSize: context.w(4), fontWeight: FontWeight.w500, fontFamily: 'Pangram'),
           ),
-          SizedBox(height: 8),
+          SizedBox(height: context.h(1)),
           Text(
             'Note: $displayedNote',
             style: TextStyle(
-                fontSize: 14, color: Colors.grey, fontFamily: 'Pangram'),
+                fontSize: context.w(3.5), color: Colors.grey, fontFamily: 'Pangram'),
           ),
           if (showReadMore) // Only show Read more if note length > 40
             TextButton(

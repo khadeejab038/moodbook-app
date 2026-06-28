@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import '../../widgets/snack_bar_helper.dart';
 import 'package:flutter/material.dart';
+import '../../../views/widgets/responsive_extension.dart';
 
 class ChangePasswordScreen extends StatefulWidget {
   @override
@@ -44,6 +45,8 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
+        height: double.infinity,
+        width: double.infinity,
         decoration: const BoxDecoration(
           gradient: RadialGradient(
             center: Alignment(-0.5, -0.5),
@@ -57,39 +60,39 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
           ),
         ),
         child: SafeArea(
-          child: Column(
-            children: [
-              AppBar(
-                backgroundColor: Colors.transparent,
-                elevation: 0,
-                leading: IconButton(
-                  icon: Icon(Icons.arrow_back, color: Colors.white), // White back button
-                  onPressed: () {
-                    Navigator.pop(context); // Go back to the previous screen
-                  },
-                ),
-                title: Padding(
-                  padding: const EdgeInsets.only(top: 25.0, left: 40),
-                  child: const Text(
-                    'Change Password',
-                    style: TextStyle(
-                      fontFamily: 'Pangram',
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                AppBar(
+                  backgroundColor: Colors.transparent,
+                  elevation: 0,
+                  leading: IconButton(
+                    icon: Icon(Icons.arrow_back, color: Colors.white), // White back button
+                    onPressed: () {
+                      Navigator.pop(context); // Go back to the previous screen
+                    },
+                  ),
+                  title: Padding(
+                    padding: EdgeInsets.only(top: context.h(3), left: context.w(10)),
+                    child: const Text(
+                      'Change Password',
+                      style: TextStyle(
+                        fontFamily: 'Pangram',
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 150),
-              Container(
-                height: 350,
-                width: 350,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20.0),
-                ),
+                SizedBox(height: context.h(3.5)),
+                Container(
+                  width: context.w(85).clamp(300.0, 360.0),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(context.w(5)),
+                  ),
                 child: Padding(
-                  padding: const EdgeInsets.all(25.0),
+                  padding: EdgeInsets.all(context.w(6.25)),
                   child: Form(
                     key: _formKey,
                     child: Column(
@@ -101,7 +104,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                           obscureText: true,
                           decoration: InputDecoration(
                             hintText: 'Current Password',
-                            prefixIcon: Icon(Icons.lock, size: 20),
+                            prefixIcon: Icon(Icons.lock, size: context.w(5)),
                           ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
@@ -110,7 +113,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                             return null;
                           },
                         ),
-                        const SizedBox(height: 20),
+                        SizedBox(height: context.h(2.5)),
 
                         // New Password Input
                         TextFormField(
@@ -118,7 +121,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                           obscureText: true,
                           decoration: InputDecoration(
                             hintText: 'New Password',
-                            prefixIcon: Icon(Icons.lock, size: 20),
+                            prefixIcon: Icon(Icons.lock, size: context.w(5)),
                           ),
                           validator: (value) {
                             if (value == null || value.length < 6) {
@@ -127,7 +130,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                             return null;
                           },
                         ),
-                        const SizedBox(height: 20),
+                        SizedBox(height: context.h(2.5)),
 
                         // Confirm New Password Input
                         TextFormField(
@@ -135,7 +138,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                           obscureText: true,
                           decoration: InputDecoration(
                             hintText: 'Confirm New Password',
-                            prefixIcon: Icon(Icons.lock, size: 20),
+                            prefixIcon: Icon(Icons.lock, size: context.w(5)),
                           ),
                           validator: (value) {
                             if (value != _newPasswordController.text) {
@@ -144,19 +147,19 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                             return null;
                           },
                         ),
-                        const SizedBox(height: 30),
+                        SizedBox(height: context.h(3.5)),
 
                         // Change Password Button
                         ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Color(0xB2C9FAFB),
+                            backgroundColor: const Color(0xB2C9FAFB),
                             foregroundColor: Colors.black,
-                            minimumSize: const Size(double.infinity, 50),
+                            minimumSize: Size(double.infinity, context.h(6)),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15.0),
+                              borderRadius: BorderRadius.circular(context.w(3.75)),
                             ),
                             elevation: 5,
-                            shadowColor: Color(0xFFCCEFFF),
+                            shadowColor: const Color(0xFFCCEFFF),
                           ),
                           onPressed: _changePassword,
                           child: const Text('Change Password'),
@@ -170,6 +173,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
           ),
         ),
       ),
+    ),
     );
   }
 }

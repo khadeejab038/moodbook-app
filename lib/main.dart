@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'controllers/mood_entry_controller.dart';
-import 'views/splash_screen.dart';
+import 'views/splash_screen/splash_screen.dart';
 import 'views/user_authentication/signin_screen.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'controllers/check_in_controller.dart';

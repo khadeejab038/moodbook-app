@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../models/database/user_database.dart';
 import '../widgets/snack_bar_helper.dart';
 import '../home/home_screen.dart';
+import '../widgets/responsive_extension.dart';
 
 // Import your custom User model with an alias
 import '../../models/user.dart' as AppUser;
@@ -62,6 +63,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
+        height: double.infinity,
+        width: double.infinity,
         decoration: const BoxDecoration(
           gradient: RadialGradient(
             center: Alignment(-0.5, -0.5),
@@ -75,39 +78,41 @@ class _SignUpScreenState extends State<SignUpScreen> {
           ),
         ),
         child: SafeArea(
-          child: Column(
-            children: [
-              AppBar(
-                backgroundColor: Colors.transparent,
-                elevation: 0,
-                leading: IconButton(
-                  icon: Icon(Icons.arrow_back, color: Colors.white),
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                ),
-                title: Padding(
-                  padding: const EdgeInsets.only(top: 25.0, left: 100),
-                  child: const Text(
-                    'Sign Up',
-                    style: TextStyle(
-                      fontFamily: 'Pangram',
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                AppBar(
+                  backgroundColor: Colors.transparent,
+                  elevation: 0,
+                  leading: IconButton(
+                    icon: Icon(Icons.arrow_back, color: Colors.white),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                  title: Padding(
+                    padding: EdgeInsets.only(top: context.h(3)),
+                    child: Center(
+                      child: const Text(
+                        'Sign Up',
+                        style: TextStyle(
+                          fontFamily: 'Pangram',
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
+                      ),
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 100),
-              Container(
-                height: 450,
-                width: 350,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20.0),
-                ),
+                SizedBox(height: context.h(3.5)),
+                Container(
+                  width: context.w(90).clamp(300.0, 360.0),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(context.w(5)),
+                  ),
                 child: Padding(
-                  padding: const EdgeInsets.all(25.0),
+                  padding: EdgeInsets.all(context.w(6.5)),
                   child: Form(
                     key: _formKey,
                     child: Column(
@@ -116,13 +121,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         // Name input field
                         TextFormField(
                           controller: _nameController,
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
                             hintText: 'Enter your name',
-                            hintStyle: TextStyle(
+                            hintStyle: const TextStyle(
                               fontFamily: 'Pangram',
                               fontWeight: FontWeight.w500,
                             ),
-                            prefixIcon: Icon(Icons.person_outline, size: 20),
+                            prefixIcon: Icon(Icons.person_outline, size: context.w(5)),
                           ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
@@ -131,17 +136,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             return null;
                           },
                         ),
-                        const SizedBox(height: 40),
+                        SizedBox(height: context.h(3)),
                         // Email input field
                         TextFormField(
                           controller: _emailController,
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
                             hintText: 'Enter your email',
-                            hintStyle: TextStyle(
+                            hintStyle: const TextStyle(
                               fontFamily: 'Pangram',
                               fontWeight: FontWeight.w500,
                             ),
-                            prefixIcon: Icon(Icons.email_outlined, size: 20),
+                            prefixIcon: Icon(Icons.email_outlined, size: context.w(5)),
                           ),
                           validator: (value) {
                             if (value == null || !value.contains('@')) {
@@ -150,17 +155,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             return null;
                           },
                         ),
-                        const SizedBox(height: 40),
+                        SizedBox(height: context.h(3)),
                         // Password input field
                         TextFormField(
                           controller: _passwordController,
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
                             hintText: 'Enter your password',
-                            hintStyle: TextStyle(
+                            hintStyle: const TextStyle(
                               fontFamily: 'Pangram',
                               fontWeight: FontWeight.w500,
                             ),
-                            prefixIcon: Icon(Icons.key, size: 20),
+                            prefixIcon: Icon(Icons.key, size: context.w(5)),
                           ),
                           obscureText: true,
                           validator: (value) {
@@ -170,15 +175,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             return null;
                           },
                         ),
-                        const SizedBox(height: 40),
+                        SizedBox(height: context.h(3)),
                         // Sign-up button
                         ElevatedButton(
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Color(0xB2C9FAFB),
                             foregroundColor: Colors.black,
-                            minimumSize: const Size(double.infinity, 50),
+                            minimumSize: Size(double.infinity, context.h(6)),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15.0),
+                              borderRadius: BorderRadius.circular(context.w(3.5)),
                             ),
                             elevation: 5,
                             shadowColor: Color(0xFFCCEFFF),
@@ -192,15 +197,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             ),
                           ),
                         ),
-                        const SizedBox(height: 20),
+                        SizedBox(height: context.h(2)),
                         // Google sign-in button (placeholder)
                         ElevatedButton(
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Color(0xB2C9FAFB),
                             foregroundColor: Colors.black,
-                            minimumSize: const Size(double.infinity, 50),
+                            minimumSize: Size(double.infinity, context.h(6)),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15.0),
+                              borderRadius: BorderRadius.circular(context.w(3.5)),
                             ),
                             elevation: 5,
                             shadowColor: Color(0xFFCCEFFF),
@@ -212,8 +217,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Image.asset('assets/google.png', height: 20),
+                                padding: EdgeInsets.all(context.w(2)),
+                                child: Image.asset('assets/google.png', height: context.h(2.5)),
                               ),
                               const Text(
                                 'Sign In with Google',
@@ -234,6 +239,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           ),
         ),
       ),
+    ),
     );
   }
 }

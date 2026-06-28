@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import '../home_screen.dart';
-import '../../stats/stats_page.dart';
-import '../../add_mood/add_mood_page_1.dart';
-import '../../history/history_page.dart';
-import '../../settings/settings_page.dart';
+import '../home/home_screen.dart';
+import '../stats/stats_screen.dart';
+import '../add_mood/add_mood_screen1_mood.dart';
+import '../history/history_screen.dart';
+import '../settings/settings_screen.dart';
 
 class BottomNavBar extends StatelessWidget {
   final int currentIndex;
@@ -75,15 +75,9 @@ class BottomNavBar extends StatelessWidget {
             children: [
               FloatingActionButton(
                 onPressed: () {
-                  showModalBottomSheet(
-                    context: context,
-                    isScrollControlled: true,
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.vertical(top: Radius.circular(100)),
-                    ),
-                    builder: (BuildContext context) {
-                      return AddMood();
-                    },
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => AddMood()),
                   );
                 },
                 backgroundColor: const Color(0xFF8B4CFC), // Button color
