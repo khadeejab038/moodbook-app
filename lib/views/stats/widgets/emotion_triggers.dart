@@ -28,16 +28,16 @@ class _EmotionTriggersInsightState extends State<EmotionTriggersInsight> {
 
     final userId = FirebaseAuth.instance.currentUser?.uid;
 
-    // Calculate the start date based on the selected range
+    final now = DateTime.now();
     DateTime startDate;
     if (range == "Today") {
-      startDate = DateTime.now();
+      startDate = DateTime(now.year, now.month, now.day);
     } else if (range == "This Week") {
-      startDate = DateTime.now().subtract(Duration(days: 7));
+      startDate = now.subtract(const Duration(days: 7));
     } else if (range == "This Month") {
-      startDate = DateTime.now().subtract(Duration(days: 30));
+      startDate = DateTime(now.year, now.month - 1, now.day);
     } else { // "This Year"
-      startDate = DateTime.now().subtract(Duration(days: 365));
+      startDate = DateTime(now.year - 1, now.month, now.day);
     }
 
     try {
