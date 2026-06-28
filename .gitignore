@@ -41,3 +41,20 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Private signing keys & password properties (Android)
+*.keystore
+*.jks
+android/key.properties
+
+# Local configuration files
+android/local.properties
+
+# Firebase Configuration files (highly recommended for public/shared repos)
+android/app/google-services.json
+ios/Runner/GoogleService-Info.plist
+
+# Environment variables / secret files
+.env
+.env.*
+
