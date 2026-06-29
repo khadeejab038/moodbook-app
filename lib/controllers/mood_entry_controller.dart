@@ -132,6 +132,13 @@ class MoodEntryController extends ChangeNotifier {
     notifyListeners();
   }
 
+  // Clear recently used emotions and reasons lists
+  void clearRecentlyUsed() {
+    _recentlyUsedEmotions = [];
+    _recentlyUsedReasons = [];
+    notifyListeners();
+  }
+
   // Count the number of mood entries created today
   Future<int> countMoodEntriesToday() async {
     try {
