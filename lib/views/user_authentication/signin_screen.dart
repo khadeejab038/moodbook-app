@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import '../../models/database/user_database.dart';
 import '../../models/user.dart' as AppUser;
+import '../../theme/app_colors.dart';
 import '../widgets/snack_bar_helper.dart';
 import 'forgot_password_screen.dart';
 import '../home/home_screen.dart';
@@ -20,27 +21,36 @@ class _SignInScreenState extends State<SignInScreen> {
 
   final _formKey = GlobalKey<FormState>();
 
-  bool isloading=false;
+  bool isloading = false;
+  bool _obscurePassword = true;
+
   Future<void> _signIn() async {
     if (_formKey.currentState!.validate()) {
       setState(() {
-        isloading=true;
+        isloading = true;
       });
       try {
-
         await FirebaseAuth.instance.signInWithEmailAndPassword(
           email: _emailController.text.trim(),
           password: _passwordController.text.trim(),
         );
 
-        showSnackBar(context, 'Sign-in successful!', Color(0xFF8B4CFC));
+        showSnackBar(context, 'Sign-in successful!', AppColors.primary);
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => HomeScreen()),
         );
 
       } on FirebaseAuthException catch (e) {
-        showSnackBar(context, e.message ?? 'Sign-in failed', Color(0xFF8B4CFC));
+        showSnackBar(context, e.message ?? 'Sign-in failed', AppColors.primary);
+        setState(() {
+          isloading = false;
+        });
+      } catch (e) {
+        showSnackBar(context, 'Sign-in failed: $e', AppColors.primary);
+        setState(() {
+          isloading = false;
+        });
       }
     }
   }
@@ -82,13 +92,13 @@ class _SignInScreenState extends State<SignInScreen> {
         }
       }
 
-      showSnackBar(context, 'Sign-in successful!', Color(0xFF8B4CFC));
+      showSnackBar(context, 'Sign-in successful!', AppColors.primary);
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => HomeScreen()),
       );
     } catch (e) {
-      showSnackBar(context, 'Google Sign-In failed: $e', Color(0xFF8B4CFC));
+      showSnackBar(context, 'Google Sign-In failed: $e', AppColors.primary);
     } finally {
       if (mounted) {
         setState(() {
@@ -101,44 +111,261 @@ class _SignInScreenState extends State<SignInScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: isloading?Center(child: CircularProgressIndicator()):Container(
-        height: double.infinity,
-        width: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: RadialGradient(
-            center: Alignment(-0.5, -0.5),
-            radius: 1.8,
-            colors: [
-              Color(0xFFF3EAF8),
-              Color(0xFFFF92A9),
-              Color(0xFFCCEFFF),
-            ],
-            stops: [0, 0.4, 0.9],
-          ),
-        ),
-        child: SafeArea(
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                SizedBox(height: context.h(2.5)),
-                AppBar(
-                  backgroundColor: Colors.transparent,
-                  elevation: 0,
-                  title: Padding(
-                    padding: EdgeInsets.only(top: context.h(3)),
+      body: isloading
+          ? Center(child: CircularProgressIndicator(color: AppColors.primary))
+          : Container(
+              height: double.infinity,
+              width: double.infinity,
+              decoration: const BoxDecoration(
+                gradient: RadialGradient(
+                  center: Alignment(-0.5, -0.5),
+                  radius: 1.8,
+                  colors: [
+                    Color(0xFFF3EAF8),
+                    Color(0xFFFF92A9),
+                    Color(0xFFCCEFFF),
+                  ],
+                  stops: [0, 0.4, 0.9],
+                ),
+              ),
+              child: SafeArea(
+                child: SingleChildScrollView(
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minHeight: MediaQuery.of(context).size.height -
+                          MediaQuery.of(context).padding.top -
+                          MediaQuery.of(context).padding.bottom,
+                    ),
                     child: Center(
-                      child: const Text(
-                        'Welcome to MoodBook!',
-                        style: TextStyle(
-                          fontFamily: 'Pangram',
-                          fontWeight: FontWeight.w600,
-                          fontSize: 26,
-                          color: Color(0xFFFFFFFF),
-                          shadows: [
-                            Shadow(
-                              offset: Offset(2.0, 2.0),
-                              blurRadius: 4.0,
-                              color: Color(0x80000000),
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(vertical: context.h(3), horizontal: context.w(5)),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Text(
+                              'Welcome to MoodBook!',
+                              style: TextStyle(
+                                fontFamily: 'Pangram',
+                                fontWeight: FontWeight.w600,
+                                fontSize: 26,
+                                color: Color(0xFFFFFFFF),
+                                shadows: [
+                                  Shadow(
+                                    offset: Offset(2.0, 2.0),
+                                    blurRadius: 4.0,
+                                    color: Color(0x80000000),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            SizedBox(height: context.h(4)),
+                            Container(
+                              width: context.w(90).clamp(300.0, 360.0),
+                              decoration: BoxDecoration(
+                                color: AppColors.primaryLight,
+                                borderRadius: BorderRadius.circular(context.w(5)),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Colors.black12,
+                                    blurRadius: 15,
+                                    offset: Offset(0, 5),
+                                  ),
+                                ],
+                              ),
+                              child: Padding(
+                                padding: EdgeInsets.all(context.w(8)),
+                                child: Form(
+                                  key: _formKey,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      TextFormField(
+                                        controller: _emailController,
+                                        style: const TextStyle(
+                                          fontFamily: 'Pangram',
+                                          fontWeight: FontWeight.w500,
+                                          color: Colors.black,
+                                        ),
+                                        decoration: InputDecoration(
+                                          hintText: 'Enter your Email',
+                                          hintStyle: const TextStyle(
+                                            fontFamily: 'Pangram',
+                                            fontWeight: FontWeight.w500,
+                                            color: Colors.black54,
+                                          ),
+                                          helperText: 'Format: name@example.com',
+                                          helperStyle: const TextStyle(
+                                            fontFamily: 'Pangram',
+                                            fontSize: 11,
+                                            color: Colors.black38,
+                                          ),
+                                          prefixIcon: Icon(Icons.email_outlined, size: context.w(5), color: Colors.black54),
+                                        ),
+                                        validator: (value) {
+                                          if (value == null || value.trim().isEmpty) {
+                                            return 'Please enter your email';
+                                          }
+                                          if (!value.contains('@')) {
+                                            return 'Email must contain @ symbol';
+                                          }
+                                          return null;
+                                        },
+                                      ),
+                                      SizedBox(height: context.h(3)),
+                                      TextFormField(
+                                        controller: _passwordController,
+                                        style: const TextStyle(
+                                          fontFamily: 'Pangram',
+                                          fontWeight: FontWeight.w500,
+                                          color: Colors.black,
+                                        ),
+                                        decoration: InputDecoration(
+                                          hintText: 'Enter your Password',
+                                          hintStyle: const TextStyle(
+                                            fontFamily: 'Pangram',
+                                            fontWeight: FontWeight.w500,
+                                            color: Colors.black54,
+                                          ),
+                                          helperText: 'Must be at least 6 characters',
+                                          helperStyle: const TextStyle(
+                                            fontFamily: 'Pangram',
+                                            fontSize: 11,
+                                            color: Colors.black38,
+                                          ),
+                                          prefixIcon: Icon(Icons.key_outlined, size: context.w(5), color: Colors.black54),
+                                          suffixIcon: IconButton(
+                                            icon: Icon(
+                                              _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                                              size: context.w(5),
+                                              color: Colors.black54,
+                                            ),
+                                            onPressed: () {
+                                              setState(() {
+                                                _obscurePassword = !_obscurePassword;
+                                              });
+                                            },
+                                          ),
+                                        ),
+                                        obscureText: _obscurePassword,
+                                        validator: (value) {
+                                          if (value == null || value.isEmpty) {
+                                            return 'Please enter your password';
+                                          }
+                                          if (value.length < 6) {
+                                            return 'Password is too short (min 6 characters)';
+                                          }
+                                          return null;
+                                        },
+                                      ),
+                                      SizedBox(height: context.h(1.2)),
+                                      Align(
+                                        alignment: Alignment.centerRight,
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(builder: (context) => ForgotPasswordScreen()),
+                                            );
+                                          },
+                                          child: const Text(
+                                            'Forgot Password?',
+                                            style: TextStyle(
+                                              fontFamily: 'Pangram',
+                                              fontWeight: FontWeight.w500,
+                                              color: Colors.black87,
+                                              decoration: TextDecoration.underline,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(height: context.h(2.5)),
+                                      ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: const Color(0xB2C9FAFB),
+                                          foregroundColor: Colors.black,
+                                          minimumSize: Size(double.infinity, context.h(6)),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(context.w(3.5)),
+                                          ),
+                                          elevation: 5,
+                                          shadowColor: const Color(0xFFCCEFFF),
+                                        ),
+                                        onPressed: _signIn,
+                                        child: const Text(
+                                          'Sign In',
+                                          style: TextStyle(
+                                            fontFamily: 'Pangram',
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(height: context.h(2.5)),
+                                      ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: const Color(0xB2C9FAFB),
+                                          foregroundColor: Colors.black,
+                                          minimumSize: Size(double.infinity, context.h(6)),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(context.w(3.5)),
+                                          ),
+                                          elevation: 5,
+                                          shadowColor: const Color(0xFFCCEFFF),
+                                        ),
+                                        onPressed: _signInWithGoogle,
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Padding(
+                                              padding: EdgeInsets.all(context.w(2)),
+                                              child: Image.asset('assets/google.png', height: context.h(2.5)),
+                                            ),
+                                            const Text(
+                                              'Sign In with Google',
+                                              style: TextStyle(
+                                                fontFamily: 'Pangram',
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      SizedBox(height: context.h(3.5)),
+                                      GestureDetector(
+                                        onTap: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(builder: (context) => SignUpScreen()),
+                                          );
+                                        },
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            const Text(
+                                              'Not a registered user?',
+                                              style: TextStyle(
+                                                fontFamily: 'Pangram',
+                                                fontWeight: FontWeight.w500,
+                                                color: Color(0xFF8B4CFC),
+                                                decoration: TextDecoration.underline,
+                                              ),
+                                            ),
+                                            const Text(
+                                              ' Sign Up',
+                                              style: TextStyle(
+                                                fontFamily: 'Pangram',
+                                                fontWeight: FontWeight.w500,
+                                                color: Colors.black,
+                                                decoration: TextDecoration.underline,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
                             ),
                           ],
                         ),
@@ -146,192 +373,8 @@ class _SignInScreenState extends State<SignInScreen> {
                     ),
                   ),
                 ),
-
-                SizedBox(height: context.h(3.5)),
-
-                Container(
-                  width: context.w(90).clamp(300.0, 360.0),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(context.w(5)),
-                  ),
-                child: Padding(
-                  padding: EdgeInsets.all(context.w(8)),
-
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        TextFormField(
-                          controller: _emailController,
-                          decoration: InputDecoration(
-                            hintText: 'Enter your Email',
-                            hintStyle: const TextStyle(
-                              fontFamily: 'Pangram',
-                              fontWeight: FontWeight.w500,
-                            ),
-                            prefixIcon: Icon(Icons.email_outlined, size: context.w(5)),
-                          ),
-                          validator: (value) {
-                            if (value == null || !value.contains('@')) {
-                              return 'Please enter a valid email';
-                            }
-                            return null;
-                          },
-                        ),
-                        SizedBox(height: context.h(3.5)),
-
-                        TextFormField(
-                          controller: _passwordController,
-                          decoration: InputDecoration(
-                            hintText: 'Enter your Password',
-                            hintStyle: const TextStyle(
-                              fontFamily: 'Pangram',
-                              fontWeight: FontWeight.w500,
-                            ),
-                            prefixIcon: Icon(Icons.key_outlined, size: context.w(5)),
-                          ),
-                          obscureText: true,
-                          validator: (value) {
-                            if (value == null || value.length < 6) {
-                              return 'Password must be at least 6 characters long';
-                            }
-                            return null;
-                          },
-                        ),
-
-                        SizedBox(height: context.h(1.2)),
-
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        ForgotPasswordScreen()),
-                              );
-                            },
-                            child: const Text(
-                              'Forgot Password?',
-                              style: TextStyle(
-                                fontFamily: 'Pangram',
-                                fontWeight: FontWeight.w500,
-                                color: Colors.black,
-                                decoration: TextDecoration.underline,
-                              ),
-                            ),
-                          ),
-                        ),
-
-                        SizedBox(height: context.h(2.5)),
-
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Color(0xB2C9FAFB),
-                            foregroundColor: Colors.black,
-                            minimumSize: Size(double.infinity, context.h(6)), // Wider button
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(context.w(3.5)), // No rounded edges
-                            ),
-
-                            elevation: 5, // Adds shadow
-                            shadowColor: Color(0xFFCCEFFF),
-                          ),
-                          onPressed: _signIn,
-                          child: const Text(
-                            'Sign In',
-                            style: TextStyle(
-                              fontFamily: 'Pangram',
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
-
-
-                        SizedBox(height: context.h(2.5)),
-
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Color(0xB2C9FAFB),
-                            foregroundColor: Colors.black, // Text color
-                            minimumSize: Size(double.infinity, context.h(6)), // Wider button
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(context.w(3.5)), // Slightly rounded edges
-                            ),
-
-                            elevation: 5, // Adds shadow
-                            shadowColor: Color(0xFFCCEFFF),
-                          ),
-                          onPressed: _signInWithGoogle,
-                          child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Padding(
-                                padding: EdgeInsets.all(context.w(2)),
-                                child: Image.asset('assets/google.png', height: context.h(2.5)),
-                              ),
-
-                              const Text(
-                                'Sign In with Google',
-                                style: TextStyle(
-                                  fontFamily: 'Pangram',
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-
-
-                        SizedBox(height: context.h(3.5)),
-
-
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => SignUpScreen()),
-                            );
-                          },
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Text(
-                                'Not a registered user?',
-                                style: TextStyle(
-                                  fontFamily: 'Pangram',
-                                  fontWeight: FontWeight.w500,
-                                  color: Color(0xFF8B4CFC),
-                                  decoration: TextDecoration.underline,
-                                ),
-                              ),
-
-                              const Text(
-                                ' Sign Up',
-                                style: TextStyle(
-                                  fontFamily: 'Pangram',
-                                  fontWeight: FontWeight.w500,
-                                  color: Colors.black,
-                                  decoration: TextDecoration.underline,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-
-                      ],
-                    ),
-                  ),
-                ),
               ),
-            ],
-          ),
-        ),
-      ),
-    ),
+            ),
     );
   }
 }
