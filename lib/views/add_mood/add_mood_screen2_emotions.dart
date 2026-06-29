@@ -170,43 +170,41 @@ class _AddEmotionsState extends State<AddEmotions> {
                               style: AppTextStyles.heading2.copyWith(color: textColor, fontSize: context.w(4.5))),
                         ),
                         SizedBox(height: context.h(1.5)),
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Wrap(
-                            spacing: context.w(5),
-                            runSpacing: context.h(1),
-                            children: moodProvider.recentlyUsedEmotions.map((emotionTitle) {
-                              final emojiItem = allEmotions.firstWhere((item) => item.title == emotionTitle);
-                              final isSelected = moodProvider.selectedEmotions.contains(emotionTitle);
-                              return GestureDetector(
-                                onTap: () => moodProvider.toggleEmotion(emotionTitle),
-                                child: Column(
-                                  children: [
-                                    CircleAvatar(
-                                      backgroundColor: isSelected
-                                          ? (isDark ? AppColors.primaryDark : AppColors.primaryLight)
-                                          : unselectedCircleBg,
-                                      radius: context.w(10),
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          border: isSelected ? Border.all(color: AppColors.primary, width: 2) : null,
-                                        ),
-                                        child: ClipOval(
-                                          child: Padding(
-                                            padding: EdgeInsets.all(context.w(1)),
-                                            child: Image.asset(emojiItem.imagePath, fit: BoxFit.contain),
-                                          ),
+                        Wrap(
+                          alignment: WrapAlignment.spaceEvenly,
+                          spacing: context.w(4),
+                          runSpacing: context.h(1),
+                          children: moodProvider.recentlyUsedEmotions.map((emotionTitle) {
+                            final emojiItem = allEmotions.firstWhere((item) => item.title == emotionTitle);
+                            final isSelected = moodProvider.selectedEmotions.contains(emotionTitle);
+                            return GestureDetector(
+                              onTap: () => moodProvider.toggleEmotion(emotionTitle),
+                              child: Column(
+                                children: [
+                                  CircleAvatar(
+                                    backgroundColor: isSelected
+                                        ? (isDark ? AppColors.primaryDark : AppColors.primaryLight)
+                                        : unselectedCircleBg,
+                                    radius: context.w(8.5),
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        border: isSelected ? Border.all(color: AppColors.primary, width: 2) : null,
+                                      ),
+                                      child: ClipOval(
+                                        child: Padding(
+                                          padding: EdgeInsets.all(context.w(1)),
+                                          child: Image.asset(emojiItem.imagePath, fit: BoxFit.contain),
                                         ),
                                       ),
                                     ),
-                                    Text(emotionTitle,
-                                        style: AppTextStyles.caption.copyWith(color: textColor, fontSize: context.w(3))),
-                                  ],
-                                ),
-                              );
-                            }).toList(),
-                          ),
+                                  ),
+                                  Text(emotionTitle,
+                                      style: AppTextStyles.caption.copyWith(color: textColor, fontSize: context.w(3))),
+                                ],
+                              ),
+                            );
+                          }).toList(),
                         ),
                         SizedBox(height: context.h(2.5)),
                       ],
@@ -218,42 +216,40 @@ class _AddEmotionsState extends State<AddEmotions> {
                             style: AppTextStyles.heading2.copyWith(color: textColor, fontSize: context.w(4.5))),
                       ),
                       SizedBox(height: context.h(1.5)),
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: Wrap(
-                          spacing: context.w(5),
-                          runSpacing: context.h(1),
-                          children: filteredEmotions.map((emotion) {
-                            final isSelected = moodProvider.selectedEmotions.contains(emotion.title);
-                            return GestureDetector(
-                              onTap: () => moodProvider.toggleEmotion(emotion.title),
-                              child: Column(
-                                children: [
-                                  CircleAvatar(
-                                    backgroundColor: isSelected
-                                        ? (isDark ? AppColors.primaryDark : AppColors.primaryLight)
-                                        : unselectedCircleBg,
-                                    radius: context.w(10),
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        border: isSelected ? Border.all(color: AppColors.primary, width: 2) : null,
-                                      ),
-                                      child: ClipOval(
-                                        child: Padding(
-                                          padding: EdgeInsets.all(context.w(1)),
-                                          child: Image.asset(emotion.imagePath, fit: BoxFit.contain),
-                                        ),
+                      Wrap(
+                        alignment: WrapAlignment.spaceEvenly,
+                        spacing: context.w(4),
+                        runSpacing: context.h(1),
+                        children: filteredEmotions.map((emotion) {
+                          final isSelected = moodProvider.selectedEmotions.contains(emotion.title);
+                          return GestureDetector(
+                            onTap: () => moodProvider.toggleEmotion(emotion.title),
+                            child: Column(
+                              children: [
+                                CircleAvatar(
+                                  backgroundColor: isSelected
+                                      ? (isDark ? AppColors.primaryDark : AppColors.primaryLight)
+                                      : unselectedCircleBg,
+                                  radius: context.w(8.5),
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      border: isSelected ? Border.all(color: AppColors.primary, width: 2) : null,
+                                    ),
+                                    child: ClipOval(
+                                      child: Padding(
+                                        padding: EdgeInsets.all(context.w(1)),
+                                        child: Image.asset(emotion.imagePath, fit: BoxFit.contain),
                                       ),
                                     ),
                                   ),
-                                  Text(emotion.title,
-                                      style: AppTextStyles.caption.copyWith(color: textColor, fontSize: context.w(3))),
-                                ],
-                              ),
-                            );
-                          }).toList(),
-                        ),
+                                ),
+                                Text(emotion.title,
+                                    style: AppTextStyles.caption.copyWith(color: textColor, fontSize: context.w(3))),
+                              ],
+                            ),
+                          );
+                        }).toList(),
                       ),
                       SizedBox(height: context.h(4)),
                     ],

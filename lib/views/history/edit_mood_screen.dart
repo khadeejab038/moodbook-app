@@ -118,49 +118,54 @@ class _EditMoodScreenState extends State<EditMoodScreen> {
                 // Editable Mood
                 Text("Mood", style: AppTextStyles.bodyBold.copyWith(color: textColor, fontSize: context.w(4))),
                 SizedBox(height: context.h(1)),
-                Container(
-                  height: context.h(15),
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: moods.length,
-                    itemBuilder: (context, index) {
-                      final isSelected = selectedEmojiIndex == index;
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: List.generate(moods.length, (index) {
+                    final isSelected = selectedEmojiIndex == index;
 
-                      return GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            selectedMood = moods[index].title;
-                            selectedEmojiIndex = index;
-                          });
-                        },
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 300),
-                          margin: EdgeInsets.symmetric(horizontal: context.w(2)),
-                          width: isSelected ? context.w(20) : context.w(15),
-                          height: isSelected ? context.w(20) : context.w(15),
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            color: containerBg,
-                            shape: BoxShape.circle,
-                            border: isSelected ? Border.all(color: AppColors.primary, width: 2) : (isDark ? Border.all(color: Colors.grey.shade800) : null),
-                            boxShadow: isSelected
-                                ? [
-                              BoxShadow(
-                                color: Colors.black26,
-                                blurRadius: 10,
-                                offset: Offset(0, 4),
-                              )
-                            ]
-                                : [],
-                          ),
-                          child: Image.asset(
-                            moods[index].imagePath,
-                            width: isSelected ? context.w(10) : context.w(7.5),
-                            height: isSelected ? context.w(10) : context.w(7.5),
-                          ),
+                    return GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          selectedMood = moods[index].title;
+                          selectedEmojiIndex = index;
+                        });
+                      },
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 300),
+                        width: isSelected ? context.w(17) : context.w(13),
+                        height: isSelected ? context.w(17) : context.w(13),
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          color: containerBg,
+                          shape: BoxShape.circle,
+                          border: isSelected ? Border.all(color: AppColors.primary, width: 2) : (isDark ? Border.all(color: Colors.grey.shade800) : null),
+                          boxShadow: isSelected
+                              ? [
+                            BoxShadow(
+                              color: Colors.black26,
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            )
+                          ]
+                              : [],
                         ),
-                      );
-                    },
+                        child: Image.asset(
+                          moods[index].imagePath,
+                          width: isSelected ? context.w(9) : context.w(6.5),
+                          height: isSelected ? context.w(9) : context.w(6.5),
+                        ),
+                      ),
+                    );
+                  }),
+                ),
+                SizedBox(height: context.h(1)),
+                Center(
+                  child: Text(
+                    selectedMood,
+                    style: AppTextStyles.bodyBold.copyWith(
+                      color: textColor,
+                      fontSize: context.w(4.5),
+                    ),
                   ),
                 ),
                 SizedBox(height: context.h(1.5)),
