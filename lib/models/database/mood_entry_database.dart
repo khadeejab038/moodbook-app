@@ -77,10 +77,12 @@ class MoodEntryDatabase {
             .where('userId', isEqualTo: user.uid) // Filter by user ID
             .get();
 
-        // Delete each mood entry
+        // Delete each mood entry in a batch
+        final batch = _db.batch();
         for (var doc in snapshot.docs) {
-          await doc.reference.delete();
+          batch.delete(doc.reference);
         }
+        await batch.commit();
 
         print('All mood entries deleted successfully.');
       } catch (e) {
