@@ -5,7 +5,6 @@ import '../../models/emoji_data.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_text_styles.dart';
 import '../widgets/date_time_picker.dart';
-import '../home/home_screen.dart';
 import 'add_mood_screen2_emotions.dart';
 import '../widgets/responsive_extension.dart';
 
@@ -67,11 +66,7 @@ class _AddMoodState extends State<AddMood> {
                       icon: Icon(Icons.close, color: textColor),
                       onPressed: () {
                         moodEntryProvider.clear();
-                        Navigator.pushAndRemoveUntil(
-                          context,
-                          MaterialPageRoute(builder: (context) => HomeScreen()),
-                          (route) => false,
-                        );
+                        Navigator.popUntil(context, (route) => route.isFirst);
                       },
                     ),
                   ],

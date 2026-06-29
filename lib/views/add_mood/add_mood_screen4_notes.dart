@@ -4,7 +4,6 @@ import 'package:provider/provider.dart';
 import '../../controllers/mood_entry_controller.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_text_styles.dart';
-import '../home/home_screen.dart';
 import 'add_mood_screen5_popup.dart';
 import '../widgets/responsive_extension.dart';
 import '../widgets/snack_bar_helper.dart';
@@ -79,11 +78,7 @@ class _AddNotesState extends State<AddNotes> {
                       onPressed: () {
                         final moodProvider = Provider.of<MoodEntryController>(context, listen: false);
                         moodProvider.clear();
-                        Navigator.pushAndRemoveUntil(
-                          context,
-                          MaterialPageRoute(builder: (context) => HomeScreen()),
-                              (route) => false,
-                        );
+                        Navigator.popUntil(context, (route) => route.isFirst);
                       },
                     ),
                   ],

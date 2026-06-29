@@ -23,8 +23,8 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
-        ChangeNotifierProvider(create: (_) => MoodEntryController(userID: '')),
-        ChangeNotifierProvider(create: (_) => CheckInController(userID: '')),
+        ChangeNotifierProvider(create: (_) => MoodEntryController()),
+        ChangeNotifierProvider(create: (_) => CheckInController()),
       ],
       child: Consumer<ThemeProvider>(
         builder: (context, themeProvider, _) {
@@ -56,14 +56,7 @@ class AuthWrapper extends StatelessWidget {
         }
 
         if (snapshot.hasData) {
-          final userID = snapshot.data!.uid;
-          return MultiProvider(
-            providers: [
-              ChangeNotifierProvider(create: (_) => MoodEntryController(userID: userID)),
-              ChangeNotifierProvider(create: (_) => CheckInController(userID: userID)),
-            ],
-            child: HomeScreen(),
-          );
+          return HomeScreen();
         }
 
         return SignInScreen();

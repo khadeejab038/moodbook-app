@@ -3,7 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebasebackend/views/home/widgets/mood_chart.dart';
 import '../widgets/bottom_nav_bar.dart';
 import 'package:flutter/material.dart';
-import '../add_mood/add_mood_screen1_mood.dart';
 import 'widgets/check_in.dart';
 import 'widgets/daily_average_mood.dart';
 import 'package:provider/provider.dart';
@@ -18,9 +17,12 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  Future<String?>? _userNameFuture;
+
   @override
   void initState() {
     super.initState();
+    _userNameFuture = _getUserName();
     // Ensure CheckIn reminders are loaded when HomeScreen is initialized
     final userId = FirebaseAuth.instance.currentUser?.uid;
     if (userId != null) {
@@ -70,7 +72,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       FutureBuilder<String?>(
-                          future: _getUserName(), // Fetch the user name
+                          future: _userNameFuture, // Fetch the user name
                           builder: (context, snapshot) {
                             String greetingText = "Hey! 👋"; // Default greeting with emoji
 
