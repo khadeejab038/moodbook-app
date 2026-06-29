@@ -136,20 +136,35 @@ class _NotificationsSettingsPageState extends State<NotificationsSettingsPage> w
               const SizedBox(height: 16),
               if (!_exactAlarmsAllowed) ...[
                 Card(
-                  color: AppColors.error.withOpacity(0.15),
+                  color: isDark 
+                      ? const Color(0xFF3A1F22) 
+                      : AppColors.error.withOpacity(0.1),
+                  elevation: 0,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
-                    side: const BorderSide(color: AppColors.error, width: 1),
+                    side: BorderSide(
+                      color: isDark 
+                          ? const Color(0xFF8C2626) 
+                          : AppColors.error.withOpacity(0.3),
+                      width: 1.5,
+                    ),
                   ),
                   child: ListTile(
-                    leading: const Icon(Icons.warning_amber_rounded, color: AppColors.error),
+                    leading: Icon(
+                      Icons.warning_amber_rounded, 
+                      color: isDark ? const Color(0xFFFF8A8A) : AppColors.error,
+                    ),
                     title: Text(
-                      'Exact Alarms Disabled',
-                      style: AppTextStyles.bodySemiBold.copyWith(color: AppColors.error),
+                      'Reminders may be delayed',
+                      style: AppTextStyles.bodySemiBold.copyWith(
+                        color: isDark ? const Color(0xFFFF8A8A) : AppColors.error,
+                      ),
                     ),
                     subtitle: Text(
-                      'Tap here to allow "Alarms & reminders" in settings so reminders trigger at the exact minute.',
-                      style: AppTextStyles.caption.copyWith(color: isDark ? Colors.white70 : Colors.black87),
+                      'Tap here to optimize settings and ensure you get your check-in reminders on time.',
+                      style: AppTextStyles.caption.copyWith(
+                        color: isDark ? Colors.white70 : Colors.black87,
+                      ),
                     ),
                     onTap: () async {
                       await NotificationService().requestExactAlarmsPermission();
@@ -209,31 +224,7 @@ class _NotificationsSettingsPageState extends State<NotificationsSettingsPage> w
                 ),
                 onPressed: () => _addCheckInReminder(context),
               ),
-              const SizedBox(height: 16),
-              OutlinedButton.icon(
-                icon: const Icon(Icons.notifications_active, color: AppColors.primary),
-                label: Text('Send Test Notification', style: AppTextStyles.button.copyWith(color: AppColors.primary)),
-                style: OutlinedButton.styleFrom(
-                  minimumSize: const Size(double.infinity, 50),
-                  side: const BorderSide(color: AppColors.primary),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                onPressed: () async {
-                  final enabled = await NotificationService().areNotificationsEnabled();
-                  if (!enabled) {
-                    showSnackBar(context, 'Notification permission is blocked. Please enable it in system settings.');
-                    await NotificationService().requestPermissions();
-                  } else {
-                    final debugTimes = NotificationService().getDebugTimes();
-                    await NotificationService().showTestNotification();
-                    await Future.delayed(const Duration(milliseconds: 500));
-                    final pendingStr = await NotificationService().getPendingNotificationsDebugString();
-                    showSnackBar(context, 'Test notification sent!\n$debugTimes\n$pendingStr');
-                  }
-                },
-              ),
+
             ],
           );
         },
