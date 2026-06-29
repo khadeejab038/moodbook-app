@@ -115,7 +115,7 @@ class SettingsPage extends StatelessWidget {
                   _buildSwitchTile(
                     textColor: textColor,
                     title: 'Dark Mode',
-                    value: themeProvider.themeMode == ThemeMode.dark,
+                    value: Theme.of(context).brightness == Brightness.dark,
                     onChanged: (value) => themeProvider.setDark(value),
                   ),
                   _buildSettingsTile(
