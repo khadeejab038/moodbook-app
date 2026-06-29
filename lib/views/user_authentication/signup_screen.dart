@@ -78,23 +78,56 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
+    // Background gradient
+    final backgroundGradient = isDark
+        ? const RadialGradient(
+            center: Alignment(-0.5, -0.5),
+            radius: 1.8,
+            colors: [
+              Color(0xFF1A1324),
+              Color(0xFF2C1625),
+              Color(0xFF101925),
+            ],
+            stops: [0, 0.5, 0.9],
+          )
+        : const RadialGradient(
+            center: Alignment(-0.5, -0.5),
+            radius: 1.8,
+            colors: [
+              Color(0xFFF3EAF8),
+              Color(0xFFFF92A9),
+              Color(0xFFCCEFFF),
+            ],
+            stops: [0, 0.4, 0.9],
+          );
+
+    // Card background
+    final cardColor = isDark ? const Color(0xFF241C30) : AppColors.primaryLight;
+    
+    // Text colors
+    final cardTextColor = isDark ? Colors.white : Colors.black;
+    final cardSubtitleColor = isDark ? Colors.white70 : Colors.black54;
+    final helperTextColor = isDark ? Colors.white30 : Colors.black38;
+    
+    // Text field styles
+    final inputFillColor = isDark ? const Color(0xFF140E1B) : Colors.white;
+    final inputBorderColor = isDark ? Colors.transparent : Colors.grey.shade300;
+
+    // Button style
+    final buttonColor = isDark ? AppColors.primary : const Color(0xB2C9FAFB);
+    final buttonTextColor = isDark ? Colors.white : Colors.black;
+    final buttonShadowColor = isDark ? Colors.transparent : const Color(0xFFCCEFFF);
+
     return Scaffold(
       body: _isLoading
           ? Center(child: CircularProgressIndicator(color: AppColors.primary))
           : Container(
               height: double.infinity,
               width: double.infinity,
-              decoration: const BoxDecoration(
-                gradient: RadialGradient(
-                  center: Alignment(-0.5, -0.5),
-                  radius: 1.8,
-                  colors: [
-                    Color(0xFFF3EAF8),
-                    Color(0xFFFF92A9),
-                    Color(0xFFCCEFFF),
-                  ],
-                  stops: [0, 0.4, 0.9],
-                ),
+              decoration: BoxDecoration(
+                gradient: backgroundGradient,
               ),
               child: SafeArea(
                 child: SingleChildScrollView(
@@ -131,7 +164,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             Container(
                               width: context.w(90).clamp(300.0, 360.0),
                               decoration: BoxDecoration(
-                                color: AppColors.primaryLight,
+                                color: cardColor,
                                 borderRadius: BorderRadius.circular(context.w(5)),
                                 boxShadow: const [
                                   BoxShadow(
@@ -151,25 +184,39 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                       // Name input field
                                       TextFormField(
                                         controller: _nameController,
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                           fontFamily: 'Pangram',
                                           fontWeight: FontWeight.w500,
-                                          color: Colors.black,
+                                          color: cardTextColor,
                                         ),
                                         decoration: InputDecoration(
+                                          filled: true,
+                                          fillColor: inputFillColor,
                                           hintText: 'Enter your name',
-                                          hintStyle: const TextStyle(
+                                          hintStyle: TextStyle(
                                             fontFamily: 'Pangram',
                                             fontWeight: FontWeight.w500,
-                                            color: Colors.black54,
+                                            color: cardSubtitleColor,
                                           ),
                                           helperText: 'Your name will show on the home screen',
-                                          helperStyle: const TextStyle(
+                                          helperStyle: TextStyle(
                                             fontFamily: 'Pangram',
                                             fontSize: 11,
-                                            color: Colors.black38,
+                                            color: helperTextColor,
                                           ),
-                                          prefixIcon: Icon(Icons.person_outline, size: context.w(5), color: Colors.black54),
+                                          prefixIcon: Icon(Icons.person_outline, size: context.w(5), color: cardSubtitleColor),
+                                          enabledBorder: OutlineInputBorder(
+                                            borderRadius: BorderRadius.circular(30),
+                                            borderSide: BorderSide(color: inputBorderColor, width: 1.5),
+                                          ),
+                                          focusedBorder: OutlineInputBorder(
+                                            borderRadius: BorderRadius.circular(30),
+                                            borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+                                          ),
+                                          border: OutlineInputBorder(
+                                            borderRadius: BorderRadius.circular(30),
+                                            borderSide: BorderSide(color: inputBorderColor, width: 1.5),
+                                          ),
                                         ),
                                         validator: (value) {
                                           if (value == null || value.trim().isEmpty) {
@@ -182,25 +229,39 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                       // Email input field
                                       TextFormField(
                                         controller: _emailController,
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                           fontFamily: 'Pangram',
                                           fontWeight: FontWeight.w500,
-                                          color: Colors.black,
+                                          color: cardTextColor,
                                         ),
                                         decoration: InputDecoration(
+                                          filled: true,
+                                          fillColor: inputFillColor,
                                           hintText: 'Enter your email',
-                                          hintStyle: const TextStyle(
+                                          hintStyle: TextStyle(
                                             fontFamily: 'Pangram',
                                             fontWeight: FontWeight.w500,
-                                            color: Colors.black54,
+                                            color: cardSubtitleColor,
                                           ),
                                           helperText: 'Format: name@example.com',
-                                          helperStyle: const TextStyle(
+                                          helperStyle: TextStyle(
                                             fontFamily: 'Pangram',
                                             fontSize: 11,
-                                            color: Colors.black38,
+                                            color: helperTextColor,
                                           ),
-                                          prefixIcon: Icon(Icons.email_outlined, size: context.w(5), color: Colors.black54),
+                                          prefixIcon: Icon(Icons.email_outlined, size: context.w(5), color: cardSubtitleColor),
+                                          enabledBorder: OutlineInputBorder(
+                                            borderRadius: BorderRadius.circular(30),
+                                            borderSide: BorderSide(color: inputBorderColor, width: 1.5),
+                                          ),
+                                          focusedBorder: OutlineInputBorder(
+                                            borderRadius: BorderRadius.circular(30),
+                                            borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+                                          ),
+                                          border: OutlineInputBorder(
+                                            borderRadius: BorderRadius.circular(30),
+                                            borderSide: BorderSide(color: inputBorderColor, width: 1.5),
+                                          ),
                                         ),
                                         validator: (value) {
                                           if (value == null || value.trim().isEmpty) {
@@ -216,36 +277,50 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                       // Password input field
                                       TextFormField(
                                         controller: _passwordController,
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                           fontFamily: 'Pangram',
                                           fontWeight: FontWeight.w500,
-                                          color: Colors.black,
+                                          color: cardTextColor,
                                         ),
                                         decoration: InputDecoration(
+                                          filled: true,
+                                          fillColor: inputFillColor,
                                           hintText: 'Enter your password',
-                                          hintStyle: const TextStyle(
+                                          hintStyle: TextStyle(
                                             fontFamily: 'Pangram',
                                             fontWeight: FontWeight.w500,
-                                            color: Colors.black54,
+                                            color: cardSubtitleColor,
                                           ),
                                           helperText: 'Must be at least 6 characters',
-                                          helperStyle: const TextStyle(
+                                          helperStyle: TextStyle(
                                             fontFamily: 'Pangram',
                                             fontSize: 11,
-                                            color: Colors.black38,
+                                            color: helperTextColor,
                                           ),
-                                          prefixIcon: Icon(Icons.key_outlined, size: context.w(5), color: Colors.black54),
+                                          prefixIcon: Icon(Icons.key_outlined, size: context.w(5), color: cardSubtitleColor),
                                           suffixIcon: IconButton(
                                             icon: Icon(
                                               _obscurePassword ? Icons.visibility_off : Icons.visibility,
                                               size: context.w(5),
-                                              color: Colors.black54,
+                                              color: cardSubtitleColor,
                                             ),
                                             onPressed: () {
                                               setState(() {
                                                 _obscurePassword = !_obscurePassword;
                                               });
                                             },
+                                          ),
+                                          enabledBorder: OutlineInputBorder(
+                                            borderRadius: BorderRadius.circular(30),
+                                            borderSide: BorderSide(color: inputBorderColor, width: 1.5),
+                                          ),
+                                          focusedBorder: OutlineInputBorder(
+                                            borderRadius: BorderRadius.circular(30),
+                                            borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+                                          ),
+                                          border: OutlineInputBorder(
+                                            borderRadius: BorderRadius.circular(30),
+                                            borderSide: BorderSide(color: inputBorderColor, width: 1.5),
                                           ),
                                         ),
                                         obscureText: _obscurePassword,
@@ -263,36 +338,50 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                       // Confirm Password input field
                                       TextFormField(
                                         controller: _confirmPasswordController,
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                           fontFamily: 'Pangram',
                                           fontWeight: FontWeight.w500,
-                                          color: Colors.black,
+                                          color: cardTextColor,
                                         ),
                                         decoration: InputDecoration(
+                                          filled: true,
+                                          fillColor: inputFillColor,
                                           hintText: 'Confirm your password',
-                                          hintStyle: const TextStyle(
+                                          hintStyle: TextStyle(
                                             fontFamily: 'Pangram',
                                             fontWeight: FontWeight.w500,
-                                            color: Colors.black54,
+                                            color: cardSubtitleColor,
                                           ),
                                           helperText: 'Re-enter password to confirm',
-                                          helperStyle: const TextStyle(
+                                          helperStyle: TextStyle(
                                             fontFamily: 'Pangram',
                                             fontSize: 11,
-                                            color: Colors.black38,
+                                            color: helperTextColor,
                                           ),
-                                          prefixIcon: Icon(Icons.lock_outline, size: context.w(5), color: Colors.black54),
+                                          prefixIcon: Icon(Icons.lock_outline, size: context.w(5), color: cardSubtitleColor),
                                           suffixIcon: IconButton(
                                             icon: Icon(
                                               _obscureConfirmPassword ? Icons.visibility_off : Icons.visibility,
                                               size: context.w(5),
-                                              color: Colors.black54,
+                                              color: cardSubtitleColor,
                                             ),
                                             onPressed: () {
                                               setState(() {
                                                 _obscureConfirmPassword = !_obscureConfirmPassword;
                                               });
                                             },
+                                          ),
+                                          enabledBorder: OutlineInputBorder(
+                                            borderRadius: BorderRadius.circular(30),
+                                            borderSide: BorderSide(color: inputBorderColor, width: 1.5),
+                                          ),
+                                          focusedBorder: OutlineInputBorder(
+                                            borderRadius: BorderRadius.circular(30),
+                                            borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+                                          ),
+                                          border: OutlineInputBorder(
+                                            borderRadius: BorderRadius.circular(30),
+                                            borderSide: BorderSide(color: inputBorderColor, width: 1.5),
                                           ),
                                         ),
                                         obscureText: _obscureConfirmPassword,
@@ -310,14 +399,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                       // Sign-up button
                                       ElevatedButton(
                                         style: ElevatedButton.styleFrom(
-                                          backgroundColor: const Color(0xB2C9FAFB),
-                                          foregroundColor: Colors.black,
+                                          backgroundColor: buttonColor,
+                                          foregroundColor: buttonTextColor,
                                           minimumSize: Size(double.infinity, context.h(6)),
                                           shape: RoundedRectangleBorder(
                                             borderRadius: BorderRadius.circular(context.w(3.5)),
                                           ),
-                                          elevation: 5,
-                                          shadowColor: const Color(0xFFCCEFFF),
+                                          elevation: isDark ? 0 : 5,
+                                          shadowColor: buttonShadowColor,
                                         ),
                                         onPressed: _signUp,
                                         child: const Text(
@@ -346,12 +435,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                                 decoration: TextDecoration.underline,
                                               ),
                                             ),
-                                            const Text(
+                                            Text(
                                               ' Sign In',
                                               style: TextStyle(
                                                 fontFamily: 'Pangram',
                                                 fontWeight: FontWeight.w500,
-                                                color: Colors.black,
+                                                color: cardTextColor,
                                                 decoration: TextDecoration.underline,
                                               ),
                                             ),

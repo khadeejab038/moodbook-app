@@ -148,6 +148,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../widgets/snack_bar_helper.dart';
 import '../widgets/responsive_extension.dart';
+import '../../theme/app_colors.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   @override
@@ -173,12 +174,21 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        height: double.infinity,
-        width: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: RadialGradient(
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
+    // Background gradient
+    final backgroundGradient = isDark
+        ? const RadialGradient(
+            center: Alignment(-0.5, -0.5),
+            radius: 1.8,
+            colors: [
+              Color(0xFF1A1324),
+              Color(0xFF2C1625),
+              Color(0xFF101925),
+            ],
+            stops: [0, 0.5, 0.9],
+          )
+        : const RadialGradient(
             center: Alignment(-0.5, -0.5),
             radius: 1.8,
             colors: [
@@ -187,7 +197,30 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               Color(0xFFCCEFFF),
             ],
             stops: [0, 0.4, 0.9],
-          ),
+          );
+
+    // Card background
+    final cardColor = isDark ? const Color(0xFF241C30) : AppColors.primaryLight;
+    
+    // Text colors
+    final cardTextColor = isDark ? Colors.white : Colors.black;
+    final cardSubtitleColor = isDark ? Colors.white70 : Colors.black54;
+
+    // Text field styles
+    final inputFillColor = isDark ? const Color(0xFF140E1B) : Colors.white;
+    final inputBorderColor = isDark ? Colors.transparent : Colors.grey.shade300;
+
+    // Button style
+    final buttonColor = isDark ? AppColors.primary : const Color(0xB2C9FAFB);
+    final buttonTextColor = isDark ? Colors.white : Colors.black;
+    final buttonShadowColor = isDark ? Colors.transparent : const Color(0xFFCCEFFF);
+
+    return Scaffold(
+      body: Container(
+        height: double.infinity,
+        width: double.infinity,
+        decoration: BoxDecoration(
+          gradient: backgroundGradient,
         ),
         child: SafeArea(
           child: SingleChildScrollView(
@@ -197,20 +230,20 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   backgroundColor: Colors.transparent,
                   elevation: 0,
                   leading: IconButton(
-                    icon: Icon(Icons.arrow_back, color: Colors.white), // White back button
+                    icon: Icon(Icons.arrow_back, color: cardTextColor),
                     onPressed: () {
-                      Navigator.pop(context); // Go back to the previous screen
+                      Navigator.pop(context);
                     },
                   ),
                   title: Padding(
                     padding: EdgeInsets.only(top: context.h(3)),
                     child: Center(
-                      child: const Text(
+                      child: Text(
                         'Change Password',
                         style: TextStyle(
                           fontFamily: 'Pangram',
                           fontWeight: FontWeight.w600,
-                          color: Colors.white,
+                          color: cardTextColor,
                         ),
                       ),
                     ),
@@ -220,54 +253,91 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 Container(
                   width: context.w(90).clamp(300.0, 360.0),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: cardColor,
                     borderRadius: BorderRadius.circular(context.w(5)),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Colors.black12,
+                        blurRadius: 15,
+                        offset: Offset(0, 5),
+                      ),
+                    ],
                   ),
-                child: Padding(
-                  padding: EdgeInsets.all(context.w(6.5)),
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        TextFormField(
-                          controller: _emailController,
-                          decoration: InputDecoration(
-                            hintText: 'Enter your Email',
-                            prefixIcon: Icon(Icons.email, size: context.w(5)),
-                          ),
-                          validator: (value) {
-                            if (value == null || !value.contains('@')) {
-                              return 'Please enter a valid email';
-                            }
-                            return null;
-                          },
-                        ),
-                        SizedBox(height: context.h(3.5)),
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Color(0xB2C9FAFB),
-                            foregroundColor: Colors.black,
-                            minimumSize: Size(double.infinity, context.h(6)),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(context.w(3.5)),
+                  child: Padding(
+                    padding: EdgeInsets.all(context.w(6.5)),
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          TextFormField(
+                            controller: _emailController,
+                            style: TextStyle(
+                              fontFamily: 'Pangram',
+                              fontWeight: FontWeight.w500,
+                              color: cardTextColor,
                             ),
-                            elevation: 5,
-                            shadowColor: Color(0xFFCCEFFF),
+                            decoration: InputDecoration(
+                              filled: true,
+                              fillColor: inputFillColor,
+                              hintText: 'Enter your Email',
+                              hintStyle: TextStyle(
+                                fontFamily: 'Pangram',
+                                fontWeight: FontWeight.w500,
+                                color: cardSubtitleColor,
+                              ),
+                              prefixIcon: Icon(Icons.email, size: context.w(5), color: cardSubtitleColor),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(30),
+                                borderSide: BorderSide(color: inputBorderColor, width: 1.5),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(30),
+                                borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+                              ),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(30),
+                                borderSide: BorderSide(color: inputBorderColor, width: 1.5),
+                              ),
+                            ),
+                            validator: (value) {
+                              if (value == null || !value.contains('@')) {
+                                return 'Please enter a valid email';
+                              }
+                              return null;
+                            },
                           ),
-                          onPressed: _resetPassword,
-                          child: const Text('Reset Password'),
-                        ),
-                      ],
+                          SizedBox(height: context.h(3.5)),
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: buttonColor,
+                              foregroundColor: buttonTextColor,
+                              minimumSize: Size(double.infinity, context.h(6)),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(context.w(3.5)),
+                              ),
+                              elevation: isDark ? 0 : 5,
+                              shadowColor: buttonShadowColor,
+                            ),
+                            onPressed: _resetPassword,
+                            child: const Text(
+                              'Reset Password',
+                              style: TextStyle(
+                                fontFamily: 'Pangram',
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
-    ),
     );
   }
 }
