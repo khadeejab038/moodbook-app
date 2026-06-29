@@ -4,6 +4,8 @@ import '../../../models/user.dart';
 import '../../../controllers/check_in_controller.dart';
 import '../../../theme/app_colors.dart';
 import '../../../theme/app_text_styles.dart';
+import '../../../services/notification_service.dart';
+import '../../widgets/snack_bar_helper.dart';
 
 class NotificationsSettingsPage extends StatefulWidget {
   @override
@@ -11,13 +13,43 @@ class NotificationsSettingsPage extends StatefulWidget {
       _NotificationsSettingsPageState();
 }
 
-class _NotificationsSettingsPageState extends State<NotificationsSettingsPage> {
+class _NotificationsSettingsPageState extends State<NotificationsSettingsPage> with WidgetsBindingObserver {
+  bool _exactAlarmsAllowed = true;
+
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     // Load check-in reminders when the page is opened
     final provider = Provider.of<CheckInController>(context, listen: false);
     provider.loadCheckInReminders();
+    
+    // Request permission on page entry
+    NotificationService().requestPermissions().then((_) {
+      _checkExactAlarmsStatus();
+    });
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _checkExactAlarmsStatus();
+    }
+  }
+
+  Future<void> _checkExactAlarmsStatus() async {
+    final allowed = await NotificationService().canScheduleExactAlarms();
+    if (mounted) {
+      setState(() {
+        _exactAlarmsAllowed = allowed;
+      });
+    }
   }
 
   Future<void> _addCheckInReminder(BuildContext context) async {
@@ -102,6 +134,30 @@ class _NotificationsSettingsPageState extends State<NotificationsSettingsPage> {
                 ),
               ),
               const SizedBox(height: 16),
+              if (!_exactAlarmsAllowed) ...[
+                Card(
+                  color: AppColors.error.withOpacity(0.15),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    side: const BorderSide(color: AppColors.error, width: 1),
+                  ),
+                  child: ListTile(
+                    leading: const Icon(Icons.warning_amber_rounded, color: AppColors.error),
+                    title: Text(
+                      'Exact Alarms Disabled',
+                      style: AppTextStyles.bodySemiBold.copyWith(color: AppColors.error),
+                    ),
+                    subtitle: Text(
+                      'Tap here to allow "Alarms & reminders" in settings so reminders trigger at the exact minute.',
+                      style: AppTextStyles.caption.copyWith(color: isDark ? Colors.white70 : Colors.black87),
+                    ),
+                    onTap: () async {
+                      await NotificationService().requestExactAlarmsPermission();
+                    },
+                  ),
+                ),
+                const SizedBox(height: 16),
+              ],
               ListView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
@@ -152,6 +208,31 @@ class _NotificationsSettingsPageState extends State<NotificationsSettingsPage> {
                   ),
                 ),
                 onPressed: () => _addCheckInReminder(context),
+              ),
+              const SizedBox(height: 16),
+              OutlinedButton.icon(
+                icon: const Icon(Icons.notifications_active, color: AppColors.primary),
+                label: Text('Send Test Notification', style: AppTextStyles.button.copyWith(color: AppColors.primary)),
+                style: OutlinedButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 50),
+                  side: const BorderSide(color: AppColors.primary),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                onPressed: () async {
+                  final enabled = await NotificationService().areNotificationsEnabled();
+                  if (!enabled) {
+                    showSnackBar(context, 'Notification permission is blocked. Please enable it in system settings.');
+                    await NotificationService().requestPermissions();
+                  } else {
+                    final debugTimes = NotificationService().getDebugTimes();
+                    await NotificationService().showTestNotification();
+                    await Future.delayed(const Duration(milliseconds: 500));
+                    final pendingStr = await NotificationService().getPendingNotificationsDebugString();
+                    showSnackBar(context, 'Test notification sent!\n$debugTimes\n$pendingStr');
+                  }
+                },
               ),
             ],
           );

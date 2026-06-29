@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../models/database/user_database.dart';
 import '../models/user.dart';
+import '../services/notification_service.dart';
 
 class CheckInController extends ChangeNotifier {
   List<CheckInReminder> _checkInReminders = [];
@@ -24,6 +25,9 @@ class CheckInController extends ChangeNotifier {
       // Sort the reminders in ascending order by timestamp
       _checkInReminders.sort((a, b) => a.timestamp.compareTo(b.timestamp));
       notifyListeners();
+      
+      // Sync local scheduled notifications
+      await NotificationService().rescheduleAllLocalNotifications(_checkInReminders);
     } catch (e) {
       print('Failed to load check-in reminders: $e');
     }
@@ -42,11 +46,17 @@ class CheckInController extends ChangeNotifier {
       _checkInReminders.sort((a, b) => a.timestamp.compareTo(b.timestamp));
       notifyListeners(); // Update UI immediately
       await UserDatabase.addCheckInReminder(uid, reminder);
+      
+      // Sync local scheduled notifications
+      await NotificationService().rescheduleAllLocalNotifications(_checkInReminders);
     } catch (e) {
       print('Failed to add check-in reminder: $e');
       // Rollback the change in case of error
       _checkInReminders.remove(reminder);
       notifyListeners();
+      
+      // Sync local scheduled notifications
+      await NotificationService().rescheduleAllLocalNotifications(_checkInReminders);
     }
   }
 
@@ -66,11 +76,17 @@ class CheckInController extends ChangeNotifier {
 
     try {
       await UserDatabase.deleteCheckInReminder(uid, index);
+      
+      // Sync local scheduled notifications
+      await NotificationService().rescheduleAllLocalNotifications(_checkInReminders);
     } catch (e) {
       print('Failed to delete check-in reminder: $e');
       // Rollback the change in case of error
       _checkInReminders.insert(index, removedReminder);
       notifyListeners();
+      
+      // Sync local scheduled notifications
+      await NotificationService().rescheduleAllLocalNotifications(_checkInReminders);
     }
   }
 
@@ -102,11 +118,17 @@ class CheckInController extends ChangeNotifier {
         timestamp: timestamp,
         isEnabled: isEnabled,
       );
+      
+      // Sync local scheduled notifications
+      await NotificationService().rescheduleAllLocalNotifications(_checkInReminders);
     } catch (e) {
       print('Failed to update check-in reminder: $e');
       // Rollback the change in case of error
       _checkInReminders[index] = originalReminder;
       notifyListeners();
+      
+      // Sync local scheduled notifications
+      await NotificationService().rescheduleAllLocalNotifications(_checkInReminders);
     }
   }
 
