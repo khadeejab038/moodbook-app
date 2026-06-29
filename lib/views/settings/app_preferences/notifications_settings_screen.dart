@@ -209,31 +209,7 @@ class _NotificationsSettingsPageState extends State<NotificationsSettingsPage> w
                 ),
                 onPressed: () => _addCheckInReminder(context),
               ),
-              const SizedBox(height: 16),
-              OutlinedButton.icon(
-                icon: const Icon(Icons.notifications_active, color: AppColors.primary),
-                label: Text('Send Test Notification', style: AppTextStyles.button.copyWith(color: AppColors.primary)),
-                style: OutlinedButton.styleFrom(
-                  minimumSize: const Size(double.infinity, 50),
-                  side: const BorderSide(color: AppColors.primary),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                onPressed: () async {
-                  final enabled = await NotificationService().areNotificationsEnabled();
-                  if (!enabled) {
-                    showSnackBar(context, 'Notification permission is blocked. Please enable it in system settings.');
-                    await NotificationService().requestPermissions();
-                  } else {
-                    final debugTimes = NotificationService().getDebugTimes();
-                    await NotificationService().showTestNotification();
-                    await Future.delayed(const Duration(milliseconds: 500));
-                    final pendingStr = await NotificationService().getPendingNotificationsDebugString();
-                    showSnackBar(context, 'Test notification sent!\n$debugTimes\n$pendingStr');
-                  }
-                },
-              ),
+
             ],
           );
         },
