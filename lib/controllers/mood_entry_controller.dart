@@ -4,7 +4,6 @@ import '../models/mood_entry.dart';
 import '../models/database/mood_entry_database.dart';
 
 class MoodEntryController extends ChangeNotifier {
-  final String userID;
   MoodEntry _moodEntry = MoodEntry(
     timestamp: DateTime.now(),
     mood: '',
@@ -16,10 +15,7 @@ class MoodEntryController extends ChangeNotifier {
   List<String> _recentlyUsedEmotions = [];
   List<String> _recentlyUsedReasons = [];
 
-  final CollectionReference _collection =
-  FirebaseFirestore.instance.collection('mood_entries');
-
-  MoodEntryController({required this.userID}); // Constructor to accept userID
+  MoodEntryController();
 
   // Getter for mood entry
   MoodEntry get moodEntry => _moodEntry;
