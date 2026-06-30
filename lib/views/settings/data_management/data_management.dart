@@ -9,6 +9,7 @@ import '../../../controllers/mood_entry_controller.dart';
 import '../../../models/mood_entry.dart';
 import '../../widgets/snack_bar_helper.dart';
 import '../../../../utils/error_parser.dart';
+import '../../../../utils/network_helper.dart';
 
 class DataManagement {
   // Convert mood entries to standard CSV format
@@ -47,6 +48,13 @@ class DataManagement {
           TextButton(
             onPressed: () async {
               Navigator.of(dialogContext).pop(); // Close confirmation dialog
+
+              if (!await NetworkHelper.isConnected()) {
+                if (pageContext.mounted) {
+                  showSnackBar(pageContext, 'No internet connection. Data export requires an active network.');
+                }
+                return;
+              }
 
               // Show loading spinner dialog using mounted parent pageContext
               showDialog(
@@ -114,6 +122,13 @@ class DataManagement {
           TextButton(
             onPressed: () async {
               Navigator.of(dialogContext).pop(); // Close confirmation dialog
+
+              if (!await NetworkHelper.isConnected()) {
+                if (pageContext.mounted) {
+                  showSnackBar(pageContext, 'No internet connection. Clearing logs requires an active network.');
+                }
+                return;
+              }
 
               // Show loading spinner dialog using the parent (mounted) pageContext
               showDialog(

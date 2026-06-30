@@ -1,10 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../widgets/snack_bar_helper.dart';
 import 'package:flutter/material.dart';
+import 'dart:io';
 import '../../../views/widgets/responsive_extension.dart';
 import '../../../theme/app_colors.dart';
 import '../../../theme/app_text_styles.dart';
 import '../../../utils/error_parser.dart';
+import '../../../utils/network_helper.dart';
 
 class ChangePasswordScreen extends StatefulWidget {
   @override
@@ -20,6 +22,9 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   Future<void> _changePassword() async {
     if (_formKey.currentState!.validate()) {
       try {
+        if (!await NetworkHelper.isConnected()) {
+          throw const SocketException('No internet connection');
+        }
         User? user = FirebaseAuth.instance.currentUser;
         if (user == null || user.email == null) {
           if (mounted) {

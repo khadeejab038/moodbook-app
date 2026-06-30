@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:flutter/material.dart';
 import '../../../models/database/user_database.dart';
@@ -7,6 +8,7 @@ import '../../../views/widgets/snack_bar_helper.dart';
 import '../../../theme/app_colors.dart';
 import '../../../theme/app_text_styles.dart';
 import '../../../../utils/error_parser.dart';
+import '../../../../utils/network_helper.dart';
 
 class EditProfile extends StatefulWidget {
   const EditProfile({super.key});
@@ -95,6 +97,9 @@ class _EditProfileState extends State<EditProfile> {
   Future<void> _updateUserProfile() async {
     if (_formKey.currentState!.validate()) {
       try {
+        if (!await NetworkHelper.isConnected()) {
+          throw const SocketException('No internet connection');
+        }
         final auth.User? firebaseUser = auth.FirebaseAuth.instance.currentUser;
 
         if (firebaseUser != null && email != currentEmail) {

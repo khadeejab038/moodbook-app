@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/services.dart';
 import 'dart:io';
 
 class ErrorParser {
@@ -40,6 +41,13 @@ class ErrorParser {
         default:
           return error.message ?? 'A database error occurred. Please try again.';
       }
+    }
+
+    if (error is PlatformException) {
+      if (error.code == 'network_error' || error.message?.toLowerCase().contains('network') == true) {
+        return 'Connection lost. Please check your internet connection and try again.';
+      }
+      return error.message ?? 'Sign-in failed. Please check your Google account settings.';
     }
 
     if (error is SocketException) {

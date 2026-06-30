@@ -7,6 +7,8 @@ import '../../theme/app_text_styles.dart';
 import 'add_mood_screen5_popup.dart';
 import '../widgets/responsive_extension.dart';
 import '../widgets/snack_bar_helper.dart';
+import '../../utils/error_parser.dart';
+import '../../utils/network_helper.dart';
 
 class AddNotes extends StatefulWidget {
   const AddNotes({super.key});
@@ -17,6 +19,7 @@ class AddNotes extends StatefulWidget {
 
 class _AddNotesState extends State<AddNotes> {
   TextEditingController notesController = TextEditingController();
+  bool _isSaving = false;
 
   @override
   void initState() {
@@ -155,24 +158,48 @@ class _AddNotesState extends State<AddNotes> {
                     ),
                     minimumSize: Size(context.w(85), context.h(7.5)),
                   ),
-                  onPressed: () async {
-                    final moodProvider = Provider.of<MoodEntryController>(context, listen: false);
-                    final moodEntry = moodProvider.moodEntry;
-                    moodEntry.setNotes = notesController.text;
+                  onPressed: _isSaving
+                      ? null
+                      : () async {
+                          setState(() {
+                            _isSaving = true;
+                          });
+                          final moodProvider = Provider.of<MoodEntryController>(context, listen: false);
+                          final moodEntry = moodProvider.moodEntry;
+                          moodEntry.setNotes = notesController.text;
 
-                    try {
-                      await MoodEntryDatabase.saveMoodEntryToFirebase(moodEntry);
-                      if (context.mounted) {
-                        moodProvider.clear();
-                        showPopupDialog(moodEntry.getMood);
-                      }
-                    } catch (e) {
-                      print('Error: $e');
-                      if (context.mounted) {
-                        showSnackBar(context, 'Error saving mood entry');
-                      }
-                    }
-                  },
+                          try {
+                            final hasNetwork = await NetworkHelper.isConnected();
+                            if (hasNetwork) {
+                              await MoodEntryDatabase.saveMoodEntryToFirebase(moodEntry);
+                              if (context.mounted) {
+                                moodProvider.clear();
+                                showPopupDialog(moodEntry.getMood);
+                              }
+                            } else {
+                              // Fire-and-forget save to local cache
+                              MoodEntryDatabase.saveMoodEntryToFirebase(moodEntry).catchError((e) {
+                                print('Offline save error: $e');
+                              });
+                              if (context.mounted) {
+                                showSnackBar(context, 'Saved locally. Your entry will sync when connection is restored.');
+                                moodProvider.clear();
+                                showPopupDialog(moodEntry.getMood);
+                              }
+                            }
+                          } catch (e) {
+                            print('Error: $e');
+                            if (context.mounted) {
+                              showSnackBar(context, ErrorParser.getFriendlyMessage(e));
+                            }
+                          } finally {
+                            if (mounted) {
+                              setState(() {
+                                _isSaving = false;
+                              });
+                            }
+                          }
+                        },
                   child: Text(
                     'Save',
                     style: AppTextStyles.button.copyWith(

@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../../models/database/user_database.dart';
@@ -5,6 +6,8 @@ import '../../theme/app_colors.dart';
 import '../widgets/snack_bar_helper.dart';
 import '../home/home_screen.dart';
 import '../widgets/responsive_extension.dart';
+import '../../utils/error_parser.dart';
+import '../../utils/network_helper.dart';
 
 // Import your custom User model with an alias
 import '../../models/user.dart' as AppUser;
@@ -33,6 +36,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
       });
       User? user;
       try {
+        if (!await NetworkHelper.isConnected()) {
+          throw const SocketException('No internet connection');
+        }
         // Create user with email and password
         UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: _emailController.text.trim(),
@@ -66,36 +72,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
             );
           }
         }
-      } on FirebaseAuthException catch (e) {
-        String message;
-        switch (e.code) {
-          case 'email-already-in-use':
-            message = 'This email is already in use.';
-            break;
-          case 'invalid-email':
-            message = 'The email address is invalid.';
-            break;
-          case 'operation-not-allowed':
-            message = 'Email/password accounts are not enabled.';
-            break;
-          case 'weak-password':
-            message = 'The password is too weak.';
-            break;
-          case 'network-request-failed':
-            message = 'Connection failed. Please check your internet connection.';
-            break;
-          default:
-            message = e.message ?? 'Sign-up failed.';
-        }
-        if (mounted) {
-          showSnackBar(context, message, AppColors.primary);
-          setState(() {
-            _isLoading = false;
-          });
-        }
       } catch (e) {
         if (mounted) {
-          showSnackBar(context, 'Sign-up failed: $e', AppColors.primary);
+          showSnackBar(context, ErrorParser.getFriendlyMessage(e), AppColors.primary);
           setState(() {
             _isLoading = false;
           });

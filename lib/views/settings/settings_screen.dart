@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import '../../utils/error_parser.dart';
+import '../../utils/network_helper.dart';
 import '../../main.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_text_styles.dart';
@@ -291,6 +292,14 @@ Future<void> deleteUserAccount(BuildContext pageContext) async {
   );
 
   try {
+    if (!await NetworkHelper.isConnected()) {
+      if (pageContext.mounted) {
+        Navigator.of(pageContext).pop(); // Dismiss spinner
+        showSnackBar(pageContext, 'No internet connection. Account deletion requires an active network.');
+      }
+      return;
+    }
+
     User? user = FirebaseAuth.instance.currentUser;
 
     if (user == null) {
@@ -411,6 +420,13 @@ void _confirmDeleteAccount(BuildContext pageContext) {
             child: Text(isGoogleUser ? 'Re-authenticate' : 'Delete', style: AppTextStyles.link.copyWith(color: AppColors.error)),
             onPressed: () async {
               Navigator.of(dialogContext).pop(); // Close the dialog
+
+              if (!await NetworkHelper.isConnected()) {
+                if (pageContext.mounted) {
+                  showSnackBar(pageContext, 'No internet connection. Account deletion requires an active network.');
+                }
+                return;
+              }
 
               if (currentUser != null) {
                 try {
