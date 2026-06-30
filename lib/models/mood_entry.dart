@@ -83,13 +83,35 @@ class MoodEntry {
 
   // Create from Firestore Map
   factory MoodEntry.fromMap(Map<String, dynamic> map) {
+    final rawTimestamp = map['timestamp'];
+    DateTime parsedTimestamp;
+    if (rawTimestamp is Timestamp) {
+      parsedTimestamp = rawTimestamp.toDate();
+    } else if (rawTimestamp is String) {
+      parsedTimestamp = DateTime.tryParse(rawTimestamp) ?? DateTime.now();
+    } else {
+      parsedTimestamp = DateTime.now();
+    }
+
+    final rawEmotions = map['emotions'];
+    List<String> parsedEmotions = [];
+    if (rawEmotions is List) {
+      parsedEmotions = rawEmotions.map((e) => e.toString()).toList();
+    }
+
+    final rawReasons = map['reasons'];
+    List<String> parsedReasons = [];
+    if (rawReasons is List) {
+      parsedReasons = rawReasons.map((e) => e.toString()).toList();
+    }
+
     return MoodEntry(
-      timestamp: (map['timestamp'] as Timestamp).toDate(),
-      mood: map['mood'] ?? '',
-      emotions: List<String>.from(map['emotions'] ?? []),
-      reasons: List<String>.from(map['reasons'] ?? []),
-      notes: map['notes'] ?? '',
-      userId: map['userId'],
+      timestamp: parsedTimestamp,
+      mood: map['mood'] as String? ?? '',
+      emotions: parsedEmotions,
+      reasons: parsedReasons,
+      notes: map['notes'] as String? ?? '',
+      userId: map['userId'] as String?,
     );
   }
 }

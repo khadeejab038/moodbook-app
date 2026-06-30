@@ -6,6 +6,7 @@ import '../../../theme/app_colors.dart';
 import '../../../theme/app_text_styles.dart';
 import '../../../services/notification_service.dart';
 import '../../widgets/snack_bar_helper.dart';
+import '../../../../utils/error_parser.dart';
 
 class NotificationsSettingsPage extends StatefulWidget {
   @override
@@ -20,9 +21,18 @@ class _NotificationsSettingsPageState extends State<NotificationsSettingsPage> w
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    
     // Load check-in reminders when the page is opened
     final provider = Provider.of<CheckInController>(context, listen: false);
-    provider.loadCheckInReminders();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      try {
+        await provider.loadCheckInReminders();
+      } catch (e) {
+        if (mounted) {
+          showSnackBar(context, ErrorParser.getFriendlyMessage(e));
+        }
+      }
+    });
     
     // Request permission on page entry
     NotificationService().requestPermissions().then((_) {
@@ -60,18 +70,36 @@ class _NotificationsSettingsPageState extends State<NotificationsSettingsPage> w
       isEnabled: true,
     );
 
-    await provider.addCheckInReminder(newReminder);
+    try {
+      await provider.addCheckInReminder(newReminder);
+    } catch (e) {
+      if (context.mounted) {
+        showSnackBar(context, ErrorParser.getFriendlyMessage(e));
+      }
+    }
   }
 
   Future<void> _deleteCheckInReminder(BuildContext context, int index) async {
     final provider = Provider.of<CheckInController>(context, listen: false);
-    await provider.deleteCheckInReminder(index);
+    try {
+      await provider.deleteCheckInReminder(index);
+    } catch (e) {
+      if (context.mounted) {
+        showSnackBar(context, ErrorParser.getFriendlyMessage(e));
+      }
+    }
   }
 
   Future<void> _toggleCheckInReminder(
       BuildContext context, int index, bool value) async {
     final provider = Provider.of<CheckInController>(context, listen: false);
-    await provider.updateCheckInReminder(index, isEnabled: value);
+    try {
+      await provider.updateCheckInReminder(index, isEnabled: value);
+    } catch (e) {
+      if (context.mounted) {
+        showSnackBar(context, ErrorParser.getFriendlyMessage(e));
+      }
+    }
   }
 
   Future<void> _pickTime(BuildContext context, int index) async {
@@ -92,7 +120,13 @@ class _NotificationsSettingsPageState extends State<NotificationsSettingsPage> w
         selectedTime.minute,
       );
 
-      await provider.updateCheckInReminder(index, timestamp: updatedTimestamp);
+      try {
+        await provider.updateCheckInReminder(index, timestamp: updatedTimestamp);
+      } catch (e) {
+        if (context.mounted) {
+          showSnackBar(context, ErrorParser.getFriendlyMessage(e));
+        }
+      }
     }
   }
 

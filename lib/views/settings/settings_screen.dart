@@ -3,6 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import '../../utils/error_parser.dart';
+import '../../utils/network_helper.dart';
 import '../../main.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_text_styles.dart';
@@ -290,50 +292,72 @@ Future<void> deleteUserAccount(BuildContext pageContext) async {
   );
 
   try {
+    if (!await NetworkHelper.isConnected()) {
+      if (pageContext.mounted) {
+        Navigator.of(pageContext).pop(); // Dismiss spinner
+        showSnackBar(pageContext, 'No internet connection. Account deletion requires an active network.');
+      }
+      return;
+    }
+
     User? user = FirebaseAuth.instance.currentUser;
 
     if (user == null) {
-      Navigator.of(pageContext).pop(); // Dismiss spinner
-      showSnackBar(pageContext, 'No user is signed in.');
+      if (pageContext.mounted) {
+        Navigator.of(pageContext).pop(); // Dismiss spinner
+        showSnackBar(pageContext, 'No user is signed in.');
+      }
       return;
     }
 
     String userId = user.uid;
 
-    // Step 1: Delete Firestore documents in a batch
-    final batch = FirebaseFirestore.instance.batch();
-
-    // Delete user profile document
-    batch.delete(FirebaseFirestore.instance.collection('users').doc(userId));
-
-    // Fetch and delete all user mood entries
+    // Fetch and delete all user mood entries in chunked batches (max 500 per batch)
     QuerySnapshot moodEntries = await FirebaseFirestore.instance
         .collection('mood_entries')
         .where('userId', isEqualTo: userId)
         .get();
 
+    var batch = FirebaseFirestore.instance.batch();
+    int count = 0;
+
+    batch.delete(FirebaseFirestore.instance.collection('users').doc(userId));
+    count++;
+
     for (var doc in moodEntries.docs) {
       batch.delete(doc.reference);
+      count++;
+      if (count == 500) {
+        await batch.commit();
+        batch = FirebaseFirestore.instance.batch();
+        count = 0;
+      }
     }
-
-    await batch.commit();
+    if (count > 0) {
+      await batch.commit();
+    }
 
     // Step 2: Delete the user account from Firebase Authentication
     await user.delete();
     print('User account and associated data successfully deleted.');
 
-    Navigator.of(pageContext).pop(); // Dismiss spinner
-    showSnackBar(pageContext, 'Account deleted successfully.');
+    if (pageContext.mounted) {
+      Navigator.of(pageContext).pop(); // Dismiss spinner
+      showSnackBar(pageContext, 'Account deleted successfully.');
+    }
 
     await FirebaseAuth.instance.signOut();
+    await GoogleSignIn().signOut(); // Clean up Google credentials
 
     navigatorKey.currentState?.pushReplacement(
       MaterialPageRoute(builder: (context) => SignInScreen()),
     );
 
   } catch (e) {
-    Navigator.of(pageContext).pop(); // Dismiss spinner
-    showSnackBar(pageContext, 'Error deleting account: $e');
+    if (pageContext.mounted) {
+      Navigator.of(pageContext).pop(); // Dismiss spinner
+      showSnackBar(pageContext, ErrorParser.getFriendlyMessage(e));
+    }
     print('Error while deleting user account: $e');
   }
 }
@@ -397,6 +421,13 @@ void _confirmDeleteAccount(BuildContext pageContext) {
             onPressed: () async {
               Navigator.of(dialogContext).pop(); // Close the dialog
 
+              if (!await NetworkHelper.isConnected()) {
+                if (pageContext.mounted) {
+                  showSnackBar(pageContext, 'No internet connection. Account deletion requires an active network.');
+                }
+                return;
+              }
+
               if (currentUser != null) {
                 try {
                   if (isGoogleUser) {
@@ -410,9 +441,13 @@ void _confirmDeleteAccount(BuildContext pageContext) {
                         idToken: googleAuth.idToken,
                       );
                       await currentUser.reauthenticateWithCredential(credential);
-                      await deleteUserAccount(pageContext);
+                      if (pageContext.mounted) {
+                        await deleteUserAccount(pageContext);
+                      }
                     } else {
-                      showSnackBar(pageContext, 'Google re-authentication canceled.');
+                      if (pageContext.mounted) {
+                        showSnackBar(pageContext, 'Google re-authentication canceled.');
+                      }
                     }
                   } else {
                     final String password = passwordController.text.trim();
@@ -424,13 +459,19 @@ void _confirmDeleteAccount(BuildContext pageContext) {
                           password: password,
                         ),
                       );
-                      await deleteUserAccount(pageContext);
+                      if (pageContext.mounted) {
+                        await deleteUserAccount(pageContext);
+                      }
                     } else {
-                      showSnackBar(pageContext, 'Please enter your password to proceed.');
+                      if (pageContext.mounted) {
+                        showSnackBar(pageContext, 'Please enter your password to proceed.');
+                      }
                     }
                   }
                 } catch (e) {
-                  showSnackBar(pageContext, 'Error deleting account: $e');
+                  if (pageContext.mounted) {
+                    showSnackBar(pageContext, ErrorParser.getFriendlyMessage(e));
+                  }
                 }
               }
             },

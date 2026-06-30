@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../../models/database/user_database.dart';
@@ -5,6 +6,8 @@ import '../../theme/app_colors.dart';
 import '../widgets/snack_bar_helper.dart';
 import '../home/home_screen.dart';
 import '../widgets/responsive_extension.dart';
+import '../../utils/error_parser.dart';
+import '../../utils/network_helper.dart';
 
 // Import your custom User model with an alias
 import '../../models/user.dart' as AppUser;
@@ -31,15 +34,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
       setState(() {
         _isLoading = true;
       });
+      User? user;
       try {
+        if (!await NetworkHelper.isConnected()) {
+          throw const SocketException('No internet connection');
+        }
         // Create user with email and password
         UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: _emailController.text.trim(),
           password: _passwordController.text.trim(),
         );
 
-        // After registration, save the user's name, email, and creation time to Firestore
-        User? user = userCredential.user;
+        user = userCredential.user;
         if (user != null) {
           // Create or update the user document in Firestore
           AppUser.User newUser = AppUser.User(
@@ -49,29 +55,30 @@ class _SignUpScreenState extends State<SignUpScreen> {
             createdAt: DateTime.now(),
           );
 
-          // Use UserDatabase to save the user to Firestore
-          await UserDatabase.saveUserToFirestore(newUser);
+          try {
+            // Use UserDatabase to save the user to Firestore
+            await UserDatabase.saveUserToFirestore(newUser);
+          } catch (dbError) {
+            // Clean up the created auth user if profile creation fails (atomic registration)
+            await user.delete();
+            throw Exception('Profile creation failed. Please try again. ($dbError)');
+          }
 
-          // Show success message
-          showSnackBar(context, 'Sign-up successful!', AppColors.primary);
-
-          // Navigate to home screen
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => HomeScreen()),
-          );
+          if (mounted) {
+            // Navigate to home screen
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => HomeScreen()),
+            );
+          }
         }
-      } on FirebaseAuthException catch (e) {
-        // Handle errors during registration
-        showSnackBar(context, e.message ?? 'Sign-up failed', AppColors.primary);
-        setState(() {
-          _isLoading = false;
-        });
       } catch (e) {
-        showSnackBar(context, 'Sign-up failed: $e', AppColors.primary);
-        setState(() {
-          _isLoading = false;
-        });
+        if (mounted) {
+          showSnackBar(context, ErrorParser.getFriendlyMessage(e), AppColors.primary);
+          setState(() {
+            _isLoading = false;
+          });
+        }
       }
     }
   }

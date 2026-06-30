@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../../theme/app_colors.dart';
 import '../../../theme/app_text_styles.dart';
+import '../../../../utils/error_parser.dart';
 
 class EmotionTriggersInsight extends StatefulWidget {
   @override
@@ -13,6 +14,7 @@ class _EmotionTriggersInsightState extends State<EmotionTriggersInsight> {
   Map<String, Map<String, int>> emotionReasonCorrelation = {};
   String selectedRange = "Today"; // Default selection
   bool _isLoading = true;
+  String? _errorMessage;
 
   @override
   void initState() {
@@ -24,6 +26,7 @@ class _EmotionTriggersInsightState extends State<EmotionTriggersInsight> {
   Future<void> _fetchEmotionTriggersData(String range) async {
     setState(() {
       _isLoading = true;
+      _errorMessage = null;
     });
 
     final userId = FirebaseAuth.instance.currentUser?.uid;
@@ -50,8 +53,14 @@ class _EmotionTriggersInsightState extends State<EmotionTriggersInsight> {
       Map<String, Map<String, int>> emotionReasonMap = {};
 
       for (var entry in snapshot.docs) {
-        final emotions = List<String>.from(entry['emotions'] ?? []);
-        final reasons = List<String>.from(entry['reasons'] ?? []);
+        final data = entry.data() as Map<String, dynamic>?;
+        if (data == null) continue;
+
+        final rawEmotions = data['emotions'];
+        final rawReasons = data['reasons'];
+
+        final emotions = rawEmotions is List ? List<String>.from(rawEmotions) : <String>[];
+        final reasons = rawReasons is List ? List<String>.from(rawReasons) : <String>[];
 
         for (var emotion in emotions) {
           for (var reason in reasons) {
@@ -66,15 +75,21 @@ class _EmotionTriggersInsightState extends State<EmotionTriggersInsight> {
         }
       }
 
-      setState(() {
-        emotionReasonCorrelation = emotionReasonMap;
-        selectedRange = range;
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          emotionReasonCorrelation = emotionReasonMap;
+          selectedRange = range;
+          _isLoading = false;
+          _errorMessage = null;
+        });
+      }
     } catch (e) {
-      setState(() {
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _errorMessage = ErrorParser.getFriendlyMessage(e);
+          _isLoading = false;
+        });
+      }
     }
   }
 
@@ -124,6 +139,31 @@ class _EmotionTriggersInsightState extends State<EmotionTriggersInsight> {
                 padding: EdgeInsets.all(16.0),
                 child: CircularProgressIndicator(),
               ))
+            else if (_errorMessage != null)
+              Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        _errorMessage!,
+                        textAlign: TextAlign.center,
+                        style: AppTextStyles.body.copyWith(color: AppColors.error),
+                      ),
+                      const SizedBox(height: 12),
+                      ElevatedButton(
+                        onPressed: () => _fetchEmotionTriggersData(selectedRange),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        ),
+                        child: Text("Retry", style: AppTextStyles.button.copyWith(color: Colors.white)),
+                      ),
+                    ],
+                  ),
+                ),
+              )
             else if (emotionReasonCorrelation.isEmpty)
               Padding(
                 padding: const EdgeInsets.all(20.0),

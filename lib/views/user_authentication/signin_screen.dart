@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebasebackend/views/user_authentication/signup_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'dart:io';
 import '../../models/database/user_database.dart';
 import '../../models/user.dart' as AppUser;
 import '../../theme/app_colors.dart';
@@ -9,6 +10,8 @@ import '../widgets/snack_bar_helper.dart';
 import 'forgot_password_screen.dart';
 import '../home/home_screen.dart';
 import '../widgets/responsive_extension.dart';
+import '../../utils/error_parser.dart';
+import '../../utils/network_helper.dart';
 
 class SignInScreen extends StatefulWidget {
   @override
@@ -30,27 +33,27 @@ class _SignInScreenState extends State<SignInScreen> {
         isloading = true;
       });
       try {
+        if (!await NetworkHelper.isConnected()) {
+          throw const SocketException('No internet connection');
+        }
         await FirebaseAuth.instance.signInWithEmailAndPassword(
           email: _emailController.text.trim(),
           password: _passwordController.text.trim(),
         );
 
-        showSnackBar(context, 'Sign-in successful!', AppColors.primary);
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => HomeScreen()),
-        );
-
-      } on FirebaseAuthException catch (e) {
-        showSnackBar(context, e.message ?? 'Sign-in failed', AppColors.primary);
-        setState(() {
-          isloading = false;
-        });
+        if (mounted) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => HomeScreen()),
+          );
+        }
       } catch (e) {
-        showSnackBar(context, 'Sign-in failed: $e', AppColors.primary);
-        setState(() {
-          isloading = false;
-        });
+        if (mounted) {
+          showSnackBar(context, ErrorParser.getFriendlyMessage(e), AppColors.primary);
+          setState(() {
+            isloading = false;
+          });
+        }
       }
     }
   }
@@ -60,11 +63,16 @@ class _SignInScreenState extends State<SignInScreen> {
       isloading = true;
     });
     try {
+      if (!await NetworkHelper.isConnected()) {
+        throw const SocketException('No internet connection');
+      }
       final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
       if (googleUser == null) {
-        setState(() {
-          isloading = false;
-        });
+        if (mounted) {
+          setState(() {
+            isloading = false;
+          });
+        }
         return; // User cancelled
       }
 
@@ -92,13 +100,16 @@ class _SignInScreenState extends State<SignInScreen> {
         }
       }
 
-      showSnackBar(context, 'Sign-in successful!', AppColors.primary);
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => HomeScreen()),
-      );
+      if (mounted) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => HomeScreen()),
+        );
+      }
     } catch (e) {
-      showSnackBar(context, 'Google Sign-In failed: $e', AppColors.primary);
+      if (mounted) {
+        showSnackBar(context, ErrorParser.getFriendlyMessage(e), AppColors.primary);
+      }
     } finally {
       if (mounted) {
         setState(() {

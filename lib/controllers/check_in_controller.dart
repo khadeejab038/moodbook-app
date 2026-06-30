@@ -30,6 +30,7 @@ class CheckInController extends ChangeNotifier {
       await NotificationService().rescheduleAllLocalNotifications(_checkInReminders);
     } catch (e) {
       print('Failed to load check-in reminders: $e');
+      rethrow;
     }
   }
 
@@ -57,6 +58,7 @@ class CheckInController extends ChangeNotifier {
       
       // Sync local scheduled notifications
       await NotificationService().rescheduleAllLocalNotifications(_checkInReminders);
+      rethrow;
     }
   }
 
@@ -87,6 +89,7 @@ class CheckInController extends ChangeNotifier {
       
       // Sync local scheduled notifications
       await NotificationService().rescheduleAllLocalNotifications(_checkInReminders);
+      rethrow;
     }
   }
 
@@ -129,6 +132,7 @@ class CheckInController extends ChangeNotifier {
       
       // Sync local scheduled notifications
       await NotificationService().rescheduleAllLocalNotifications(_checkInReminders);
+      rethrow;
     }
   }
 
