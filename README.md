@@ -1,4 +1,4 @@
-# MoodBook 📖
+# MoodBook 
 
 **MoodBook** is a modern, intuitive, and feature-rich mood-tracking mobile application built with Flutter. It is designed to help users build self-awareness and track their mental wellness over time through quick daily check-ins, timezone-aware native notifications, interactive stats analytics, and robust offline support.
 
