@@ -1,9 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../widgets/snack_bar_helper.dart';
 import 'package:flutter/material.dart';
+import 'dart:io';
 import '../../../views/widgets/responsive_extension.dart';
 import '../../../theme/app_colors.dart';
 import '../../../theme/app_text_styles.dart';
+import '../../../utils/error_parser.dart';
+import '../../../utils/network_helper.dart';
 
 class ChangePasswordScreen extends StatefulWidget {
   @override
@@ -19,11 +22,20 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   Future<void> _changePassword() async {
     if (_formKey.currentState!.validate()) {
       try {
+        if (!await NetworkHelper.isConnected()) {
+          throw const SocketException('No internet connection');
+        }
         User? user = FirebaseAuth.instance.currentUser;
+        if (user == null || user.email == null) {
+          if (mounted) {
+            showSnackBar(context, 'No authenticated user session found.', AppColors.primary);
+          }
+          return;
+        }
 
         // Re-authenticate the user
         AuthCredential credential = EmailAuthProvider.credential(
-          email: user!.email!,
+          email: user.email!,
           password: _currentPasswordController.text.trim(),
         );
 
@@ -32,12 +44,14 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
         // Update the password
         await user.updatePassword(_newPasswordController.text.trim());
 
-        showSnackBar(context, 'Password changed successfully!', AppColors.primary);
-
-        // Navigate back after successful password change
-        Navigator.pop(context);
-      } on FirebaseAuthException catch (e) {
-        showSnackBar(context, e.message ?? 'Password change failed', AppColors.primary);
+        if (mounted) {
+          showSnackBar(context, 'Password changed successfully!', AppColors.primary);
+          Navigator.pop(context);
+        }
+      } catch (e) {
+        if (mounted) {
+          showSnackBar(context, ErrorParser.getFriendlyMessage(e), AppColors.primary);
+        }
       }
     }
   }

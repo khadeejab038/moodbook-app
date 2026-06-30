@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../home/home_screen.dart';
 import '../widgets/responsive_extension.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_text_styles.dart';
@@ -95,10 +94,9 @@ class AddMoodPopup extends StatelessWidget {
                 minimumSize: Size(context.w(50), context.h(6)),
               ),
               onPressed: () {
-                Navigator.pushAndRemoveUntil(
+                Navigator.popUntil(
                   context,
-                  MaterialPageRoute(builder: (context) => HomeScreen()),
-                      (route) => false,
+                  (route) => route.isFirst,
                 );
               },
               child: Text(

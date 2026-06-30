@@ -5,7 +5,6 @@ import '../../models/emoji_data.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_text_styles.dart';
 import '../widgets/date_time_picker.dart';
-import '../home/home_screen.dart';
 import 'add_mood_screen2_emotions.dart';
 import '../widgets/responsive_extension.dart';
 
@@ -67,11 +66,7 @@ class _AddMoodState extends State<AddMood> {
                       icon: Icon(Icons.close, color: textColor),
                       onPressed: () {
                         moodEntryProvider.clear();
-                        Navigator.pushAndRemoveUntil(
-                          context,
-                          MaterialPageRoute(builder: (context) => HomeScreen()),
-                          (route) => false,
-                        );
+                        Navigator.popUntil(context, (route) => route.isFirst);
                       },
                     ),
                   ],
@@ -130,41 +125,43 @@ class _AddMoodState extends State<AddMood> {
                         style: AppTextStyles.subtitle.copyWith(color: subtitleColor, fontSize: context.w(3.75)),
                       ),
                       SizedBox(height: context.h(4)),
-                      // Horizontal Mood List
-                      SizedBox(
-                        height: context.h(15),
-                        child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: moods.length,
-                          itemBuilder: (context, index) {
-                            final isSelected = selectedEmojiIndex == index;
-                            return GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  selectedEmojiIndex = index;
-                                });
-                              },
-                              child: AnimatedContainer(
-                                duration: const Duration(milliseconds: 300),
-                                margin: EdgeInsets.symmetric(horizontal: context.w(2)),
-                                width: isSelected ? context.w(20) : context.w(15),
-                                height: isSelected ? context.w(20) : context.w(15),
-                                alignment: Alignment.center,
-                                decoration: BoxDecoration(
-                                  color: isDark ? AppColors.cardDark : Colors.white,
-                                  shape: BoxShape.circle,
-                                  boxShadow: isSelected
-                                      ? [BoxShadow(color: Colors.black26, blurRadius: 10, offset: const Offset(0, 4))]
-                                      : [],
-                                ),
-                                child: Image.asset(
-                                  moods[index].imagePath,
-                                  width: isSelected ? context.w(10) : context.w(7.5),
-                                  height: isSelected ? context.w(10) : context.w(7.5),
-                                ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: List.generate(moods.length, (index) {
+                          final isSelected = selectedEmojiIndex == index;
+                          return GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                selectedEmojiIndex = index;
+                              });
+                            },
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 300),
+                              width: isSelected ? context.w(17) : context.w(13),
+                              height: isSelected ? context.w(17) : context.w(13),
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                color: isDark ? AppColors.cardDark : Colors.white,
+                                shape: BoxShape.circle,
+                                boxShadow: isSelected
+                                    ? [BoxShadow(color: Colors.black26, blurRadius: 10, offset: const Offset(0, 4))]
+                                    : [],
                               ),
-                            );
-                          },
+                              child: Image.asset(
+                                moods[index].imagePath,
+                                width: isSelected ? context.w(9) : context.w(6.5),
+                                height: isSelected ? context.w(9) : context.w(6.5),
+                              ),
+                            ),
+                          );
+                        }),
+                      ),
+                      SizedBox(height: context.h(1.5)),
+                      Text(
+                        moods[selectedEmojiIndex].title,
+                        style: AppTextStyles.bodyBold.copyWith(
+                          color: textColor,
+                          fontSize: context.w(4.5),
                         ),
                       ),
                       SizedBox(height: context.h(4)),

@@ -28,8 +28,9 @@ class UserDatabase {
     try {
       DocumentSnapshot userDoc = await _db.collection('users').doc(userID).get();
 
-      if (userDoc.exists) {
-        return User.fromFirestore(userDoc.data() as Map<String, dynamic>);
+      final data = userDoc.data() as Map<String, dynamic>?;
+      if (userDoc.exists && data != null) {
+        return User.fromFirestore(data);
       } else {
         print("User not found");
         return null;
@@ -85,10 +86,16 @@ class UserDatabase {
       DocumentSnapshot userDoc = await _db.collection('users').doc(userID).get();
 
       if (userDoc.exists) {
-        final data = userDoc.data() as Map<String, dynamic>;
-        if (data['checkInReminders'] != null) {
+        final data = userDoc.data() as Map<String, dynamic>?;
+        if (data != null && data['checkInReminders'] is List) {
           return (data['checkInReminders'] as List)
-              .map((item) => CheckInReminder.fromMap(item))
+              .map((item) {
+                if (item is Map) {
+                  return CheckInReminder.fromMap(Map<String, dynamic>.from(item));
+                }
+                return null;
+              })
+              .whereType<CheckInReminder>()
               .toList();
         }
       }

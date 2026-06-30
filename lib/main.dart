@@ -8,12 +8,14 @@ import 'views/home/home_screen.dart';
 import 'views/user_authentication/signin_screen.dart';
 import 'theme/app_theme.dart';
 import 'theme/theme_provider.dart';
+import 'services/notification_service.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  await NotificationService().init();
   runApp(MyApp());
 }
 
@@ -23,8 +25,8 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
-        ChangeNotifierProvider(create: (_) => MoodEntryController(userID: '')),
-        ChangeNotifierProvider(create: (_) => CheckInController(userID: '')),
+        ChangeNotifierProvider(create: (_) => MoodEntryController()),
+        ChangeNotifierProvider(create: (_) => CheckInController()),
       ],
       child: Consumer<ThemeProvider>(
         builder: (context, themeProvider, _) {
@@ -56,14 +58,7 @@ class AuthWrapper extends StatelessWidget {
         }
 
         if (snapshot.hasData) {
-          final userID = snapshot.data!.uid;
-          return MultiProvider(
-            providers: [
-              ChangeNotifierProvider(create: (_) => MoodEntryController(userID: userID)),
-              ChangeNotifierProvider(create: (_) => CheckInController(userID: userID)),
-            ],
-            child: HomeScreen(),
-          );
+          return HomeScreen();
         }
 
         return SignInScreen();

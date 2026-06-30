@@ -4,6 +4,9 @@ import '../../../models/user.dart';
 import '../../../controllers/check_in_controller.dart';
 import '../../../theme/app_colors.dart';
 import '../../../theme/app_text_styles.dart';
+import '../../../services/notification_service.dart';
+import '../../widgets/snack_bar_helper.dart';
+import '../../../../utils/error_parser.dart';
 
 class NotificationsSettingsPage extends StatefulWidget {
   @override
@@ -11,13 +14,52 @@ class NotificationsSettingsPage extends StatefulWidget {
       _NotificationsSettingsPageState();
 }
 
-class _NotificationsSettingsPageState extends State<NotificationsSettingsPage> {
+class _NotificationsSettingsPageState extends State<NotificationsSettingsPage> with WidgetsBindingObserver {
+  bool _exactAlarmsAllowed = true;
+
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    
     // Load check-in reminders when the page is opened
     final provider = Provider.of<CheckInController>(context, listen: false);
-    provider.loadCheckInReminders();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      try {
+        await provider.loadCheckInReminders();
+      } catch (e) {
+        if (mounted) {
+          showSnackBar(context, ErrorParser.getFriendlyMessage(e));
+        }
+      }
+    });
+    
+    // Request permission on page entry
+    NotificationService().requestPermissions().then((_) {
+      _checkExactAlarmsStatus();
+    });
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _checkExactAlarmsStatus();
+    }
+  }
+
+  Future<void> _checkExactAlarmsStatus() async {
+    final allowed = await NotificationService().canScheduleExactAlarms();
+    if (mounted) {
+      setState(() {
+        _exactAlarmsAllowed = allowed;
+      });
+    }
   }
 
   Future<void> _addCheckInReminder(BuildContext context) async {
@@ -28,18 +70,36 @@ class _NotificationsSettingsPageState extends State<NotificationsSettingsPage> {
       isEnabled: true,
     );
 
-    await provider.addCheckInReminder(newReminder);
+    try {
+      await provider.addCheckInReminder(newReminder);
+    } catch (e) {
+      if (context.mounted) {
+        showSnackBar(context, ErrorParser.getFriendlyMessage(e));
+      }
+    }
   }
 
   Future<void> _deleteCheckInReminder(BuildContext context, int index) async {
     final provider = Provider.of<CheckInController>(context, listen: false);
-    await provider.deleteCheckInReminder(index);
+    try {
+      await provider.deleteCheckInReminder(index);
+    } catch (e) {
+      if (context.mounted) {
+        showSnackBar(context, ErrorParser.getFriendlyMessage(e));
+      }
+    }
   }
 
   Future<void> _toggleCheckInReminder(
       BuildContext context, int index, bool value) async {
     final provider = Provider.of<CheckInController>(context, listen: false);
-    await provider.updateCheckInReminder(index, isEnabled: value);
+    try {
+      await provider.updateCheckInReminder(index, isEnabled: value);
+    } catch (e) {
+      if (context.mounted) {
+        showSnackBar(context, ErrorParser.getFriendlyMessage(e));
+      }
+    }
   }
 
   Future<void> _pickTime(BuildContext context, int index) async {
@@ -60,7 +120,13 @@ class _NotificationsSettingsPageState extends State<NotificationsSettingsPage> {
         selectedTime.minute,
       );
 
-      await provider.updateCheckInReminder(index, timestamp: updatedTimestamp);
+      try {
+        await provider.updateCheckInReminder(index, timestamp: updatedTimestamp);
+      } catch (e) {
+        if (context.mounted) {
+          showSnackBar(context, ErrorParser.getFriendlyMessage(e));
+        }
+      }
     }
   }
 
@@ -102,6 +168,45 @@ class _NotificationsSettingsPageState extends State<NotificationsSettingsPage> {
                 ),
               ),
               const SizedBox(height: 16),
+              if (!_exactAlarmsAllowed) ...[
+                Card(
+                  color: isDark 
+                      ? const Color(0xFF3A1F22) 
+                      : AppColors.error.withOpacity(0.1),
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    side: BorderSide(
+                      color: isDark 
+                          ? const Color(0xFF8C2626) 
+                          : AppColors.error.withOpacity(0.3),
+                      width: 1.5,
+                    ),
+                  ),
+                  child: ListTile(
+                    leading: Icon(
+                      Icons.warning_amber_rounded, 
+                      color: isDark ? const Color(0xFFFF8A8A) : AppColors.error,
+                    ),
+                    title: Text(
+                      'Reminders may be delayed',
+                      style: AppTextStyles.bodySemiBold.copyWith(
+                        color: isDark ? const Color(0xFFFF8A8A) : AppColors.error,
+                      ),
+                    ),
+                    subtitle: Text(
+                      'Tap here to optimize settings and ensure you get your check-in reminders on time.',
+                      style: AppTextStyles.caption.copyWith(
+                        color: isDark ? Colors.white70 : Colors.black87,
+                      ),
+                    ),
+                    onTap: () async {
+                      await NotificationService().requestExactAlarmsPermission();
+                    },
+                  ),
+                ),
+                const SizedBox(height: 16),
+              ],
               ListView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
@@ -153,6 +258,7 @@ class _NotificationsSettingsPageState extends State<NotificationsSettingsPage> {
                 ),
                 onPressed: () => _addCheckInReminder(context),
               ),
+
             ],
           );
         },

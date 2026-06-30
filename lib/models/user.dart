@@ -20,13 +20,37 @@ class User {
 
   // Convert Firestore document to UserModel
   factory User.fromFirestore(Map<String, dynamic> doc) {
+    final rawCreatedAt = doc['createdAt'];
+    DateTime parsedCreatedAt;
+    if (rawCreatedAt is Timestamp) {
+      parsedCreatedAt = rawCreatedAt.toDate();
+    } else if (rawCreatedAt is String) {
+      parsedCreatedAt = DateTime.tryParse(rawCreatedAt) ?? DateTime.now();
+    } else {
+      parsedCreatedAt = DateTime.now();
+    }
+
+    final rawReminders = doc['checkInReminders'];
+    List<CheckInReminder>? parsedReminders;
+    if (rawReminders is List) {
+      parsedReminders = rawReminders
+          .map((item) {
+            if (item is Map) {
+              return CheckInReminder.fromMap(Map<String, dynamic>.from(item));
+            }
+            return null;
+          })
+          .whereType<CheckInReminder>()
+          .toList();
+    }
+
     return User(
-      userID: doc['userID'] ?? '',
-      email: doc['email'] ?? '',
-      name: doc['name'] ?? '',
-      createdAt: (doc['createdAt'] as Timestamp).toDate(),
-      avatar: doc['avatar'],
-      checkInReminders: (doc['checkInReminders'] as List?)?.map((item) => CheckInReminder.fromMap(item)).toList(),
+      userID: doc['userID'] as String? ?? '',
+      email: doc['email'] as String? ?? '',
+      name: doc['name'] as String? ?? '',
+      createdAt: parsedCreatedAt,
+      avatar: doc['avatar'] as String?,
+      checkInReminders: parsedReminders,
     );
   }
 
@@ -55,9 +79,19 @@ class CheckInReminder {
 
   // Convert CheckInReminder map to CheckInReminder object
   factory CheckInReminder.fromMap(Map<String, dynamic> map) {
+    final rawTimestamp = map['timestamp'];
+    DateTime parsedTimestamp;
+    if (rawTimestamp is Timestamp) {
+      parsedTimestamp = rawTimestamp.toDate();
+    } else if (rawTimestamp is String) {
+      parsedTimestamp = DateTime.tryParse(rawTimestamp) ?? DateTime.now();
+    } else {
+      parsedTimestamp = DateTime.now();
+    }
+
     return CheckInReminder(
-      timestamp: (map['timestamp'] as Timestamp).toDate(),
-      isEnabled: map['isEnabled'] ?? false,
+      timestamp: parsedTimestamp,
+      isEnabled: map['isEnabled'] as bool? ?? false,
     );
   }
 

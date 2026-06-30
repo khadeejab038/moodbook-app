@@ -2,6 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import '../../utils/error_parser.dart';
+import '../../utils/network_helper.dart';
 import '../../main.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_text_styles.dart';
@@ -114,7 +117,7 @@ class SettingsPage extends StatelessWidget {
                   _buildSwitchTile(
                     textColor: textColor,
                     title: 'Dark Mode',
-                    value: themeProvider.themeMode == ThemeMode.dark,
+                    value: Theme.of(context).brightness == Brightness.dark,
                     onChanged: (value) => themeProvider.setDark(value),
                   ),
                   _buildSettingsTile(
@@ -277,108 +280,199 @@ class SettingsPage extends StatelessWidget {
   }
 }
 
-Future<void> deleteUserAccount() async {
+Future<void> deleteUserAccount(BuildContext pageContext) async {
+  // Show loading spinner
+  showDialog(
+    context: pageContext,
+    barrierDismissible: false,
+    builder: (spinnerContext) => const Scaffold(
+      backgroundColor: Colors.transparent,
+      body: Center(child: CircularProgressIndicator()),
+    ),
+  );
+
   try {
+    if (!await NetworkHelper.isConnected()) {
+      if (pageContext.mounted) {
+        Navigator.of(pageContext).pop(); // Dismiss spinner
+        showSnackBar(pageContext, 'No internet connection. Account deletion requires an active network.');
+      }
+      return;
+    }
+
     User? user = FirebaseAuth.instance.currentUser;
 
     if (user == null) {
-      print('No user is signed in.');
+      if (pageContext.mounted) {
+        Navigator.of(pageContext).pop(); // Dismiss spinner
+        showSnackBar(pageContext, 'No user is signed in.');
+      }
       return;
     }
 
     String userId = user.uid;
 
-    // Step 1: Delete Firestore documents associated with the user
-    await FirebaseFirestore.instance.collection('users').doc(userId).delete();
-
+    // Fetch and delete all user mood entries in chunked batches (max 500 per batch)
     QuerySnapshot moodEntries = await FirebaseFirestore.instance
         .collection('mood_entries')
         .where('userId', isEqualTo: userId)
         .get();
 
+    var batch = FirebaseFirestore.instance.batch();
+    int count = 0;
+
+    batch.delete(FirebaseFirestore.instance.collection('users').doc(userId));
+    count++;
+
     for (var doc in moodEntries.docs) {
-      await FirebaseFirestore.instance.collection('mood_entries').doc(doc.id).delete();
+      batch.delete(doc.reference);
+      count++;
+      if (count == 500) {
+        await batch.commit();
+        batch = FirebaseFirestore.instance.batch();
+        count = 0;
+      }
+    }
+    if (count > 0) {
+      await batch.commit();
     }
 
     // Step 2: Delete the user account from Firebase Authentication
     await user.delete();
     print('User account and associated data successfully deleted.');
 
+    if (pageContext.mounted) {
+      Navigator.of(pageContext).pop(); // Dismiss spinner
+      showSnackBar(pageContext, 'Account deleted successfully.');
+    }
+
     await FirebaseAuth.instance.signOut();
+    await GoogleSignIn().signOut(); // Clean up Google credentials
 
     navigatorKey.currentState?.pushReplacement(
       MaterialPageRoute(builder: (context) => SignInScreen()),
     );
 
   } catch (e) {
+    if (pageContext.mounted) {
+      Navigator.of(pageContext).pop(); // Dismiss spinner
+      showSnackBar(pageContext, ErrorParser.getFriendlyMessage(e));
+    }
     print('Error while deleting user account: $e');
   }
 }
 
 // Confirm Delete Account Dialog
-void _confirmDeleteAccount(BuildContext context) {
+void _confirmDeleteAccount(BuildContext pageContext) {
   final TextEditingController passwordController = TextEditingController();
-  final isDark = Theme.of(context).brightness == Brightness.dark;
+  final isDark = Theme.of(pageContext).brightness == Brightness.dark;
   final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
+  final currentUser = FirebaseAuth.instance.currentUser;
+  final isGoogleUser = currentUser != null &&
+      currentUser.providerData.any((u) => u.providerId == 'google.com');
 
   showDialog(
-    context: context,
-    builder: (BuildContext context) {
+    context: pageContext,
+    builder: (dialogContext) {
       return AlertDialog(
         backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
         title: Text('Delete Account', style: AppTextStyles.heading2.copyWith(color: textColor)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('Are you sure you want to delete your account? This action cannot be undone.',
                 style: AppTextStyles.body.copyWith(color: textColor)),
-            const SizedBox(height: 10),
-            TextField(
-              controller: passwordController,
-              obscureText: true,
-              style: AppTextStyles.body.copyWith(color: textColor),
-              decoration: InputDecoration(
-                labelText: 'Enter your password',
-                labelStyle: AppTextStyles.inputLabel.copyWith(color: isDark ? Colors.grey.shade400 : Colors.grey.shade700),
-                hintText: 'Password',
-                hintStyle: AppTextStyles.inputHint.copyWith(color: isDark ? Colors.grey.shade500 : Colors.grey.shade400),
-                filled: true,
-                fillColor: isDark ? AppColors.cardDark : Colors.grey.shade100,
-                border: const OutlineInputBorder(),
+            if (!isGoogleUser) ...[
+              const SizedBox(height: 15),
+              TextField(
+                controller: passwordController,
+                obscureText: true,
+                style: AppTextStyles.body.copyWith(color: textColor),
+                decoration: InputDecoration(
+                  labelText: 'Enter your password',
+                  labelStyle: AppTextStyles.inputLabel.copyWith(color: isDark ? Colors.grey.shade400 : Colors.grey.shade700),
+                  hintText: 'Password',
+                  hintStyle: AppTextStyles.inputHint.copyWith(color: isDark ? Colors.grey.shade500 : Colors.grey.shade400),
+                  filled: true,
+                  fillColor: isDark ? AppColors.cardDark : Colors.grey.shade100,
+                  border: const OutlineInputBorder(),
+                ),
               ),
-            ),
+            ] else ...[
+              const SizedBox(height: 15),
+              Text(
+                'To delete your account, we need to re-authenticate with your Google Account first.',
+                style: AppTextStyles.body.copyWith(
+                  color: isDark ? Colors.grey.shade400 : Colors.grey.shade700,
+                  fontSize: 14,
+                ),
+              ),
+            ],
           ],
         ),
         actions: [
           TextButton(
             child: Text('Cancel', style: AppTextStyles.link.copyWith(color: AppColors.primary)),
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: () => Navigator.of(dialogContext).pop(),
           ),
           TextButton(
-            child: Text('Delete', style: AppTextStyles.link.copyWith(color: AppColors.error)),
+            child: Text(isGoogleUser ? 'Re-authenticate' : 'Delete', style: AppTextStyles.link.copyWith(color: AppColors.error)),
             onPressed: () async {
-              Navigator.of(context).pop(); // Close the dialog
-              final String password = passwordController.text.trim();
+              Navigator.of(dialogContext).pop(); // Close the dialog
 
-              if (password.isNotEmpty) {
-                final currentUser = FirebaseAuth.instance.currentUser;
+              if (!await NetworkHelper.isConnected()) {
+                if (pageContext.mounted) {
+                  showSnackBar(pageContext, 'No internet connection. Account deletion requires an active network.');
+                }
+                return;
+              }
 
-                if (currentUser != null) {
-                  try {
-                    await currentUser.reauthenticateWithCredential(
-                      EmailAuthProvider.credential(
-                        email: currentUser.email!,
-                        password: password,
-                      ),
-                    );
-                    await deleteUserAccount();
-                    print("deleted user");
-                  } catch (e) {
-                    showSnackBar(context, 'Error deleting account: $e');
+              if (currentUser != null) {
+                try {
+                  if (isGoogleUser) {
+                    final GoogleSignIn googleSignIn = GoogleSignIn();
+                    final GoogleSignInAccount? googleUser = await googleSignIn.signInSilently() ?? await googleSignIn.signIn();
+                    final GoogleSignInAuthentication? googleAuth = await googleUser?.authentication;
+
+                    if (googleAuth != null) {
+                      final AuthCredential credential = GoogleAuthProvider.credential(
+                        accessToken: googleAuth.accessToken,
+                        idToken: googleAuth.idToken,
+                      );
+                      await currentUser.reauthenticateWithCredential(credential);
+                      if (pageContext.mounted) {
+                        await deleteUserAccount(pageContext);
+                      }
+                    } else {
+                      if (pageContext.mounted) {
+                        showSnackBar(pageContext, 'Google re-authentication canceled.');
+                      }
+                    }
+                  } else {
+                    final String password = passwordController.text.trim();
+
+                    if (password.isNotEmpty) {
+                      await currentUser.reauthenticateWithCredential(
+                        EmailAuthProvider.credential(
+                          email: currentUser.email!,
+                          password: password,
+                        ),
+                      );
+                      if (pageContext.mounted) {
+                        await deleteUserAccount(pageContext);
+                      }
+                    } else {
+                      if (pageContext.mounted) {
+                        showSnackBar(pageContext, 'Please enter your password to proceed.');
+                      }
+                    }
+                  }
+                } catch (e) {
+                  if (pageContext.mounted) {
+                    showSnackBar(pageContext, ErrorParser.getFriendlyMessage(e));
                   }
                 }
-              } else {
-                showSnackBar(context, 'Please enter your password to proceed.');
               }
             },
           ),

@@ -55,6 +55,19 @@ class MoodChart extends StatelessWidget {
             .limit(5)
             .snapshots(),
         builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Text(
+                  'Failed to load mood chart: ${snapshot.error}',
+                  textAlign: TextAlign.center,
+                  style: AppTextStyles.body.copyWith(color: AppColors.error),
+                ),
+              ),
+            );
+          }
+
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
           }
@@ -101,12 +114,15 @@ class MoodChart extends StatelessWidget {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: List.generate(reversedEntries.length, (index) {
-                            final mood = reversedEntries[index]['mood'] ?? 'Neutral';
-                            final timestamp = reversedEntries[index]['timestamp'];
-                            final time = TimeOfDay.fromDateTime(
-                              (timestamp as Timestamp).toDate(),
-                            ).format(context);
-                            final date = DateFormat('MMM dd').format(timestamp.toDate());
+                            final data = reversedEntries[index].data() as Map<String, dynamic>?;
+                            final mood = data?['mood'] as String? ?? 'Neutral';
+                            final rawTimestamp = data?['timestamp'];
+                            DateTime parsedTime = DateTime.now();
+                            if (rawTimestamp is Timestamp) {
+                              parsedTime = rawTimestamp.toDate();
+                            }
+                            final time = TimeOfDay.fromDateTime(parsedTime).format(context);
+                            final date = DateFormat('MMM dd').format(parsedTime);
 
                             return SizedBox(
                               width: slotWidth,

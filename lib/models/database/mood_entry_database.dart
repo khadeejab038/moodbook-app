@@ -77,9 +77,21 @@ class MoodEntryDatabase {
             .where('userId', isEqualTo: user.uid) // Filter by user ID
             .get();
 
-        // Delete each mood entry
-        for (var doc in snapshot.docs) {
-          await doc.reference.delete();
+        final docs = snapshot.docs;
+        var batch = _db.batch();
+        int count = 0;
+
+        for (var doc in docs) {
+          batch.delete(doc.reference);
+          count++;
+          if (count == 500) {
+            await batch.commit();
+            batch = _db.batch();
+            count = 0;
+          }
+        }
+        if (count > 0) {
+          await batch.commit();
         }
 
         print('All mood entries deleted successfully.');
@@ -102,7 +114,11 @@ class MoodEntryDatabase {
             .where('userId', isEqualTo: user.uid) // Filter by user ID
             .get();
         return snapshot.docs
-            .map((doc) => MoodEntry.fromMap(doc.data() as Map<String, dynamic>))
+            .map((doc) {
+              final data = doc.data() as Map<String, dynamic>?;
+              return data != null ? MoodEntry.fromMap(data) : null;
+            })
+            .whereType<MoodEntry>()
             .toList();
       } catch (e) {
         throw Exception('Failed to fetch mood entries: $e');

@@ -53,8 +53,22 @@ class _DailyAverageMoodState extends State<DailyAverageMood> {
           .orderBy('timestamp', descending: false)
           .snapshots(), // Listen for real-time updates
       builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Text(
+                'Failed to load daily average mood: ${snapshot.error}',
+                style: AppTextStyles.body.copyWith(color: textColor),
+              ),
+            ),
+          );
+        }
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
         if (!snapshot.hasData) {
-          return Center(child: CircularProgressIndicator());
+          return const Center(child: CircularProgressIndicator());
         }
 
         // Process mood entries
@@ -63,9 +77,17 @@ class _DailyAverageMoodState extends State<DailyAverageMood> {
 
         // Group by date and collect mood titles
         for (var entry in moodEntries) {
-          final timestamp = (entry['timestamp'] as Timestamp).toDate();
-          final date = DateFormat('yyyy-MM-dd').format(timestamp);
-          final mood = entry['mood'] as String;
+          final data = entry.data() as Map<String, dynamic>?;
+          if (data == null) continue;
+
+          final rawTimestamp = data['timestamp'];
+          DateTime parsedTime = DateTime.now();
+          if (rawTimestamp is Timestamp) {
+            parsedTime = rawTimestamp.toDate();
+          }
+
+          final date = DateFormat('yyyy-MM-dd').format(parsedTime);
+          final mood = data['mood'] as String? ?? 'Neutral';
           moodData.putIfAbsent(date, () => []).add(mood);
         }
 
