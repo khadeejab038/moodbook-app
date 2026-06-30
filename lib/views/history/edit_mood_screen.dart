@@ -9,6 +9,7 @@ import '../widgets/responsive_extension.dart';
 import '../widgets/snack_bar_helper.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_text_styles.dart';
+import '../../utils/error_parser.dart';
 
 class EditMoodScreen extends StatefulWidget {
   final DocumentSnapshot moodEntryDoc;
@@ -30,17 +31,27 @@ class _EditMoodScreenState extends State<EditMoodScreen> {
   @override
   void initState() {
     super.initState();
-    final moodEntry = widget.moodEntryDoc.data() as Map<String, dynamic>;
+    final moodEntry = widget.moodEntryDoc.data() as Map<String, dynamic>? ?? {};
 
-    // Initialize values
-    selectedDateTime = (moodEntry['timestamp'] as Timestamp).toDate();
-    selectedMood = moodEntry['mood'];
+    // Initialize values safely
+    final rawTimestamp = moodEntry['timestamp'];
+    if (rawTimestamp is Timestamp) {
+      selectedDateTime = rawTimestamp.toDate();
+    } else if (rawTimestamp is String) {
+      selectedDateTime = DateTime.tryParse(rawTimestamp) ?? DateTime.now();
+    } else {
+      selectedDateTime = DateTime.now();
+    }
+
+    selectedMood = moodEntry['mood'] as String? ?? 'Neutral';
     selectedEmojiIndex = getMoodIndex(selectedMood);
 
-    notesController = TextEditingController(text: moodEntry['notes'] ?? '');
+    notesController = TextEditingController(text: moodEntry['notes'] as String? ?? '');
     selectedEmotions = List<String>.from(moodEntry['emotions'] ?? []);
-    reasonsController = TextEditingController(
-        text: (moodEntry['reasons'] as List<dynamic>).join(', '));
+
+    final rawReasons = moodEntry['reasons'];
+    final reasonsList = rawReasons is List ? List<dynamic>.from(rawReasons) : [];
+    reasonsController = TextEditingController(text: reasonsList.join(', '));
   }
 
   // Helper function to get the mood index based on the current mood string
@@ -326,7 +337,7 @@ class _EditMoodScreenState extends State<EditMoodScreen> {
                         backgroundColor: AppColors.primary,
                         minimumSize: Size(context.w(35), context.h(6)),
                       ),
-                      onPressed: () {
+                      onPressed: () async {
                         if (selectedEmotions.isEmpty || reasonsController.text.isEmpty) {
                           showSnackBar(context, 'Please select at least one emotion and one reason');
                         } else {
@@ -340,11 +351,15 @@ class _EditMoodScreenState extends State<EditMoodScreen> {
                           );
 
                           try {
-                            MoodEntryDatabase.updateMoodEntry(
+                            await MoodEntryDatabase.updateMoodEntry(
                                 widget.moodEntryDoc.id, updatedMoodEntry);
-                            Navigator.of(context).pop();
+                            if (context.mounted) {
+                              Navigator.of(context).pop();
+                            }
                           } catch (e) {
-                            showSnackBar(context, 'Error updating entry: $e');
+                            if (context.mounted) {
+                              showSnackBar(context, ErrorParser.getFriendlyMessage(e));
+                            }
                           }
                         }
                       },

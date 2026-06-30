@@ -31,6 +31,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       setState(() {
         _isLoading = true;
       });
+      User? user;
       try {
         // Create user with email and password
         UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
@@ -38,8 +39,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           password: _passwordController.text.trim(),
         );
 
-        // After registration, save the user's name, email, and creation time to Firestore
-        User? user = userCredential.user;
+        user = userCredential.user;
         if (user != null) {
           // Create or update the user document in Firestore
           AppUser.User newUser = AppUser.User(
@@ -49,29 +49,57 @@ class _SignUpScreenState extends State<SignUpScreen> {
             createdAt: DateTime.now(),
           );
 
-          // Use UserDatabase to save the user to Firestore
-          await UserDatabase.saveUserToFirestore(newUser);
+          try {
+            // Use UserDatabase to save the user to Firestore
+            await UserDatabase.saveUserToFirestore(newUser);
+          } catch (dbError) {
+            // Clean up the created auth user if profile creation fails (atomic registration)
+            await user.delete();
+            throw Exception('Profile creation failed. Please try again. ($dbError)');
+          }
 
-          // Show success message
-          showSnackBar(context, 'Sign-up successful!', AppColors.primary);
-
-          // Navigate to home screen
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => HomeScreen()),
-          );
+          if (mounted) {
+            // Navigate to home screen
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => HomeScreen()),
+            );
+          }
         }
       } on FirebaseAuthException catch (e) {
-        // Handle errors during registration
-        showSnackBar(context, e.message ?? 'Sign-up failed', AppColors.primary);
-        setState(() {
-          _isLoading = false;
-        });
+        String message;
+        switch (e.code) {
+          case 'email-already-in-use':
+            message = 'This email is already in use.';
+            break;
+          case 'invalid-email':
+            message = 'The email address is invalid.';
+            break;
+          case 'operation-not-allowed':
+            message = 'Email/password accounts are not enabled.';
+            break;
+          case 'weak-password':
+            message = 'The password is too weak.';
+            break;
+          case 'network-request-failed':
+            message = 'Connection failed. Please check your internet connection.';
+            break;
+          default:
+            message = e.message ?? 'Sign-up failed.';
+        }
+        if (mounted) {
+          showSnackBar(context, message, AppColors.primary);
+          setState(() {
+            _isLoading = false;
+          });
+        }
       } catch (e) {
-        showSnackBar(context, 'Sign-up failed: $e', AppColors.primary);
-        setState(() {
-          _isLoading = false;
-        });
+        if (mounted) {
+          showSnackBar(context, 'Sign-up failed: $e', AppColors.primary);
+          setState(() {
+            _isLoading = false;
+          });
+        }
       }
     }
   }

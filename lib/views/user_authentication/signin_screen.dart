@@ -35,22 +35,45 @@ class _SignInScreenState extends State<SignInScreen> {
           password: _passwordController.text.trim(),
         );
 
-        showSnackBar(context, 'Sign-in successful!', AppColors.primary);
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => HomeScreen()),
-        );
-
+        if (mounted) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => HomeScreen()),
+          );
+        }
       } on FirebaseAuthException catch (e) {
-        showSnackBar(context, e.message ?? 'Sign-in failed', AppColors.primary);
-        setState(() {
-          isloading = false;
-        });
+        String message;
+        switch (e.code) {
+          case 'user-not-found':
+          case 'wrong-password':
+          case 'invalid-credential':
+            message = 'Invalid email or password.';
+            break;
+          case 'user-disabled':
+            message = 'This user account has been disabled.';
+            break;
+          case 'too-many-requests':
+            message = 'Too many failed sign-in attempts. Please try again later.';
+            break;
+          case 'network-request-failed':
+            message = 'Connection failed. Please check your internet connection.';
+            break;
+          default:
+            message = e.message ?? 'Sign-in failed.';
+        }
+        if (mounted) {
+          showSnackBar(context, message, AppColors.primary);
+          setState(() {
+            isloading = false;
+          });
+        }
       } catch (e) {
-        showSnackBar(context, 'Sign-in failed: $e', AppColors.primary);
-        setState(() {
-          isloading = false;
-        });
+        if (mounted) {
+          showSnackBar(context, 'Sign-in failed: $e', AppColors.primary);
+          setState(() {
+            isloading = false;
+          });
+        }
       }
     }
   }
@@ -62,9 +85,11 @@ class _SignInScreenState extends State<SignInScreen> {
     try {
       final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
       if (googleUser == null) {
-        setState(() {
-          isloading = false;
-        });
+        if (mounted) {
+          setState(() {
+            isloading = false;
+          });
+        }
         return; // User cancelled
       }
 
@@ -92,13 +117,16 @@ class _SignInScreenState extends State<SignInScreen> {
         }
       }
 
-      showSnackBar(context, 'Sign-in successful!', AppColors.primary);
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => HomeScreen()),
-      );
+      if (mounted) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => HomeScreen()),
+        );
+      }
     } catch (e) {
-      showSnackBar(context, 'Google Sign-In failed: $e', AppColors.primary);
+      if (mounted) {
+        showSnackBar(context, 'Google Sign-In failed: $e', AppColors.primary);
+      }
     } finally {
       if (mounted) {
         setState(() {

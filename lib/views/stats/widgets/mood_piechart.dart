@@ -57,7 +57,8 @@ class _MoodPieChartState extends State<MoodPieChart> {
     };
 
     for (var entry in querySnapshot.docs) {
-      final mood = entry['mood'] as String?;
+      final data = entry.data() as Map<String, dynamic>?;
+      final mood = data?['mood'] as String?;
       if (mood != null && moodCounts.containsKey(mood)) {
         moodCounts[mood] = moodCounts[mood]! + 1;
       }
@@ -173,6 +174,21 @@ class _MoodPieChartState extends State<MoodPieChart> {
         FutureBuilder<Map<String, double>>(
           future: _fetchMoodData(selectedView),
           builder: (context, snapshot) {
+            if (snapshot.hasError) {
+              return Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Center(
+                  child: Text(
+                    "Error loading chart: ${snapshot.error}",
+                    textAlign: TextAlign.center,
+                    style: AppTextStyles.body.copyWith(color: AppColors.error),
+                  ),
+                ),
+              );
+            }
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(child: CircularProgressIndicator());
+            }
             if (!snapshot.hasData) {
               return Center(child: CircularProgressIndicator());
             }

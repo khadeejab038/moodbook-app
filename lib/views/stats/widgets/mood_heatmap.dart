@@ -62,8 +62,22 @@ class _MoodHeatmapState extends State<MoodHeatmap> {
           .orderBy('timestamp', descending: false)
           .snapshots(),
       builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Text(
+                'Failed to load heatmap: ${snapshot.error}',
+                style: AppTextStyles.body.copyWith(color: textColor),
+              ),
+            ),
+          );
+        }
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
         if (!snapshot.hasData) {
-          return Center(child: CircularProgressIndicator());
+          return const Center(child: CircularProgressIndicator());
         }
 
         // Prepare data
@@ -71,9 +85,17 @@ class _MoodHeatmapState extends State<MoodHeatmap> {
         Map<String, List<String>> moodData = {};
 
         for (var entry in moodEntries) {
-          final timestamp = (entry['timestamp'] as Timestamp).toDate();
-          final date = DateFormat('yyyy-MM-dd').format(timestamp);
-          final mood = entry['mood'] as String;
+          final data = entry.data() as Map<String, dynamic>?;
+          if (data == null) continue;
+
+          final rawTimestamp = data['timestamp'];
+          DateTime parsedTime = DateTime.now();
+          if (rawTimestamp is Timestamp) {
+            parsedTime = rawTimestamp.toDate();
+          }
+
+          final date = DateFormat('yyyy-MM-dd').format(parsedTime);
+          final mood = data['mood'] as String? ?? 'Neutral';
           moodData.putIfAbsent(date, () => []).add(mood);
         }
 

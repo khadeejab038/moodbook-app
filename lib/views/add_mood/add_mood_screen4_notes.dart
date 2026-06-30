@@ -162,11 +162,15 @@ class _AddNotesState extends State<AddNotes> {
 
                     try {
                       await MoodEntryDatabase.saveMoodEntryToFirebase(moodEntry);
-                      moodProvider.clear();
-                      showPopupDialog(moodEntry.getMood);
+                      if (context.mounted) {
+                        moodProvider.clear();
+                        showPopupDialog(moodEntry.getMood);
+                      }
                     } catch (e) {
                       print('Error: $e');
-                      showSnackBar(context, 'Error saving mood entry');
+                      if (context.mounted) {
+                        showSnackBar(context, 'Error saving mood entry');
+                      }
                     }
                   },
                   child: Text(

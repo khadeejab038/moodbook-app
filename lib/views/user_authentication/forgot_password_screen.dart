@@ -149,6 +149,7 @@ import 'package:flutter/material.dart';
 import '../widgets/snack_bar_helper.dart';
 import '../widgets/responsive_extension.dart';
 import '../../theme/app_colors.dart';
+import '../../utils/error_parser.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   @override
@@ -165,9 +166,13 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         await FirebaseAuth.instance.sendPasswordResetEmail(
           email: _emailController.text.trim(),
         );
-        showSnackBar(context, 'Password reset email sent!', Color(0xFF8B4CFC));
-      } on FirebaseAuthException catch (e) {
-        showSnackBar(context, e.message ?? 'Failed to send email', Color(0xFF8B4CFC));
+        if (mounted) {
+          showSnackBar(context, 'Password reset email sent!', Color(0xFF8B4CFC));
+        }
+      } catch (e) {
+        if (mounted) {
+          showSnackBar(context, ErrorParser.getFriendlyMessage(e), Color(0xFF8B4CFC));
+        }
       }
     }
   }

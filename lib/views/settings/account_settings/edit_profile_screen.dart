@@ -6,6 +6,7 @@ import '../../../views/widgets/responsive_extension.dart';
 import '../../../views/widgets/snack_bar_helper.dart';
 import '../../../theme/app_colors.dart';
 import '../../../theme/app_text_styles.dart';
+import '../../../../utils/error_parser.dart';
 
 class EditProfile extends StatefulWidget {
   const EditProfile({super.key});
@@ -30,7 +31,7 @@ class _EditProfileState extends State<EditProfile> {
   Future<void> _fetchUserData() async {
     try {
       model.User? currentUser = await UserDatabase.fetchCurrentUser();
-      if (currentUser != null) {
+      if (currentUser != null && mounted) {
         setState(() {
           name = currentUser.name;
           email = currentUser.email;
@@ -39,10 +40,12 @@ class _EditProfileState extends State<EditProfile> {
         });
       }
     } catch (e) {
-      showSnackBar(context, 'Failed to fetch user data: $e');
-      setState(() {
-        isLoading = false;
-      });
+      if (mounted) {
+        showSnackBar(context, ErrorParser.getFriendlyMessage(e));
+        setState(() {
+          isLoading = false;
+        });
+      }
     }
   }
 
@@ -73,7 +76,7 @@ class _EditProfileState extends State<EditProfile> {
             TextButton(
               child: Text('Cancel', style: AppTextStyles.link.copyWith(color: AppColors.primary)),
               onPressed: () {
-                Navigator.of(context).pop();
+                Navigator.of(context).pop(null); // return null explicitly
               },
             ),
             TextButton(
@@ -97,16 +100,19 @@ class _EditProfileState extends State<EditProfile> {
         if (firebaseUser != null && email != currentEmail) {
           String? userPassword = await _promptForPassword();
 
-          if (userPassword != null && userPassword.isNotEmpty) {
-            final auth.AuthCredential credential = auth.EmailAuthProvider.credential(
-              email: currentEmail,
-              password: userPassword,
-            );
-            await firebaseUser.reauthenticateWithCredential(credential);
-            await firebaseUser.updateEmail(email);
-          } else {
-            throw Exception("Password not provided.");
+          if (userPassword == null || userPassword.isEmpty) {
+            if (mounted) {
+              showSnackBar(context, 'Password is required to change your email.');
+            }
+            return;
           }
+
+          final auth.AuthCredential credential = auth.EmailAuthProvider.credential(
+            email: currentEmail,
+            password: userPassword,
+          );
+          await firebaseUser.reauthenticateWithCredential(credential);
+          await firebaseUser.updateEmail(email);
         }
 
         model.User? currentUser = await UserDatabase.fetchCurrentUser();
@@ -115,17 +121,15 @@ class _EditProfileState extends State<EditProfile> {
           currentUser.email = email;
           await UserDatabase.updateUserInFirestore(currentUser.userID, currentUser);
 
-          showSnackBar(context, 'Profile updated successfully!');
-          Navigator.pop(context);
-        }
-      } on auth.FirebaseAuthException catch (e) {
-        if (e.code == 'requires-recent-login') {
-          showSnackBar(context, 'Please log in again to update your email.');
-        } else {
-          showSnackBar(context, 'Failed to update email: ${e.message}');
+          if (mounted) {
+            showSnackBar(context, 'Profile updated successfully!');
+            Navigator.pop(context);
+          }
         }
       } catch (e) {
-        showSnackBar(context, 'Failed to update profile: $e');
+        if (mounted) {
+          showSnackBar(context, ErrorParser.getFriendlyMessage(e));
+        }
       }
     }
   }

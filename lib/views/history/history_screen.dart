@@ -10,6 +10,7 @@ import '../widgets/responsive_extension.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_text_styles.dart';
 import '../widgets/snack_bar_helper.dart';
+import '../../utils/error_parser.dart';
 
 class HistoryPage extends StatefulWidget {
   @override
@@ -200,11 +201,14 @@ class _HistoryPageState extends State<HistoryPage> {
                   var moodEntries = snapshot.data!.docs;
 
                   final filteredEntries = moodEntries.where((entry) {
+                    final data = entry.data() as Map<String, dynamic>?;
+                    if (data == null) return false;
                     if (_searchQuery.isEmpty) return true;
+                    
                     final query = _searchQuery.toLowerCase();
-                    final emotions = List<String>.from(entry['emotions'] ?? []);
-                    final reasons = List<String>.from(entry['reasons'] ?? []);
-                    final note = (entry['notes'] as String? ?? '').toLowerCase();
+                    final emotions = List<String>.from(data['emotions'] ?? []);
+                    final reasons = List<String>.from(data['reasons'] ?? []);
+                    final note = (data['notes'] as String? ?? '').toLowerCase();
 
                     final matchesEmotions = emotions.any((e) => e.toLowerCase().contains(query));
                     final matchesReasons = reasons.any((r) => r.toLowerCase().contains(query));
@@ -227,15 +231,39 @@ class _HistoryPageState extends State<HistoryPage> {
 
                   // Sort the filtered entries
                   if (_sortingOption == 'newest') {
-                    filteredEntries.sort((a, b) => (b['timestamp'] as Timestamp)
-                        .compareTo(a['timestamp'] as Timestamp));
+                    filteredEntries.sort((a, b) {
+                      final aData = a.data() as Map<String, dynamic>?;
+                      final bData = b.data() as Map<String, dynamic>?;
+                      final aTime = aData?['timestamp'] as Timestamp?;
+                      final bTime = bData?['timestamp'] as Timestamp?;
+                      if (aTime == null || bTime == null) return 0;
+                      return bTime.compareTo(aTime);
+                    });
                   } else if (_sortingOption == 'oldest') {
-                    filteredEntries.sort((a, b) => (a['timestamp'] as Timestamp)
-                        .compareTo(b['timestamp'] as Timestamp));
+                    filteredEntries.sort((a, b) {
+                      final aData = a.data() as Map<String, dynamic>?;
+                      final bData = b.data() as Map<String, dynamic>?;
+                      final aTime = aData?['timestamp'] as Timestamp?;
+                      final bTime = bData?['timestamp'] as Timestamp?;
+                      if (aTime == null || bTime == null) return 0;
+                      return aTime.compareTo(bTime);
+                    });
                   } else if (_sortingOption == 'best') {
-                    filteredEntries.sort((a, b) => moodToValue(b['mood']).compareTo(moodToValue(a['mood'])));
+                    filteredEntries.sort((a, b) {
+                      final aData = a.data() as Map<String, dynamic>?;
+                      final bData = b.data() as Map<String, dynamic>?;
+                      final aMood = aData?['mood'] as String? ?? 'Neutral';
+                      final bMood = bData?['mood'] as String? ?? 'Neutral';
+                      return moodToValue(bMood).compareTo(moodToValue(aMood));
+                    });
                   } else if (_sortingOption == 'worst') {
-                    filteredEntries.sort((a, b) => moodToValue(a['mood']).compareTo(moodToValue(b['mood'])));
+                    filteredEntries.sort((a, b) {
+                      final aData = a.data() as Map<String, dynamic>?;
+                      final bData = b.data() as Map<String, dynamic>?;
+                      final aMood = aData?['mood'] as String? ?? 'Neutral';
+                      final bMood = bData?['mood'] as String? ?? 'Neutral';
+                      return moodToValue(aMood).compareTo(moodToValue(bMood));
+                    });
                   }
 
                   return ListView.builder(
@@ -243,25 +271,35 @@ class _HistoryPageState extends State<HistoryPage> {
                     itemCount: filteredEntries.length,
                     itemBuilder: (context, index) {
                       final entry = filteredEntries[index];
+                      final data = entry.data() as Map<String, dynamic>?;
+                      final moodStr = data?['mood'] as String? ?? 'Neutral';
+                      final rawTimestamp = data?['timestamp'];
+                      DateTime parsedTime = DateTime.now();
+                      if (rawTimestamp is Timestamp) {
+                        parsedTime = rawTimestamp.toDate();
+                      }
 
                       // Find the matching mood or default to Neutral
                       final emojiItem = moods.firstWhere(
-                            (moodItem) => moodItem.title.toLowerCase() == (entry['mood']?.toLowerCase() ?? 'neutral'),
+                            (moodItem) => moodItem.title.toLowerCase() == moodStr.toLowerCase(),
                         orElse: () => EmojiItem(imagePath: 'assets/neutral-face.png', title: 'Neutral'),
                       );
 
+                      final emotionsList = data?['emotions'] as List<dynamic>?;
+                      final reasonsList = data?['reasons'] as List<dynamic>?;
+
                       return HistoryTile(
-                        mood: entry['mood'] ?? 'No mood',
+                        mood: moodStr,
                         emoji: Image.asset(
                           emojiItem.imagePath,
                           width: context.w(8),
                           height: context.w(8),
                           fit: BoxFit.contain,
                         ),
-                        timestamp: DateFormat('dd/MM/yyyy hh:mm a').format((entry['timestamp'] as Timestamp).toDate()),
-                        feelings: entry['emotions']?.join(', ') ?? 'No emotions',
-                        reason: entry['reasons']?.join(', ') ?? 'No reason',
-                        note: entry['notes'] ?? 'No note',
+                        timestamp: DateFormat('dd/MM/yyyy hh:mm a').format(parsedTime),
+                        feelings: emotionsList?.join(', ') ?? 'No emotions',
+                        reason: reasonsList?.join(', ') ?? 'No reason',
+                        note: data?['notes'] as String? ?? 'No note',
                         entryId: entry.id,
                       );
                     },
@@ -307,7 +345,9 @@ class _HistoryTileState extends State<HistoryTile> {
     try {
       await FirebaseFirestore.instance.collection('mood_entries').doc(widget.entryId).delete();
     } catch (e) {
-      showSnackBar(context, 'Error deleting entry: $e');
+      if (mounted) {
+        showSnackBar(context, ErrorParser.getFriendlyMessage(e));
+      }
     }
   }
 
@@ -318,18 +358,22 @@ class _HistoryTileState extends State<HistoryTile> {
           .doc(widget.entryId)
           .get();
 
-      if (document.exists) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => EditMoodScreen(moodEntryDoc: document),
-          ),
-        );
-      } else {
-        showSnackBar(context, 'Mood entry not found');
+      if (mounted) {
+        if (document.exists) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => EditMoodScreen(moodEntryDoc: document),
+            ),
+          );
+        } else {
+          showSnackBar(context, 'Mood entry not found');
+        }
       }
     } catch (e) {
-      showSnackBar(context, 'Error fetching entry: $e');
+      if (mounted) {
+        showSnackBar(context, ErrorParser.getFriendlyMessage(e));
+      }
     }
   }
 
