@@ -19,87 +19,85 @@ class StatsPage extends StatelessWidget {
         decoration: BoxDecoration(
           gradient: isDark ? AppColors.pageGradientDark : AppColors.pageGradientLight,
         ),
-        child: SafeArea(
-          child: Column(
-            children: [
-              Padding(
-                padding: EdgeInsets.fromLTRB(context.w(4), context.h(7.5), context.w(4), context.h(1)),
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    'Stats',
-                    style: AppTextStyles.pageTitle.copyWith(
-                      color: textColor,
-                      fontSize: context.w(5),
-                    ),
+        child: Column(
+          children: [
+            Padding(
+              padding: EdgeInsets.fromLTRB(context.w(4), context.h(10), context.w(4), context.h(1)),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Stats',
+                  style: AppTextStyles.pageTitle.copyWith(
+                    color: textColor,
+                    fontSize: context.w(5),
                   ),
                 ),
               ),
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: context.w(4)),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SizedBox(height: context.h(2.5)),
-                        Text(
-                          'Mood Calendar',
-                          style: AppTextStyles.heading2.copyWith(
-                            fontSize: context.w(4.5),
-                            color: textColor,
-                          ),
+            ),
+            Expanded(
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: context.w(4)),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(height: context.h(2.5)),
+                      Text(
+                        'Mood Calendar',
+                        style: AppTextStyles.heading2.copyWith(
+                          fontSize: context.w(4.5),
+                          color: textColor,
                         ),
-                        SizedBox(height: context.h(2)),
-                        Container(
-                          decoration: BoxDecoration(
-                            color: cardBg,
-                            borderRadius: BorderRadius.circular(context.w(3)),
-                          ),
-                          padding: EdgeInsets.all(context.w(4)),
-                          child: MoodHeatmap(),
+                      ),
+                      SizedBox(height: context.h(2)),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: cardBg,
+                          borderRadius: BorderRadius.circular(context.w(3)),
                         ),
-                        SizedBox(height: context.h(2.5)),
-                        Text(
-                          'Mood Distribution',
-                          style: AppTextStyles.heading2.copyWith(
-                            fontSize: context.w(4.5),
-                            color: textColor,
-                          ),
+                        padding: EdgeInsets.all(context.w(4)),
+                        child: MoodHeatmap(),
+                      ),
+                      SizedBox(height: context.h(2.5)),
+                      Text(
+                        'Mood Distribution',
+                        style: AppTextStyles.heading2.copyWith(
+                          fontSize: context.w(4.5),
+                          color: textColor,
                         ),
-                        SizedBox(height: context.h(2)),
-                        Container(
-                          decoration: BoxDecoration(
-                            color: cardBg,
-                            borderRadius: BorderRadius.circular(context.w(3)),
-                          ),
-                          padding: EdgeInsets.all(context.w(4)),
-                          child: MoodPieChart(),
+                      ),
+                      SizedBox(height: context.h(2)),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: cardBg,
+                          borderRadius: BorderRadius.circular(context.w(3)),
                         ),
-                        SizedBox(height: context.h(2.5)),
-                        Text(
-                          'Emotion Triggers',
-                          style: AppTextStyles.heading2.copyWith(
-                            fontSize: context.w(4.5),
-                            color: textColor,
-                          ),
+                        padding: EdgeInsets.all(context.w(4)),
+                        child: MoodPieChart(),
+                      ),
+                      SizedBox(height: context.h(2.5)),
+                      Text(
+                        'Emotion Triggers',
+                        style: AppTextStyles.heading2.copyWith(
+                          fontSize: context.w(4.5),
+                          color: textColor,
                         ),
-                        SizedBox(height: context.h(2)),
-                        Container(
-                          decoration: BoxDecoration(
-                            color: cardBg,
-                            borderRadius: BorderRadius.circular(context.w(3)),
-                          ),
-                          padding: EdgeInsets.all(context.w(4)),
-                          child: EmotionTriggersInsight(),
+                      ),
+                      SizedBox(height: context.h(2)),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: cardBg,
+                          borderRadius: BorderRadius.circular(context.w(3)),
                         ),
-                      ],
-                    ),
+                        padding: EdgeInsets.all(context.w(4)),
+                        child: EmotionTriggersInsight(),
+                      ),
+                    ],
                   ),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
       bottomNavigationBar: BottomNavBar(currentIndex: 1),

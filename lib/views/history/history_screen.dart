@@ -76,7 +76,7 @@ class _HistoryPageState extends State<HistoryPage> {
           children: [
             // History text and filter button
             Padding(
-              padding: EdgeInsets.fromLTRB(context.w(4), context.h(7.5), context.w(4), context.h(1)),
+              padding: EdgeInsets.fromLTRB(context.w(4), context.h(9.5), context.w(4), context.h(1)),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [

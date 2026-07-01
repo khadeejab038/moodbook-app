@@ -38,7 +38,7 @@ class SettingsPage extends StatelessWidget {
         child: Column(
           children: [
             Padding(
-              padding: EdgeInsets.fromLTRB(context.w(4), context.h(8.75), context.w(4), context.w(4)),
+              padding: EdgeInsets.fromLTRB(context.w(4), context.h(9.5), context.w(4), context.w(4)),
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
