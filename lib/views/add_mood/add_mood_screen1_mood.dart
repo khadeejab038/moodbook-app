@@ -120,7 +120,7 @@ class _AddMoodState extends State<AddMood> {
                       ),
                       SizedBox(height: context.h(1.5)),
                       Text(
-                        "Select mood that reflects the most how you are feeling at this moment.",
+                        "Select the mood that reflects the most how you are feeling at this moment.",
                         textAlign: TextAlign.center,
                         style: AppTextStyles.subtitle.copyWith(color: subtitleColor, fontSize: context.w(3.75)),
                       ),

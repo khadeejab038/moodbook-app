@@ -80,7 +80,7 @@ class _AddReasonsState extends State<AddReasons> {
                       ),
                       SizedBox(height: context.h(1.5)),
                       Text(
-                        "Select reasons that reflected your emotions",
+                        "Select the reasons that reflected your emotions",
                         textAlign: TextAlign.center,
                         style: AppTextStyles.subtitle.copyWith(color: subtitleColor, fontSize: context.w(3.75)),
                       ),
