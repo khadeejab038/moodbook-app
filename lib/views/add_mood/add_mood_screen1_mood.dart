@@ -124,7 +124,7 @@ class _AddMoodState extends State<AddMood> {
                         textAlign: TextAlign.center,
                         style: AppTextStyles.subtitle.copyWith(color: subtitleColor, fontSize: context.w(3.75)),
                       ),
-                      SizedBox(height: context.h(4)),
+                      SizedBox(height: context.h(14.5)),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: List.generate(moods.length, (index) {
