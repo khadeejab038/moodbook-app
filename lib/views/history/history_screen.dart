@@ -341,13 +341,41 @@ class HistoryTile extends StatefulWidget {
 class _HistoryTileState extends State<HistoryTile> {
   bool _isNoteExpanded = false;
 
-  void _deleteEntry() async {
+  Future<void> _deleteEntry() async {
     try {
       await FirebaseFirestore.instance.collection('mood_entries').doc(widget.entryId).delete();
     } catch (e) {
       if (mounted) {
         showSnackBar(context, ErrorParser.getFriendlyMessage(e));
       }
+    }
+  }
+
+  Future<void> _confirmDelete(BuildContext context) async {
+    final bool? confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) {
+        final bool isDark = Theme.of(context).brightness == Brightness.dark;
+        final Color textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
+        return AlertDialog(
+          backgroundColor: isDark ? AppColors.cardStatsDark : AppColors.cardStatsLight,
+          title: Text('Delete Mood Entry', style: AppTextStyles.heading2.copyWith(color: textColor)),
+          content: Text('Are you sure you want to delete mood entry?', style: AppTextStyles.body.copyWith(color: textColor)),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(false),
+              child: Text('Cancel', style: AppTextStyles.link.copyWith(color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight)),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(true),
+              child: Text('OK', style: AppTextStyles.link.copyWith(color: AppColors.error)),
+            ),
+          ],
+        );
+      },
+    );
+    if (confirmed == true) {
+      await _deleteEntry();
     }
   }
 
@@ -434,9 +462,9 @@ class _HistoryTileState extends State<HistoryTile> {
               Row(
                 children: [
                   IconButton(
-                      icon: Icon(Icons.delete, color: AppColors.error, size: context.w(5)),
-                      onPressed: _deleteEntry,
-                    ),
+                       icon: Icon(Icons.delete, color: AppColors.error, size: context.w(5)),
+                       onPressed: () => _confirmDelete(context),
+                     ),
                   Container(
                     width: context.w(0.25),
                     height: context.h(3),
