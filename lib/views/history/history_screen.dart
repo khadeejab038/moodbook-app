@@ -433,25 +433,19 @@ class _HistoryTileState extends State<HistoryTile> {
               Spacer(),
               Row(
                 children: [
-                  TextButton(
-                    onPressed: _deleteEntry,
-                    child: Text(
-                      'Delete',
-                      style: AppTextStyles.link.copyWith(color: AppColors.error, fontSize: context.w(3.5)),
+                  IconButton(
+                      icon: Icon(Icons.delete, color: AppColors.error, size: context.w(5)),
+                      onPressed: _deleteEntry,
                     ),
-                  ),
                   Container(
                     width: context.w(0.25),
                     height: context.h(3),
                     color: isDark ? Colors.grey.shade800 : Colors.grey.withOpacity(0.5),
                   ),
-                  TextButton(
-                    onPressed: _editEntry,
-                    child: Text(
-                      'Edit',
-                      style: AppTextStyles.link.copyWith(color: AppColors.primary, fontSize: context.w(3.5)),
+                  IconButton(
+                      icon: Icon(Icons.edit, color: AppColors.primary, size: context.w(5)),
+                      onPressed: _editEntry,
                     ),
-                  ),
                 ],
               ),
             ],
