@@ -151,7 +151,7 @@ class _AddReasonsState extends State<AddReasons> {
                       // Recently used
                       Align(
                         alignment: Alignment.centerLeft,
-                        child: Text("Recently used",
+                        child: Text("Recently used:",
                             style: AppTextStyles.heading2.copyWith(color: textColor, fontSize: context.w(4.5))),
                       ),
                       SizedBox(height: context.h(1.5)),
@@ -170,7 +170,7 @@ class _AddReasonsState extends State<AddReasons> {
                       // All reasons
                       Align(
                         alignment: Alignment.centerLeft,
-                        child: Text("All reasons",
+                        child: Text("All reasons:",
                             style: AppTextStyles.heading2.copyWith(color: textColor, fontSize: context.w(4.5))),
                       ),
                       SizedBox(height: context.h(1.5)),
