@@ -15,6 +15,11 @@ class MoodEntryController extends ChangeNotifier {
   List<String> _recentlyUsedEmotions = [];
   List<String> _recentlyUsedReasons = [];
 
+  // Tracks the last time a mood entry was successfully saved;
+  // stats widgets listen to this to know when to re-fetch.
+  DateTime? _lastSavedAt;
+  DateTime? get lastSavedAt => _lastSavedAt;
+
   MoodEntryController();
 
   // Getter for mood entry
@@ -129,6 +134,14 @@ class MoodEntryController extends ChangeNotifier {
       reasons: [],
       notes: null,
     );
+    notifyListeners();
+  }
+
+  /// Call this immediately after a mood entry is successfully saved to Firestore.
+  /// Stats widgets (MoodPieChart, EmotionTriggersInsight) listen to this
+  /// signal and will automatically re-fetch their data.
+  void notifyEntrySaved() {
+    _lastSavedAt = DateTime.now();
     notifyListeners();
   }
 
